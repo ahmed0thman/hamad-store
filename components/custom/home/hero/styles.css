@@ -1,0 +1,14 @@
+.heroCarousel {
+  .swiper-pagination {
+    bottom: 6rem;
+    inset-inline-start: 25%;
+    .swiper-pagination-bullet {
+      background: var(--color-stone-700);
+    }
+    .swiper-pagination-bullet-active {
+      background: var(--color-teal-700);
+      width: 1rem;
+      border-radius: 4px;
+    }
+  }
+}
