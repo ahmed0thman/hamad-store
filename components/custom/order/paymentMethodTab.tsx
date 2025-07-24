@@ -2,51 +2,82 @@
 
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { ArrowLeft, Upload } from "lucide-react";
-import { Info } from "lucide-react";
-import Link from "next/link";
-import { useState } from "react";
-import Image from "next/image";
-import ButtonStepNav from "./buttonStepNav";
+import {
+  ArrowLeft,
+  Banknote,
+  CheckCircle,
+  CreditCard,
+  DollarSign,
+  Info,
+  Landmark,
+  Upload,
+  WalletCards,
+} from "lucide-react";
+
 import {
   Dialog,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
-import { useForm } from "react-hook-form";
-import { SubmitHandler } from "react-hook-form";
+import Image from "next/image";
+import Link from "next/link";
+import { useState } from "react";
+import { SubmitHandler, useForm } from "react-hook-form";
+import ButtonStepNav from "./buttonStepNav";
+
+import { cardSchema } from "@/lib/validators";
+import { CardFormData } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-
-const cardSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  number: z
-    .string()
-    .regex(/^\d{4} \d{4} \d{4} \d{4}$/, "Card number must be 16 digits"),
-  expiry: z
-    .string()
-    .regex(/^(0[1-9]|1[0-2])\/\d{2}$/, "Expiry must be in MM/YY format"),
-  cvv: z.string().regex(/^\d{3,4}$/, "Invalid CVV"),
-  setDefault: z.boolean().optional(),
-});
-
-type CardFormData = z.infer<typeof cardSchema>;
+import AddNewCardDialog from "./addNewCardDialog";
 
 export default function PaymentMethodTab({ onBack }: { onBack: () => void }) {
   const [selectedPayment, setSelectedPayment] = useState("Card");
   const [selectedCard, setSelectedCard] = useState("Visa");
   const [showNewCardDialog, setShowNewCardDialog] = useState(false);
   const [zainPayImage, setZainPayImage] = useState<string | null>(null);
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
 
   const paymentMethods = ["Card", "Zain Pay", "Cash on Delivery", "Pay Later"];
   const savedCards = [
-    { name: "Visa", info: "Ending in 4242", logo: "/visa.svg" },
-    { name: "Mastercard", info: "Ending in 1234", logo: "/mastercard.svg" },
+    {
+      name: "Visa",
+      info: "Ending in 4242",
+      icon: <CreditCard className="h-6 w-10 text-blue-600" />,
+      expired: false,
+    },
+    {
+      name: "Mastercard",
+      info: "Ending in 1234",
+      icon: <Landmark className="h-6 w-10 text-orange-500" />,
+      expired: false,
+    },
+    {
+      name: "American Express",
+      info: "Ending in 5678",
+      icon: <Banknote className="h-6 w-10 text-green-600" />,
+      expired: true,
+    },
+    {
+      name: "Discover",
+      info: "Ending in 8765",
+      icon: <WalletCards className="h-6 w-10 text-purple-600" />,
+      expired: false,
+    },
+    {
+      name: "JCB",
+      info: "Ending in 1122",
+      icon: <WalletCards className="h-6 w-10 text-pink-500" />,
+      expired: false,
+    },
+    {
+      name: "Diners Club",
+      info: "Ending in 3344",
+      icon: <DollarSign className="h-6 w-10 text-yellow-500" />,
+      expired: false,
+    },
   ];
 
   const {
@@ -84,120 +115,53 @@ export default function PaymentMethodTab({ onBack }: { onBack: () => void }) {
       {selectedPayment === "Card" && (
         <div className="space-y-3">
           <h4 className="text-base font-semibold pt-2">Saved Cards</h4>
-          {savedCards.map((card) => (
-            <label
-              key={card.name}
-              className="flex items-center justify-between border border-border p-4 rounded-xl"
-            >
-              <div className="flex items-center gap-4">
-                <img
-                  src={card.logo}
-                  alt="card"
-                  className="h-6 w-10 object-contain"
-                />
-                <div>
-                  <p className="text-base font-medium text-foreground">
-                    {card.name}
-                  </p>
-                  <p className="text-sm text-muted-foreground">{card.info}</p>
-                </div>
-              </div>
-              <input
-                type="checkbox"
-                checked={selectedCard === card.name}
-                onChange={() => setSelectedCard(card.name)}
-              />
-            </label>
-          ))}
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button variant="secondary" className="block mx-auto">
-                Add New Card
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Add New Card</DialogTitle>
-              </DialogHeader>
-              <form
-                onSubmit={handleSubmit(onSubmit)}
-                className="space-y-4 py-2"
-              >
-                <Input placeholder="Cardholder Name" {...register("name")} />
-                {errors.name && (
-                  <p className="text-sm text-red-500">{errors.name.message}</p>
-                )}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {savedCards.map((card) => {
+              const isSelected = selectedCard === card.name;
+              const isExpired = card.expired;
+              return (
+                <button
+                  key={card.name}
+                  type="button"
+                  onClick={() => !isExpired && setSelectedCard(card.name)}
+                  className={`flex items-center w-full gap-4 border p-4 rounded-xl transition-all duration-150 focus:outline-none relative
+                    ${
+                      isSelected && !isExpired
+                        ? "border-primary bg-primary/10 shadow-lg ring-2 ring-primary"
+                        : "border-border bg-background"
+                    }
+                    ${isExpired ? "opacity-60 cursor-not-allowed" : ""}`}
+                  aria-pressed={isSelected && !isExpired}
+                  disabled={isExpired}
+                >
+                  {card.icon}
+                  {isExpired && (
+                    <span className=" bg-red-100 text-red-700 px-2 py-0.5 rounded-full text-xs font-semibold border border-red-300 dark:bg-red-900 dark:text-red-100 dark:border-red-400">
+                      Expired
+                    </span>
+                  )}
+                  <div className="flex flex-col flex-1 text-left">
+                    <p className="text-base font-medium text-foreground">
+                      {card.name}
+                    </p>
+                    <p className="text-sm text-muted-foreground">{card.info}</p>
+                  </div>
 
-                <Input
-                  placeholder="Card Number"
-                  {...register("number")}
-                  inputMode="numeric"
-                  maxLength={19}
-                  onChange={(e) => {
-                    let value = e.target.value.replace(/\D/g, "");
-                    value = value.match(/.{1,4}/g)?.join(" ") || "";
-                    e.target.value = value;
-                  }}
-                />
-                {errors.number && (
-                  <p className="text-sm text-red-500">
-                    {errors.number.message}
-                  </p>
-                )}
-
-                <div className="flex gap-4">
-                  <Input
-                    placeholder="Expiry Date (MM/YY)"
-                    {...register("expiry")}
-                    maxLength={5}
-                    inputMode="numeric"
-                    onChange={(e) => {
-                      let value = e.target.value.replace(/\D/g, "");
-                      if (value.length > 4) value = value.slice(0, 4);
-                      let month = value.slice(0, 2);
-                      const year = value.slice(2);
-                      if (month.length === 2) {
-                        const monthNum = parseInt(month, 10);
-                        if (monthNum < 1 || monthNum > 12) month = "12";
-                      }
-                      e.target.value =
-                        value.length > 2 ? month + "/" + year : month;
-                    }}
-                  />
-                  <Input
-                    placeholder="CVV"
-                    {...register("cvv")}
-                    maxLength={4}
-                    inputMode="numeric"
-                    onChange={(e) => {
-                      e.target.value = e.target.value
-                        .replace(/\D/g, "")
-                        .slice(0, 4);
-                    }}
-                  />
-                </div>
-                {errors.expiry && (
-                  <p className="text-sm text-red-500">
-                    {errors.expiry.message}
-                  </p>
-                )}
-                {errors.cvv && (
-                  <p className="text-sm text-red-500">{errors.cvv.message}</p>
-                )}
-
-                <div className="flex items-center gap-2">
-                  <Checkbox id="setDefault" {...register("setDefault")} />
-                  <label htmlFor="setDefault" className="text-sm">
-                    Set as default
-                  </label>
-                </div>
-
-                <DialogFooter>
-                  <Button type="submit">Save</Button>
-                </DialogFooter>
-              </form>
-            </DialogContent>
-          </Dialog>
+                  {isSelected && !isExpired && (
+                    <CheckCircle className="w-6 h-6 text-primary" />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+          <AddNewCardDialog
+            open={showNewCardDialog}
+            onOpenChange={setShowNewCardDialog}
+            onSubmit={onSubmit}
+            register={register}
+            errors={errors}
+            handleSubmit={handleSubmit}
+          />
         </div>
       )}
 
@@ -302,15 +266,80 @@ export default function PaymentMethodTab({ onBack }: { onBack: () => void }) {
           </span>
         </div>
       )}
+      {/* Order Summary Card */}
+      <div className="max-w-xl mx-auto mt-8 mb-6">
+        <div className="bg-primary/10 dark:bg-muted border border-border rounded-xl shadow-sm p-6">
+          <h4 className="text-lg font-semibold mb-4">Order Summary</h4>
+          <div className="space-y-3 divide-y divide-accent text-sm">
+            <div className="flex justify-between">
+              <span>Products Total</span>
+              <span className="font-medium">500 LE</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Coupon</span>
+              <span className="font-medium text-green-600">-50 LE</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Location</span>
+              <span className="font-medium">Cairo, Egypt</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Shipping Method</span>
+              <span className="font-medium">Express (30 LE)</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Payment Method</span>
+              <span className="font-medium">{selectedPayment}</span>
+            </div>
+            {selectedPayment === "Cash on Delivery" && (
+              <div className="flex justify-between">
+                <span>Cash Handling Fee</span>
+                <span className="font-medium">20 LE</span>
+              </div>
+            )}
+            <div className="border-t border-border my-3"></div>
+            <div className="flex justify-between text-base font-bold">
+              <span>Total</span>
+              <span>500 LE</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      {/* Action Buttons */}
       <div className="flex justify-end items-center gap-3 pt-4">
         <ButtonStepNav handleClick={onBack}>
           <ArrowLeft className="auto-dir" />
           Back
         </ButtonStepNav>
-        <Button asChild>
-          <Link href={"/account/orders"}>Place Order</Link>
-        </Button>
+        <Button onClick={() => setShowSuccessDialog(true)}>Place Order</Button>
       </div>
+
+      {/* Success Dialog */}
+      <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
+        <DialogContent className="max-w-sm mx-auto text-center">
+          <div className="flex flex-col items-center justify-center mb-2">
+            <CheckCircle className="w-12 h-12 text-green-500 mb-2" />
+          </div>
+          <DialogHeader>
+            <DialogTitle className="text-green-600 text-center">
+              Order Placed Successfully!
+            </DialogTitle>
+          </DialogHeader>
+          <div className="my-4">
+            <p className="text-base text-muted-foreground mb-2">
+              Your order has been placed. Thank you for shopping with us!
+            </p>
+          </div>
+          <DialogFooter className="flex flex-col gap-2">
+            <Button asChild variant="default" className="">
+              <Link href="/account/orders">Show Order</Link>
+            </Button>
+            <Button asChild variant="secondary" className="">
+              <Link href="/">Keep Shopping</Link>
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

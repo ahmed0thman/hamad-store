@@ -32,16 +32,23 @@ export default function ShippingMethodTab({
         {shippingMethods.map((method) => (
           <label
             key={method.name}
-            className="flex items-center gap-4 border border-gray-300 dark:border-gray-600 p-4 rounded-xl"
+            className="flex items-center justify-between border border-gray-300 dark:border-gray-600 p-4 rounded-xl"
           >
-            <RadioGroupItem value={method.name} />
-            <div className="flex flex-col">
-              <p className="font-medium text-sm text-gray-900 dark:text-gray-100">
-                {method.name}
-              </p>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                {method.price} · {method.eta}
-              </p>
+            <div className="flex items-center gap-4">
+              <RadioGroupItem value={method.name} />
+              <div className="flex flex-col">
+                <p className="font-medium text-sm text-gray-900 dark:text-gray-100">
+                  {method.name}
+                </p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  {method.price} · {method.eta}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center">
+              <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-semibold">
+                Fees: {method.price}
+              </span>
             </div>
           </label>
         ))}

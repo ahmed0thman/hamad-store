@@ -9,7 +9,7 @@ const TextExpander = () => {
   const displayedText = showMore ? fullText : fullText.slice(0, 180) + "...";
   return (
     <p
-      className="text-sm text-gray-600 dark:text-slate-400 leading-loose cursor-pointer"
+      className="text-base font-medium text-gray-600 dark:text-slate-400 leading-loose cursor-pointer"
       onClick={() => setShowMore(!showMore)}
     >
       {displayedText}

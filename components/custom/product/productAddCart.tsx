@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { formatCurrencyEGP } from "@/lib/utils";
 import { ShoppingCart } from "lucide-react";
 import React from "react";
+import AddToCart from "./addToCart";
 
 const ProductAddCart = () => {
   const stock = 3;
@@ -27,10 +28,17 @@ const ProductAddCart = () => {
         </div>
         {stock > 0 && (
           <div className="flex-center">
-            <Button variant="default" className="w-full ">
-              <ShoppingCart className="w-5 h-5" />
-              أضف إلى العربة
-            </Button>
+            <AddToCart
+              item={{
+                productId: "1",
+                name: "Product 1",
+                slug: "product-1",
+                quantity: 1,
+                image: "https://via.placeholder.com/150",
+                unitPrice: "100.00",
+                totalPrice: "100.00",
+              }}
+            />
           </div>
         )}
       </CardContent>

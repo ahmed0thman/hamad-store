@@ -26,7 +26,7 @@ const ProductSwiper = ({ headLine }: { headLine: string }) => {
                 className="flex items-center gap-1  font-sans !text-sm"
               >
                 <span>Show all</span>
-                <ArrowRight />
+                <ArrowRight className="auto-dir" />
               </Link>
             </Button>
           </div>

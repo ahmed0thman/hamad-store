@@ -12,5 +12,5 @@ export const pharmacyCategories = [
 export const headerPages = [
   { title: "Home", path: "/" },
   { title: "About", path: "/about" },
-  { title: "Contact Us", path: "/contactus" },
+  { title: "Contact Us", path: "/contact-us" },
 ];

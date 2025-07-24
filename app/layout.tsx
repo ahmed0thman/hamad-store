@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Poppins, Tajawal } from "next/font/google";
+import { Poppins, Cairo } from "next/font/google";
 import "@/assets/styles/globals.css";
 import { APP_DESCRIPTION, APP_NAME, SERVER_URL } from "@/lib/constants";
 import { ThemeProvider } from "next-themes";
@@ -10,10 +10,10 @@ const poppins = Poppins({
   weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
   variable: "--font-poppins",
 });
-const tajawal = Tajawal({
+const cairo = Cairo({
   subsets: ["latin", "arabic"],
   weight: ["200", "300", "400", "500", "700", "800", "900"],
-  variable: "--font-tajawal",
+  variable: "--font-cairo",
 });
 
 export const metadata: Metadata = {
@@ -32,9 +32,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" dir="rtl" suppressHydrationWarning>
-      <body
-        className={` ${poppins.className} ${tajawal.className} antialiased`}
-      >
+      <body className={` ${poppins.className} ${cairo.className} antialiased`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="light"

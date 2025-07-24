@@ -43,7 +43,7 @@ import { strings } from "@/localization";
 const headerPages = [
   { title: "Home", path: "/", icon: <Home /> },
   { title: "About", path: "/about", icon: <Info /> },
-  { title: "Contact Us", path: "/contactus", icon: <Mail /> },
+  { title: "Contact Us", path: "/contact-us", icon: <Mail /> },
 ];
 
 const accountPages = [

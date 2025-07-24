@@ -20,19 +20,19 @@ const userMenuItems = [
   },
   {
     title: "Notification",
-    href: "/account/profile",
+    href: "/account/notifications",
     icon: <Bell />,
   },
   {
     title: "Favorites",
-    href: "/account/profile",
+    href: "/account/favorites",
     icon: <Heart />,
   },
 ];
 
 const UserButton = async () => {
   // const session = await auth();
-  const singedIn = false;
+  const singedIn = true;
   // const singedIn = true;
   // const fisrtInitial = session.user?.name?.charAt(0).toUpperCase() ?? "U";
   // if (!session)
