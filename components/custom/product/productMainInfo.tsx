@@ -1,25 +1,11 @@
 import { Button } from "@/components/ui/button";
-import {
-  ShoppingCart,
-  Scaling,
-  Heart,
-  Share,
-  Facebook,
-  Twitter,
-  Copy,
-} from "lucide-react";
-import {
-  Popover,
-  PopoverTrigger,
-  PopoverContent,
-} from "@/components/ui/popover";
 import { formatCurrencyEGP } from "@/lib/utils";
-import ProductImages from "./productImage";
+import { Heart, Scaling } from "lucide-react";
+import ProductShare from "../buttonShare";
 import TextExpander from "../textExpander";
-import ProductShare from "./productShare";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import ProductAddCart from "./productAddCart";
+import ProductImages from "./productImage";
+import ButtonShare from "../buttonShare";
 
 const ProductMainInfo = () => {
   return (
@@ -63,7 +49,7 @@ const ProductMainInfo = () => {
               أضف للمقارنة
             </Button>
             <div className="flex justify-end gap-2 mb-2">
-              <ProductShare />
+              <ButtonShare />
               <Button
                 variant="ghost"
                 size="icon"

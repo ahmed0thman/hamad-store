@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,6 +12,7 @@ import { strings } from "@/localization";
 // import { auth } from "@/lib/auth";
 import { Bell, Heart, LogOut, User } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const userMenuItems = [
   {
@@ -25,13 +27,12 @@ const userMenuItems = [
   },
   {
     title: "Favorites",
-    href: "/account/favorites",
+    href: "/favorites",
     icon: <Heart />,
   },
 ];
 
 const UserButton = async () => {
-  // const session = await auth();
   const singedIn = true;
   // const singedIn = true;
   // const fisrtInitial = session.user?.name?.charAt(0).toUpperCase() ?? "U";
@@ -104,10 +105,7 @@ const UserButton = async () => {
               ))}
 
               <DropdownMenuItem className="p-0 mb-1">
-                <form
-                  // action={signOutUser}
-                  className="w-full"
-                >
+                <form action={"/"} className="w-full">
                   <Button
                     variant="ghost"
                     className="w-full py-4 px-2 justify-start"

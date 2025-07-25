@@ -8,7 +8,7 @@ import { Mail, Phone } from "lucide-react";
 const ContactUs = () => {
   return (
     <section className="wrapper">
-      <div className="container py-12 grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="py-12 grid grid-cols-1 md:grid-cols-3 gap-8">
         {/* Contact Info */}
         <div className="rounded-2xl bg-muted/50 p-6 space-y-8 shadow-sm">
           <div className="flex flex-col items-center text-center space-y-2">
@@ -42,7 +42,7 @@ const ContactUs = () => {
         </div>
 
         {/* Form */}
-        <div className="lg:col-span-2 rounded-2xl bg-muted/50 px-6 py-10 flex flex-col space-y-4 shadow-sm">
+        <div className="md:col-span-2 rounded-2xl bg-muted/50 px-6 py-10 flex flex-col space-y-4 shadow-sm">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <Input placeholder="اسمك *" className="bg-white dark:bg-gray-800" />
             <Input

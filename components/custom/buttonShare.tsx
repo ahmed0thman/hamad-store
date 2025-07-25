@@ -10,7 +10,7 @@ import {
 import { Copy, Facebook, Share2, Twitter } from "lucide-react";
 import { toast } from "sonner";
 
-const ProductShare = () => {
+const ButtonShare = () => {
   return (
     <>
       <DropdownMenu>
@@ -50,4 +50,4 @@ const ProductShare = () => {
   );
 };
 
-export default ProductShare;
+export default ButtonShare;
