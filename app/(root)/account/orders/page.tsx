@@ -79,7 +79,7 @@ const Orders = () => {
   );
 
   return (
-    <section className="font-sans">
+    <section className="">
       <div className="wrapper px-4 py-8">
         <div className="flex flex-col max-w-4xl mx-auto">
           {/* Header */}

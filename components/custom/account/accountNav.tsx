@@ -8,12 +8,11 @@ const accountTabs = [
   { name: "البيانات الشخصية", href: "/account/profile" },
   { name: "العناوين", href: "/account/addresses" },
   { name: "الطلبات", href: "/account/orders" },
-  { name: "المرتجعات", href: "/account/returns" },
+  { name: "المرتجعات", href: "/account/refund" },
   { name: "طرق الدفع", href: "/account/payment-methods" },
   { name: "المحفظة", href: "/account/wallet" },
   { name: "مقارنة المنتجات", href: "/account/compare" },
-  { name: "جهازي", href: "/account/device" },
-  { name: "استشر طبيب", href: "/account/doctor" },
+  // { name: "استشر طبيب", href: "/account/doctor" },
 ];
 
 const AccountNav = () => {

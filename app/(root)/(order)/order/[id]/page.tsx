@@ -22,12 +22,14 @@ import {
 import StarRating from "@/components/custom/starRating";
 import { CartItem } from "@/types";
 import RatingDialog from "@/components/custom/order/ratingDialog";
+import { Check, CheckCircle, Minus } from "lucide-react";
+import Link from "next/link";
 
 export default function OrderDetailsPage() {
   const items: CartItem[] = [
     {
       productId: "1",
-      name: "Product 1",
+      name: "omega three plus | soft gel capsules",
       image:
         "https://lh3.googleusercontent.com/aida-public/AB6AXuDG2UkD0xXRZROYZiruiWl-jIOiBtUV338EFIYgLdbMulEdL3TQxm35Rm_rWr7Nm9L6DVf-RbTnSbFl674_wsIpoBRZShGxl5sD35WlfFSMWEtFQG6NSb1h7nCuJNZJlf_sKw44jGvTJisBVws6vWhusAVZTEqO8ofP3G-597og7l2VWgsrKQmCCIt1mfpT7XOms36o8R6Xp5G6lEsfgmHenfaCaeE_KselOUnnvWJ1wtO9SxZ2jwDnoDhrwkBtlon6Xeo9vRzYInA",
       quantity: 1,
@@ -50,15 +52,6 @@ export default function OrderDetailsPage() {
   return (
     <div className="min-h-screen bg-background text-foreground py-6 px-4 md:px-40">
       <div className="max-w-4xl mx-auto space-y-6">
-        {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <a href="#" className="hover:underline">
-            Home
-          </a>
-          <span>/</span>
-          <span className="text-foreground">Order Details</span>
-        </div>
-
         {/* Order Header */}
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-bold tracking-tight text-foreground">
@@ -109,8 +102,36 @@ export default function OrderDetailsPage() {
                     {formatCurrencyEGP(+item.totalPrice)}
                   </TableCell>
                   {/* Rate Action */}
-                  <TableCell className="p-4">
+                  <TableCell className="p-4 flex items-center gap-2">
                     <RatingDialog item={item} />
+                    {/* Button ask refund */}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="rounded-full bg-muted"
+                      onClick={() => {
+                        import("sonner").then(({ toast }) => {
+                          toast(
+                            <div className="space-y-2">
+                              <div className="flex gap-1 items-center">
+                                <p>
+                                  Product added to refund request, you can add
+                                  more or view the request
+                                </p>
+                                <CheckCircle className="w-8 h-8 text-green-500 ml-2" />
+                              </div>
+                              <Button asChild variant="link" size={"sm"}>
+                                <Link href="/account/refund">
+                                  Complete Refund
+                                </Link>
+                              </Button>
+                            </div>
+                          );
+                        });
+                      }}
+                    >
+                      refund
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))}
