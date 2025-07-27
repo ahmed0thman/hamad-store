@@ -24,7 +24,7 @@ const HeroSlider = () => {
       >
         <SwiperSlide>
           <Image
-            src="/images/banners/hero.png"
+            src="/images/banners/Hero.png"
             fill
             alt="hero"
             className="object-cover object-center"
@@ -33,7 +33,7 @@ const HeroSlider = () => {
         </SwiperSlide>
         <SwiperSlide>
           <Image
-            src="/images/banners/hero.png"
+            src="/images/banners/Hero.png"
             fill
             alt="hero"
             className="object-cover object-center"
@@ -42,7 +42,7 @@ const HeroSlider = () => {
         </SwiperSlide>
         <SwiperSlide>
           <Image
-            src="/images/banners/hero.png"
+            src="/images/banners/Hero.png"
             fill
             alt="hero"
             className="object-cover object-center"
