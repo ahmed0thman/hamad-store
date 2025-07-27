@@ -34,7 +34,7 @@ export default function RefundPage() {
       quantity: 1,
       unitPrice: 25,
       totalPrice: 25,
-      image: "/multivitamin.jpg",
+      image: "/images/uploads/drug.jpg",
     },
     {
       id: "2",
@@ -42,7 +42,7 @@ export default function RefundPage() {
       quantity: 1,
       unitPrice: 30,
       totalPrice: 30,
-      image: "/omega3.jpg",
+      image: "/images/uploads/drug.jpg",
     },
   ]);
   const [reason, setReason] = useState("");

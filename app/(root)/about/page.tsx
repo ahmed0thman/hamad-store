@@ -32,7 +32,7 @@ const stats = [
 
 const About = () => {
   return (
-    <div className="min-h-screen bg-background py-10 px-4 md:px-12 lg:px-32 space-y-16">
+    <div className="wrapper mt-8 space-y-16">
       <section className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
         {stats.map((stat, idx) => (
           <Card

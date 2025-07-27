@@ -130,7 +130,9 @@ const Orders = () => {
                     size="sm"
                     className="rounded-full w-fit"
                   >
-                    <Link href={`/order/${order.id}`}>View Details</Link>
+                    <Link href={`/account/orders/${order.id}`}>
+                      View Details
+                    </Link>
                   </Button>
                 </div>
                 <div className="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-xl flex-1 relative">

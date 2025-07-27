@@ -34,19 +34,20 @@ const AccountNav = () => {
         </h2>
       </div>
       <nav className="space-y-2 text-sm font-medium text-accent-foreground">
-        {accountTabs.map((tab, index) => (
-          <Link
-            key={index}
-            href={tab.href}
-            className={`block px-4 py-2 rounded-lg transition-colors ${
-              pathName === tab.href
-                ? "bg-teal-600 text-white"
-                : "hover:bg-muted"
-            }`}
-          >
-            {tab.name}
-          </Link>
-        ))}
+        {accountTabs.map((tab, index) => {
+          const isActive = pathName.startsWith(tab.href);
+          return (
+            <Link
+              key={index}
+              href={tab.href}
+              className={`block px-4 py-2 rounded-lg transition-colors ${
+                isActive ? "bg-teal-600 text-white" : "hover:bg-muted"
+              }`}
+            >
+              {tab.name}
+            </Link>
+          );
+        })}
       </nav>
     </aside>
   );
