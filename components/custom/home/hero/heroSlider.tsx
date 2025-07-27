@@ -28,6 +28,7 @@ const HeroSlider = () => {
             fill
             alt="hero"
             className="object-cover object-center"
+            priority={true}
           />
         </SwiperSlide>
         <SwiperSlide>
@@ -36,6 +37,7 @@ const HeroSlider = () => {
             fill
             alt="hero"
             className="object-cover object-center"
+            priority={true}
           />
         </SwiperSlide>
         <SwiperSlide>
@@ -44,6 +46,7 @@ const HeroSlider = () => {
             fill
             alt="hero"
             className="object-cover object-center"
+            priority={true}
           />
         </SwiperSlide>
       </Swiper>
