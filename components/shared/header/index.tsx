@@ -6,8 +6,14 @@ import UserButton from "./userButton";
 import HeaderMenu from "./headerMenu";
 import { Categories } from "./categories";
 import MobileNav from "./mobileNav";
+import { auth } from "@/lib/auth";
 
-const Header = () => {
+const Header = async () => {
+  const session = await auth();
+  let user = null;
+  if (session?.user) {
+    user = session.user;
+  }
   return (
     <>
       <header className="border-b sticky top-0 start-0 end-0 bg-background z-50">
@@ -17,7 +23,7 @@ const Header = () => {
             <HaederPages />
             <HeaderSearch />
             <HeaderButtons />
-            <UserButton />
+            <UserButton user={user} />
             <HeaderMenu />
             <MobileNav />
           </div>

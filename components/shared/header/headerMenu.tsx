@@ -38,7 +38,6 @@ import profileImg from "/public/images/uploads/profile.png";
 import Link from "next/link";
 import { useTheme } from "next-themes";
 import { pharmacyCategories } from "@/lib/sampleData";
-import { strings } from "@/localization";
 
 const headerPages = [
   { title: "Home", path: "/", icon: <Home /> },
@@ -60,7 +59,6 @@ const accountPages = [
 const HeaderMenu = () => {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
-  console.log(theme);
 
   useEffect(function () {
     setMounted(true);
@@ -142,7 +140,7 @@ const HeaderMenu = () => {
             {/* Menu Actions */}
             <Menu>
               <MenuItem
-                title={strings.currentLanguage}
+                title={"en"}
                 icon={<Globe />}
                 handleClick={() => console.log("change lang")}
               />

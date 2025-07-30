@@ -1,5 +1,6 @@
-import { Button } from "@/components/ui/button";
+"use client";
 
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -7,12 +8,13 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { strings } from "@/localization";
-// import { signOutUser } from "@/lib/actions/user.actions";
-// import { auth } from "@/lib/auth";
+import { signOut } from "@/lib/auth";
 import { Bell, Heart, LogOut, User } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import ButtonLogout from "./buttonLogout";
+import { User as UserType } from "@/types";
 
 const userMenuItems = [
   {
@@ -32,14 +34,14 @@ const userMenuItems = [
   },
 ];
 
-const UserButton = async () => {
-  const singedIn = true;
+const UserButton = ({ user }: { user: UserType | null }) => {
+  const [dialogOpen, setDialogOpen] = useState(false);
   // const singedIn = true;
   // const fisrtInitial = session.user?.name?.charAt(0).toUpperCase() ?? "U";
   // if (!session)
   return (
     <div className="hidden lg:block">
-      {!singedIn ? (
+      {!user ? (
         <div className="flex-center gap-2" style={{ fontFamily: "Poppins" }}>
           <Button asChild>
             <Link href="/signin" className="flex-center ">
@@ -49,7 +51,7 @@ const UserButton = async () => {
 
           <Button variant="outline" asChild>
             <Link href="/signUp" className="flex-center  font-medium">
-              Guest
+              Signup
             </Link>
           </Button>
         </div>
@@ -65,7 +67,9 @@ const UserButton = async () => {
                   variant="ghost"
                   className="w-8 h-8 aspect-square rounded-full ms-2 flex items-center justify-center bg-secondary text-primary"
                 >
-                  {/* {fisrtInitial} */}A
+                  {user?.firstName?.charAt(0).toUpperCase() ??
+                    user?.lastName?.charAt(0).toUpperCase() ??
+                    "U"}
                 </Button>
               </div>
             </DropdownMenuTrigger>
@@ -78,12 +82,11 @@ const UserButton = async () => {
               <DropdownMenuLabel className="font-normal">
                 <div className="flex flex-col space-y-1">
                   <div className="text-sm leading-none">
-                    Ahmed Othman
-                    {/* {session.user?.name} */}
+                    {/* Ahmed Othman */}
+                    {user?.firstName} {user?.lastName}
                   </div>
                   <div className="text-sm text-muted-foreground leading-none">
-                    {/* {session.user?.email} */}
-                    ahmed@mail.com
+                    {user?.email}
                   </div>
                 </div>
               </DropdownMenuLabel>
@@ -105,20 +108,20 @@ const UserButton = async () => {
               ))}
 
               <DropdownMenuItem className="p-0 mb-1">
-                <form action={"/"} className="w-full">
-                  <Button
-                    variant="ghost"
-                    className="w-full py-4 px-2 justify-start"
-                  >
-                    <LogOut className="text-destructive" />
-                    Sign Out
-                  </Button>
-                </form>
+                <Button
+                  variant="ghost"
+                  className="w-full py-4 px-2 justify-start"
+                  onClick={() => setDialogOpen(true)}
+                >
+                  <LogOut className="text-destructive" />
+                  Sign Out
+                </Button>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
       )}
+      <ButtonLogout dialogOpen={dialogOpen} setDialogOpen={setDialogOpen} />
     </div>
   );
 };

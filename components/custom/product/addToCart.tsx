@@ -19,7 +19,6 @@ const AddToCart = ({ item }: { item: CartItem }) => {
         },
       },
     });
-    console.log("Item added to cart:", item);
   }
   return (
     <Button

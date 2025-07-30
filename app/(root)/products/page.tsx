@@ -2,8 +2,10 @@ import ProductCard from "@/components/custom/product/productCard";
 import Pagination from "@/components/custom/pagination";
 import { Slider } from "@/components/ui/slider";
 import ProductSidebar from "@/components/custom/product/productSidebar";
+import { getFilteredProducts, getSearchProducts } from "@/lib/api/apiProducts";
 
-const Products = () => {
+const Products = async () => {
+  const products = await getFilteredProducts();
   return (
     <div className="wrapper">
       <div className="grid grid-cols-12 gap-6 px-3 sm:px-6 py-8 relative">
@@ -13,14 +15,14 @@ const Products = () => {
         {/* Product grid */}
         <section className="col-span-12 pt-4 lg:pt-0 lg:col-span-9 space-y-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 justify-center">
-            {[...Array(9)].map((_, i) => (
-              <div className="mx-auto sm:mx-0" key={i}>
-                <ProductCard />
+            {products.slice(0, 6).map((productItem) => (
+              <div className="mx-auto sm:mx-0" key={productItem.id}>
+                <ProductCard productItem={productItem} />
               </div>
             ))}
           </div>
 
-          <Pagination count={300} pageSize={9} visibleButtons={3} />
+          <Pagination count={300} pageSize={6} visibleButtons={3} />
         </section>
       </div>
     </div>

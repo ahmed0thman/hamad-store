@@ -6,8 +6,9 @@ import Image from "next/image";
 import { formatCurrencyEGP } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { ProductItem } from "@/types";
 
-const ProductCard = () => {
+const ProductCard = ({ productItem }: { productItem: ProductItem }) => {
   const [favorite, setFavorite] = useState(false);
 
   return (
@@ -34,13 +35,26 @@ const ProductCard = () => {
 
       <div className="space-y-3 mt-5">
         <h3 className="text-lg font-semibold text-foreground">
-          فانيليا نوترين لمرض السكري
+          {productItem.name}
         </h3>
 
         <div className="flex items-center gap-4 justify-between">
-          <h4 className="text-xl font-bold text-primary-600">
-            {formatCurrencyEGP(120)}
-          </h4>
+          <div className="flex flex-col ">
+            {productItem.offer ? (
+              <>
+                <span className="line-through text-gray-500 text-sm">
+                  {formatCurrencyEGP(productItem.offer.price_before)}
+                </span>
+                <span className="text-primary font-semibold text-lg">
+                  {formatCurrencyEGP(productItem.offer.price_after)}
+                </span>
+              </>
+            ) : (
+              <span className="text-primary font-semibold text-xl">
+                {formatCurrencyEGP(productItem.price)}
+              </span>
+            )}
+          </div>
 
           <div className="flex items-end flex-col gap-2">
             <div className="flex items-center text-yellow-500">
@@ -61,7 +75,7 @@ const ProductCard = () => {
             asChild
             className="flex-grow-1 text-stone-100 font-medium text-base"
           >
-            <Link href={`/product/slug`}>اشتري</Link>
+            <Link href={`/product/${productItem.id}`}>اشتري</Link>
           </Button>
           <Button className="flex-grow-1 text-stone-100 font-medium text-base">
             مقارنة

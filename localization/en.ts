@@ -6,6 +6,7 @@ const en = {
   elements: "elements",
   currentLang: "En",
   currentLanguage: "English",
+  offers: "Offers",
 };
 
 export default en;

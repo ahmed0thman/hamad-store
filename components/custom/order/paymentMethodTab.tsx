@@ -89,7 +89,6 @@ export default function PaymentMethodTab({ onBack }: { onBack: () => void }) {
   });
 
   const onSubmit: SubmitHandler<CardFormData> = (data) => {
-    console.log("Submitted Card Data:", data);
     setShowNewCardDialog(false);
   };
 

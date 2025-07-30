@@ -10,8 +10,17 @@ import {
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { ProductItem } from "@/types";
 
-const ProductSwiper = ({ headLine }: { headLine: string }) => {
+const ProductSwiper = ({
+  headLine,
+  products,
+  showAll = false,
+}: {
+  headLine: string;
+  products: ProductItem[] | null;
+  showAll?: boolean;
+}) => {
   return (
     <section className="py-6">
       <div className="wrapper !px-8">
@@ -20,15 +29,14 @@ const ProductSwiper = ({ headLine }: { headLine: string }) => {
             <h3 className="text-gray-700 font-semibold text-xl lg:text-3xl dark:text-slate-400">
               {headLine}
             </h3>
-            <Button variant="ghost" asChild className="!text-primary">
-              <Link
-                href=""
-                className="flex items-center gap-1  font-sans !text-sm"
-              >
-                <span>Show all</span>
-                <ArrowRight className="auto-dir" />
+            {showAll && (
+              <Link href="/products">
+                <Button variant="link" className="text-primary">
+                  عرض الكل
+                  <ArrowRight className="w-4 h-4 ms-1" />
+                </Button>
               </Link>
-            </Button>
+            )}
           </div>
         </div>
         <Carousel
@@ -38,13 +46,13 @@ const ProductSwiper = ({ headLine }: { headLine: string }) => {
           className="w-10/12 sm:w-11/12 mx-auto"
         >
           <CarouselContent className="-ms-1">
-            {Array.from({ length: 5 }).map((_, index) => (
+            {products?.map((productItem, index) => (
               <CarouselItem
                 key={index}
                 className="ps-1 sm:basis-1/2 md:basis-1/3 xl:basis-1/4"
               >
                 <div className="p-1 flex-center sm:!block">
-                  <ProductCard />
+                  <ProductCard productItem={productItem} />
                 </div>
               </CarouselItem>
             ))}

@@ -1,6 +1,5 @@
 "use client";
-import { useRouter } from "next/navigation";
-import React from "react";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogClose,
@@ -11,21 +10,27 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { LogOut } from "lucide-react";
+import { signOut } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import React from "react";
 
-const ButtonLogout = () => {
-  // const session = await auth();
+const ButtonLogout = ({
+  dialogOpen,
+  setDialogOpen,
+}: {
+  dialogOpen: boolean;
+  setDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}) => {
   const router = useRouter();
 
   const handleLogout = () => {
-    // TODO: implement sign-out logic (e.g., clear auth tokens)
-    router.push("/");
+    signOut({ callbackUrl: "/signin" });
   };
   return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button variant="ghost" className="w-full py-4 px-2 justify-start">
+    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+      <DialogTrigger className="hidden" asChild>
+        <Button variant="ghost" onClick={() => setDialogOpen(true)}>
           <LogOut className="text-destructive" />
           Sign Out
         </Button>

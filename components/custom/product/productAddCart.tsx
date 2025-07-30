@@ -6,15 +6,17 @@ import { formatCurrencyEGP } from "@/lib/utils";
 import { ShoppingCart } from "lucide-react";
 import React from "react";
 import AddToCart from "./addToCart";
+import { Product } from "@/types";
 
-const ProductAddCart = () => {
+const ProductAddCart = ({ product }: { product: Product }) => {
   const stock = 3;
+  const price = product.offer ? product.offer.price_after : product.price;
   return (
     <Card className="p-0">
       <CardContent className="p-4">
         <div className="mb-2 flex justify-between">
           <div>Price</div>
-          <div>{formatCurrencyEGP(100)}</div>
+          <div>{formatCurrencyEGP(price)}</div>
         </div>
         <div className="mb-2 flex justify-between">
           <div>Status</div>

@@ -71,6 +71,11 @@
     }
   }
 
+  select {
+    @apply !pe-2;
+    background-image: none !important;
+  }
+
   footer {
     @apply bg-teal-600 text-white dark:bg-slate-700/50 dark:text-slate-300;
 

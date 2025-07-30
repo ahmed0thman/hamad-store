@@ -7,9 +7,20 @@ import {
   CarouselContent,
   CarouselItem,
 } from "@/components/ui/carousel";
+import { ImageOff } from "lucide-react";
 
 const ProductImages = ({ images }: { images: string[] }) => {
   const [current, setCurrnet] = useState(0);
+  if (!images || images.length === 0)
+    return (
+      <div className="flex flex-col items-center justify-center h-full min-h-80 md:min-h-[400px] col-span-1 sm:col-span-2 border rounded-lg">
+        <div className="relative flex-center flex-col">
+          <ImageOff className="w-16 h-16 text-gray-400" />
+          <div className="text-gray-500 mt-2">No images available</div>
+        </div>
+      </div>
+    );
+
   return (
     <div className="flex flex-col gap-4 h-full min-h-80 md:min-h-[400px] col-span-1 sm:col-span-2">
       <div className="relative flex-grow-1">

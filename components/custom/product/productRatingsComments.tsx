@@ -12,16 +12,19 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Product, Comment } from "@/types";
 
 function CommentCard({
   name,
   type,
   rating,
+  comment,
   avatarUrl,
 }: {
   name: string;
   type: "doctor" | "customer";
   rating: number;
+  comment: string;
   avatarUrl?: string;
 }) {
   const initials = name
@@ -54,7 +57,7 @@ function CommentCard({
             {name}
           </div>
           <div className={`flex items-center gap-0.5 ${starColor}`}>
-            <StarRating value={4} outOf={5} color={starColor} />
+            <StarRating value={rating} outOf={5} color={starColor} />
           </div>
         </div>
         <div className="ms-auto text-foreground">
@@ -62,13 +65,25 @@ function CommentCard({
         </div>
       </div>
       <p className="text-sm text-gray-600 dark:text-slate-400 text-start">
-        تعليق الطبيب على جودة المنتج وفاعليته في تنظيم السكر...
+        {comment}
       </p>
     </div>
   );
 }
 
-function CommentTabs({ count }: { count: number }) {
+function CommentTabs({
+  userComments,
+  doctorComments,
+  limit = 0,
+}: {
+  userComments: Comment[];
+  doctorComments: Comment[];
+  limit?: number;
+}) {
+  const userCommentsToShow =
+    limit > 0 ? userComments.slice(0, limit) : userComments;
+  const doctorCommentsToShow =
+    limit > 0 ? doctorComments.slice(0, limit) : doctorComments;
   return (
     <Tabs
       defaultValue="customer"
@@ -76,12 +91,12 @@ function CommentTabs({ count }: { count: number }) {
     >
       <TabsList className="bg-muted w-fit h-auto">
         <TabsTrigger asChild value="customer">
-          <Button variant="ghost" className="text-base !py-2 !px-4">
+          <Button variant="ghost" className="text-xs sm:text-base !py-2 !px-4">
             تعليق المستخدمين
           </Button>
         </TabsTrigger>
         <TabsTrigger asChild value="doctor">
-          <Button variant="ghost" className="text-base !py-2 !px-4">
+          <Button variant="ghost" className="text-xs sm:text-base !py-2 !px-4">
             تعليق الأطباء
           </Button>
         </TabsTrigger>
@@ -91,24 +106,48 @@ function CommentTabs({ count }: { count: number }) {
         value="customer"
         className="divide-y divide-gray-200 dark:divide-slate-800 bg-muted/30 px-3 space-y-2 mt-4 overflow-auto"
       >
-        {Array.from({ length: count }).map((_, i) => (
-          <CommentCard key={i} name="أحمد" type="customer" rating={5} />
-        ))}
+        {userComments && userComments.length > 0 ? (
+          userCommentsToShow.map((comment) => (
+            <CommentCard
+              key={comment.user_name}
+              name={comment.user_name}
+              comment={comment.comment}
+              type="customer"
+              rating={comment.rate}
+            />
+          ))
+        ) : (
+          <div className="text-center text-muted-foreground py-4">
+            لا توجد تعليقات من المستخدمين بعد.
+          </div>
+        )}
       </TabsContent>
 
       <TabsContent
         value="doctor"
         className="divide-y divide-gray-200 dark:divide-slate-800 bg-muted/30 px-3 space-y-2 mt-4 overflow-auto"
       >
-        {Array.from({ length: count }).map((_, i) => (
-          <CommentCard key={i} name="د. مايكل" type="doctor" rating={4} />
-        ))}
+        {doctorComments && doctorComments.length > 0 ? (
+          doctorCommentsToShow.map((comment) => (
+            <CommentCard
+              key={comment.user_name}
+              name={comment.user_name}
+              type="doctor"
+              rating={comment.rate}
+              comment={comment.comment}
+            />
+          ))
+        ) : (
+          <div className="text-center text-muted-foreground py-4">
+            لا توجد تعليقات من الأطباء بعد.
+          </div>
+        )}
       </TabsContent>
     </Tabs>
   );
 }
 
-const ProductRatingsComments = () => {
+const ProductRatingsComments = ({ product }: { product: Product }) => {
   return (
     <section className="wrapper space-y-8">
       <div className="grid gap-4">
@@ -123,7 +162,9 @@ const ProductRatingsComments = () => {
 
             <div className="rounded-md shadow-sm py-3 px-6  bg-yellow-100 text-yellow-600 text-sm font-semibold flex flex-col items-center gap-1">
               <Star className="w-14 h-14 fill-current" />
-              <span className="text-lg">4.0</span>
+              <span className="text-lg">
+                {product.average_rating.user.toFixed(1)}
+              </span>
             </div>
             <span className="text-muted-foreground text-sm">(185 ratings)</span>
           </div>
@@ -135,7 +176,9 @@ const ProductRatingsComments = () => {
 
             <div className="rounded-md shadow-sm py-3 px-6  bg-green-100 text-green-600 text-sm font-semibold flex flex-col items-center gap-1">
               <Star className="w-14 h-14 fill-current" />
-              <span className="text-lg">4.2</span>
+              <span className="text-lg">
+                {product.average_rating.pharmacist.toFixed(1)}
+              </span>
             </div>
             <span className="text-muted-foreground text-sm">(64 ratings)</span>
           </div>
@@ -143,13 +186,17 @@ const ProductRatingsComments = () => {
       </div>
 
       <div className="relative">
-        <CommentTabs count={4} />
+        <CommentTabs
+          userComments={product.user_comments}
+          doctorComments={product.pharmacist_comments}
+          limit={4}
+        />
 
         <Dialog>
           <DialogTrigger asChild>
             <Button
               variant="link"
-              className="absolute top-3 end-3 !text-primary text-lg"
+              className="absolute top-1 -end-6 sm:top-3 sm:end-3 !text-primary text-sm sm:text-lg"
             >
               Show all
             </Button>
@@ -158,7 +205,10 @@ const ProductRatingsComments = () => {
             <DialogHeader>
               <DialogTitle></DialogTitle>
               <div className="mt-3">
-                <CommentTabs count={40} />
+                <CommentTabs
+                  userComments={product.user_comments}
+                  doctorComments={product.pharmacist_comments}
+                />
               </div>
             </DialogHeader>
           </DialogContent>

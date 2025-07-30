@@ -9,10 +9,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { getAllCategories } from "@/lib/api/apiProducts";
+import { category } from "@/types";
 import { Search } from "lucide-react";
 import React from "react";
 
-const HeaderSearch = () => {
+const HeaderSearch = async () => {
+  const categories: category[] = await getAllCategories();
   return (
     <div className="!border-primary border rounded-md bg-secondary h-9 md:h-10 flex-center overflow-hidden">
       <div className="flex-center py-2">
@@ -27,11 +30,11 @@ const HeaderSearch = () => {
             <SelectGroup>
               <SelectLabel>Categories</SelectLabel>
               <SelectItem value="all">All Categories</SelectItem>
-              <SelectItem value="apple">Apple</SelectItem>
-              <SelectItem value="banana">Banana</SelectItem>
-              <SelectItem value="blueberry">Blueberry</SelectItem>
-              <SelectItem value="grapes">Grapes</SelectItem>
-              <SelectItem value="pineapple">Pineapple</SelectItem>
+              {categories.map((category) => (
+                <SelectItem key={category.id} value={category.id}>
+                  {category.name}
+                </SelectItem>
+              ))}
             </SelectGroup>
           </SelectContent>
         </Select>

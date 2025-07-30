@@ -1,11 +1,9 @@
 "use client";
 import React, { useState } from "react";
 
-const TextExpander = () => {
+const TextExpander = ({ content }: { content: string }) => {
   const [showMore, setShowMore] = useState(false);
-  const fullText = `
-    قدرات ممتازة لتوفير المغذيات الضرورية لدعم صحة مرضى السكري، حيث تحتوي على تركيبة متوازنة من البروتينات والكربوهيدرات والدهون بالإضافة إلى الفيتامينات والمعادن الأساسية. تمتاز بطعم الفانيليا اللذيذ وسهولة التحضير دون الحاجة إلى إعادة التسخين. يمكن استخدامها كوجبة خفيفة أو مكمل غذائي لتعويض النقص في العناصر الغذائية. تم تطويرها بعناية لتناسب احتياجات المرضى وتوفير الراحة أثناء الاستخدام. تحتوي كل عبوة على عدة وجبات وتعتبر اقتصادية وسهلة التخزين.
-  `.trim();
+  const fullText = content.trim();
   const displayedText = showMore ? fullText : fullText.slice(0, 180) + "...";
   return (
     <p

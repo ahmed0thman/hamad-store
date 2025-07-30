@@ -8,6 +8,7 @@ const ar: Locale = {
   elements: "عناصر",
   currentLang: "ع",
   currentLanguage: "عربي",
+  offers: "عروض",
 };
 
 export default ar;

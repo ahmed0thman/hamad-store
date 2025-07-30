@@ -10,7 +10,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { formatCurrencyEGP } from "@/lib/utils";
-import { strings } from "@/localization";
 import { Globe, Moon, ShoppingCart, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import Link from "next/link";
@@ -32,7 +31,7 @@ const HeaderButtons = () => {
     <div className="flex-center text-stone-700 dark:text-stone-400 !hidden lg:!flex">
       <Button variant="ghost" className=" gap-1 p-0">
         <Globe className="!w-6 !h-6" />
-        {strings.currentLang}
+        {"en"}
       </Button>
       <Button onClick={toggleTheme} variant="ghost" className=" p-0">
         {theme === "light" ? (
