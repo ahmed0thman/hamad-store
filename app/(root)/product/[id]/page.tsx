@@ -5,7 +5,13 @@ import ProductMainInfo from "@/components/custom/product/productMainInfo";
 import ProductRatingsComments from "@/components/custom/product/productRatingsComments";
 import { getProduct } from "@/lib/api/apiProducts";
 
-const ProductPage = async ({ params }: { params: { id: string } }) => {
+interface ProductPageProps {
+  params: {
+    id: string;
+  };
+}
+
+const ProductPage = async ({ params }: ProductPageProps) => {
   const product = await getProduct(params.id);
   return (
     <section className="space-y-12 pt-6 px-4 sm:px-8">
