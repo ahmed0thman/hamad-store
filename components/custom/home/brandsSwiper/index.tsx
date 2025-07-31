@@ -10,15 +10,18 @@ import {
 import Link from "next/link";
 
 import BrandCard from "./brandCard";
+import { Brand, category } from "@/types";
 
 const BrandSwiper = ({
   headLine,
   subHeadign,
   highlight,
+  items,
 }: {
   headLine: string;
   subHeadign: string;
   highlight: string;
+  items: Brand[] | category[];
 }) => {
   return (
     <section className="py-6">
@@ -40,16 +43,17 @@ const BrandSwiper = ({
           className="w-10/12 sm:w-11/12 mx-auto"
         >
           <CarouselContent className="-ms-1">
-            {Array.from({ length: 5 }).map((_, index) => (
-              <CarouselItem
-                key={index}
-                className="ps-1 basis-1/2 sm:basis-1/3 md:basis-1/4 xl:basis-1/5 ms-2"
-              >
-                <div className="p-1 flex-center sm:!block">
-                  <BrandCard />
-                </div>
-              </CarouselItem>
-            ))}
+            {items.length > 0 &&
+              items.map((item) => (
+                <CarouselItem
+                  key={item.id}
+                  className="ps-1 basis-1/2 sm:basis-1/3 md:basis-1/4 xl:basis-1/5 ms-2"
+                >
+                  <div className="p-1 flex-center sm:!block">
+                    <BrandCard item={item} />
+                  </div>
+                </CarouselItem>
+              ))}
           </CarouselContent>
           <CarouselPrevious />
           <CarouselNext />

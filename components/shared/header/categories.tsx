@@ -11,7 +11,7 @@ export const Categories = async () => {
       {categories.map((ele) => (
         <Link
           key={`category-${ele.id}`}
-          href={`/products/${ele.id}`}
+          href={`/products?category=${ele.id}`}
           className="text-stone-200 font-medium p-2"
         >
           {ele.name}

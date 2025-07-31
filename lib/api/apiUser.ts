@@ -4,8 +4,7 @@ import { RegisterFormData, SignInFormData } from "@/types";
 import { api } from "../axios";
 import { AxiosError } from "axios";
 import { signInSchema } from "../validators";
-import { signIn } from "../auth";
-import { success } from "zod";
+import { signIn, signOut } from "../auth";
 
 export async function registerUser(data: RegisterFormData) {
   try {
@@ -56,5 +55,15 @@ export async function signInWithCredentials(formData: SignInFormData) {
         payload: "An unexpected error occurred",
       };
     }
+  }
+}
+
+export async function signOutUser() {
+  try {
+    await signOut();
+
+    // Redirect to the sign-in page after successful sign-out
+  } catch (error) {
+    console.error("Error during sign-out:", error);
   }
 }

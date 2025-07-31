@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Filter, Star } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useRef, useState } from "react";
+import { revalidatePath } from "next/cache";
 
 function SidebarContent({
   minRef,
@@ -43,7 +44,6 @@ function SidebarContent({
               type="number"
               placeholder="Min"
               min={0}
-              max={500}
               className="mb-2"
             />
           </div>
@@ -54,7 +54,6 @@ function SidebarContent({
               type="number"
               placeholder="Max"
               min={0}
-              max={500}
               className="mb-2"
             />
           </div>
@@ -112,7 +111,7 @@ function SidebarContent({
   );
 }
 
-function ProductSidebar() {
+function ProductSidebar({ revalidate }: { revalidate: () => void }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const minRef = useRef<HTMLInputElement>(null);
@@ -122,11 +121,12 @@ function ProductSidebar() {
 
   const handleApply = () => {
     const params = new URLSearchParams(searchParams.toString());
-    if (minRef.current?.value) params.set("min", minRef.current.value);
-    if (maxRef.current?.value) params.set("max", maxRef.current.value);
-    if (customerRating) params.set("customerRating", String(customerRating));
-    if (doctorRating) params.set("doctorRating", String(doctorRating));
+    if (minRef.current?.value) params.set("price_min", minRef.current.value);
+    if (maxRef.current?.value) params.set("price_max", maxRef.current.value);
+    if (customerRating) params.set("user_rating_min", String(customerRating));
+    if (doctorRating) params.set("pharmacist_rating_min", String(doctorRating));
     router.push(`?${params.toString()}`);
+    revalidate(); // Call revalidate if provided
   };
 
   const handleReset = () => {

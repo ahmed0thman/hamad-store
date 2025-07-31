@@ -3,11 +3,16 @@ export const APP_DESCRIPTION =
   process.env.NEXT_PUBLIC_APP_DESCRIPTION ||
   "Prostore is your one-stop online shop for the latest electronics, fashion, and home essentials. Enjoy fast shipping, secure checkout, and unbeatable deals every day.";
 
+export const NEXT_PUBLIC = "http://localhost:3000";
+
 export const SERVER_URL =
-  process.env.NEXT_PUBLIC_SERVER_URL || "http://127.0.0.1:8000";
+  process.env.LARAVEL_PUBLIC_SERVER_URL || "http://127.0.0.1:8000";
+export const SERVER_URL_images =
+  process.env.LARAVEL_PUBLIC_SERVER_URL_IMAGES ||
+  "http://127.0.0.1:8000/storage";
 
 export const API_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL || "http://127.0.0.1:8000/api/";
+  process.env.LARAVEL_PUBLIC_API_BASE_URL || "http://127.0.0.1:8000/api/";
 
 export const LATEST_PRODUCTS_LIMIT =
   Number(process.env.LATEST_PRODUCTS_LIMIT) || 4;

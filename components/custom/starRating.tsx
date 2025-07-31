@@ -8,6 +8,7 @@ export type StarRatingProps = {
   color?: string;
   readOnly?: boolean;
   onChange?: (value: number) => void;
+  filledOnly?: boolean;
 };
 
 export default function StarRating({
@@ -16,6 +17,7 @@ export default function StarRating({
   color = "text-yellow-500",
   readOnly = true,
   onChange,
+  filledOnly = false,
 }: StarRatingProps) {
   // track hover state for interactive fill on hover
   const [hovered, setHovered] = useState<number | null>(null);
@@ -35,7 +37,9 @@ export default function StarRating({
             fill={filled ? "currentColor" : "none"}
             stroke="currentColor"
             strokeWidth={1}
-            className={!readOnly && onChange ? "cursor-pointer" : undefined}
+            className={`${
+              !readOnly && onChange ? "cursor-pointer" : undefined
+            } ${filledOnly && !filled ? "hidden" : ""}`}
             onClick={() => {
               if (!readOnly && onChange) {
                 onChange(i + 1);

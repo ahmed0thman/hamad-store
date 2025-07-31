@@ -8,7 +8,7 @@ const StorePage = () => {
   return (
     <>
       <StoreHero />
-      <ProductSwiper headLine="Offers" />
+      {/* <ProductSwiper headLine="Offers" />
       <BrandSwiper
         headLine="Browse all"
         highlight="Categories"
@@ -19,7 +19,7 @@ const StorePage = () => {
       <ProductSwiper headLine="Top Rated Products" />
       <Banner />
       <BrandSwiper headLine="Top" highlight="Rated Brands" subHeadign="" />
-      <ProductSwiper headLine="Top Selling Products" />
+      <ProductSwiper headLine="Top Selling Products" /> */}
     </>
   );
 };

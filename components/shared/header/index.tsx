@@ -1,3 +1,4 @@
+
 import HaederPages from "./headerPages";
 import HeaderButtons from "./headerButtons";
 import HeaderLogo from "./headerLogo";
@@ -7,9 +8,12 @@ import HeaderMenu from "./headerMenu";
 import { Categories } from "./categories";
 import MobileNav from "./mobileNav";
 import { auth } from "@/lib/auth";
+import HeaderCart from "./headerCart";
+import { getCartData } from "@/lib/api/apiCart";
 
 const Header = async () => {
   const session = await auth();
+  const cart = await getCartData();
   let user = null;
   if (session?.user) {
     user = session.user;
@@ -22,7 +26,9 @@ const Header = async () => {
             <HeaderLogo />
             <HaederPages />
             <HeaderSearch />
-            <HeaderButtons />
+            <HeaderButtons>
+              <HeaderCart session={session} cartData={cart} />
+            </HeaderButtons>
             <UserButton user={user} />
             <HeaderMenu />
             <MobileNav />

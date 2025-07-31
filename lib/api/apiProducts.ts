@@ -1,5 +1,7 @@
-import { category, Product, ProductItem } from "@/types";
+import { Brand, category, Product, ProductItem } from "@/types";
 import { api } from "../axios";
+import { AxiosError } from "axios";
+import { delay } from "../utils";
 
 // Get Endpoints
 
@@ -16,7 +18,28 @@ export async function getAllCategories() {
 }
 
 // Home API Endpoints
-// Get Offers
+
+export async function getBrandsBytitle(title?: string) {
+  try {
+    const response = await api.get(`home/brands/`);
+    const brands: Brand[] = response.data.data;
+    return brands;
+  } catch (error) {
+    console.error("Error fetching brands by title:", error);
+    throw error;
+  }
+}
+
+export async function getProductsBytitle(title: string) {
+  try {
+    const response = await api.get(`home/products/${title}`);
+    const products: ProductItem[] = response.data.data;
+    return products;
+  } catch (error) {
+    console.error("Error fetching products by title:", error);
+    throw error;
+  }
+}
 
 // Get Search Products
 export async function getSearchProducts(
@@ -36,21 +59,45 @@ export async function getSearchProducts(
 }
 
 // Get Filtered Products
-export async function getFilteredProducts(): Promise<ProductItem[]> {
+interface filterParams {
+  price_min?: string;
+  price_max?: string;
+  user_rating_min?: string;
+  pharmacist_rating_min?: string;
+  pageSize?: number;
+  page?: number;
+  sort?: string;
+  sortBy?: string;
+}
+export async function getFilteredProducts(filterParams: filterParams = {}) {
+  // await delay(300000);
   try {
-    const response = await api.get(`filter-products`, {
+    const response = await api.get(`home/products/filter`, {
       params: {
-        price_min: "100",
-        price_max: "",
-        user_rating_min: "",
-        pharmacist_rating_min: "",
+        price_min: filterParams.price_min || "100",
+        price_max: filterParams.price_max || "",
+        user_rating_min: filterParams.user_rating_min || "",
+        pharmacist_rating_min: filterParams.pharmacist_rating_min || "",
       },
     });
-    const products: ProductItem[] = response.data.data;
-    return products;
+    // console.log("Api response:", response.data.data);
+    const productsData = response.data.data;
+    return {
+      success: true,
+      products: productsData.products as ProductItem[],
+      pagination: productsData.pagination,
+      message: "Filtered products retrieved successfully",
+    };
   } catch (error) {
-    console.error("Error fetching filtered products:", error);
-    throw error;
+    if (error instanceof AxiosError) {
+      console.error("Error fetching filtered request:", error.request.message);
+      console.log("Error response data:", error.response);
+    }
+    return {
+      success: false,
+      message: "Failed to retrieve filtered products",
+      products: null,
+    };
   }
 }
 

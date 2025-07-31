@@ -1,10 +1,10 @@
 import ProductSwiper from "@/components/custom/product/productSwiper";
 import React from "react";
 
-const Favorites = () => {
+const Favorites = async () => {
   return (
     <section className="wrapper">
-      <ProductSwiper headLine="favorites" />
+      {/* <ProductSwiper headLine="favorites" /> */}
     </section>
   );
 };

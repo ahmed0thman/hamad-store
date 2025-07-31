@@ -6,13 +6,12 @@ import ProductRatingsComments from "@/components/custom/product/productRatingsCo
 import { getProduct } from "@/lib/api/apiProducts";
 
 interface ProductPageProps {
-  params: {
-    id: string;
-  };
+  params: Promise<{ id: string }>;
 }
 
 const ProductPage = async ({ params }: ProductPageProps) => {
-  const product = await getProduct(params.id);
+  const { id: productId } = await params;
+  const product = await getProduct(productId);
   return (
     <section className="space-y-12 pt-6 px-4 sm:px-8">
       {/* Main Info */}

@@ -113,7 +113,7 @@ html[dir="rtl"] {
     aspect-ratio: 1;
     border-radius: 50%;
     border: 8px solid var(--color-primary);
-    border-right-color: var(--color-primary);
+    border-right-color: var(--color-secondary);
     animation: rotate 1s infinite linear;
   }
 
@@ -122,7 +122,7 @@ html[dir="rtl"] {
     width: 20px;
     aspect-ratio: 1;
     border-radius: 50%;
-    border: 2px solid var(--color-primary);
+    border: 2px solid var(--color-secondary);
     border-right-color: transparent;
     animation: rotate 1s infinite linear;
   }

@@ -1,28 +1,34 @@
-import ProductCard from "@/components/custom/product/productCard";
-import Pagination from "@/components/custom/pagination";
-import { Slider } from "@/components/ui/slider";
+import ProductsFiltered from "@/components/custom/product/productsFiltered";
 import ProductSidebar from "@/components/custom/product/productSidebar";
-import { getFilteredProducts, getSearchProducts } from "@/lib/api/apiProducts";
+import Spinner from "@/components/custom/spinner";
+import { delay } from "@/lib/utils";
+import { SearchParams } from "@/types";
+import { revalidatePath } from "next/cache";
+import { Suspense } from "react";
 
-const Products = async () => {
-  const products = await getFilteredProducts();
+const Products = async ({
+  searchParams,
+}: {
+  searchParams: Promise<SearchParams>;
+}) => {
+  const filterParams = await searchParams;
+
+  async function refetchDataWithParams() {
+    "use server";
+    revalidatePath("/products");
+  }
+
   return (
     <div className="wrapper">
       <div className="grid grid-cols-12 gap-6 px-3 sm:px-6 py-8 relative">
         {/* Sidebar filters */}
-        <ProductSidebar />
+        <ProductSidebar revalidate={refetchDataWithParams} />
 
         {/* Product grid */}
-        <section className="col-span-12 pt-4 lg:pt-0 lg:col-span-9 space-y-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 justify-center">
-            {products.slice(0, 6).map((productItem) => (
-              <div className="mx-auto sm:mx-0" key={productItem.id}>
-                <ProductCard productItem={productItem} />
-              </div>
-            ))}
-          </div>
-
-          <Pagination count={300} pageSize={6} visibleButtons={3} />
+        <section className="col-span-12 pt-4 lg:pt-0 lg:col-span-9 space-y-6 flex flex-col">
+          <Suspense fallback={<Spinner />} key={JSON.stringify(filterParams)}>
+            <ProductsFiltered filterParams={filterParams} />
+          </Suspense>
         </section>
       </div>
     </div>
