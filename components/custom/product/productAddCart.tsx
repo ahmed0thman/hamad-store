@@ -1,16 +1,29 @@
-"use client";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { formatCurrencyEGP } from "@/lib/utils";
-import { ShoppingCart } from "lucide-react";
-import React from "react";
+import { CartData, Product } from "@/types";
 import AddToCart from "./addToCart";
-import { Product } from "@/types";
+import { auth } from "@/lib/auth";
+import { revalidatePath } from "next/cache";
+import { getCartData } from "@/lib/api/apiCart";
 
-const ProductAddCart = ({ product }: { product: Product }) => {
-  const stock = 3;
+const ProductAddCart = async ({ product }: { product: Product }) => {
+  const session = await auth();
+  const cartData = await getCartData();
+  let cart: CartData | null | undefined;
+
+  if (cartData?.success) {
+    cart = cartData.data;
+  }
+  if (cartData?.empty) {
+    cart = null;
+  }
+  const stock = product.quantity || 0;
   const price = product.offer ? product.offer.price_after : product.price;
+  async function refetchDataWithParams(pathName: string) {
+    "use server";
+    revalidatePath(pathName);
+  }
   return (
     <Card className="p-0">
       <CardContent className="p-4">
@@ -22,7 +35,7 @@ const ProductAddCart = ({ product }: { product: Product }) => {
           <div>Status</div>
           <div>
             {stock > 0 ? (
-              <Badge variant="outline">In Stock</Badge>
+              <Badge variant="outline">In Stock ({stock})</Badge>
             ) : (
               <Badge variant="destructive">Out Of Stock</Badge>
             )}
@@ -31,15 +44,11 @@ const ProductAddCart = ({ product }: { product: Product }) => {
         {stock > 0 && (
           <div className="flex-center">
             <AddToCart
-              item={{
-                productId: "1",
-                name: "Product 1",
-                slug: "product-1",
-                quantity: 1,
-                image: "https://via.placeholder.com/150",
-                unitPrice: "100.00",
-                totalPrice: "100.00",
-              }}
+              cart={cart}
+              stock={stock}
+              productId={product.id}
+              revalidate={refetchDataWithParams}
+              token={session?.user.token || session?.accessToken || ""}
             />
           </div>
         )}

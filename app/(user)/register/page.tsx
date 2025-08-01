@@ -23,6 +23,10 @@ import {
 import { registerUser } from "@/lib/api/apiUser";
 import Link from "next/link";
 import Image from "next/image";
+import { useFormStatus } from "react-dom";
+import Spinner from "@/components/custom/spinner";
+import SpinnerMini from "@/components/custom/SpinnerMini";
+import { redirect } from "next/navigation";
 
 // 3|e8wTV7x6fnsJjPbowVI3OmVxM78DqkGSnj68G7BDc3155768
 
@@ -31,18 +35,23 @@ const RegisterPage = () => {
   const {
     register,
     handleSubmit,
+    formState: { isSubmitting },
     formState: { errors },
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
   });
 
   const onSubmit = async (data: RegisterFormData) => {
+    setFormErrors([]);
     const response = await registerUser(data);
+
     if (response.status === "error") {
       const errorsArray = Object.entries(response.payload).map(
         ([key, value]) => value as string
       );
       setFormErrors(errorsArray);
+    } else {
+      redirect("/signin");
     }
   };
 
@@ -243,8 +252,12 @@ const RegisterPage = () => {
             </div>
           )}
 
-          <Button type="submit" className="w-fit mx-auto">
-            Register
+          <Button
+            disabled={isSubmitting}
+            type="submit"
+            className="w-fit mx-auto"
+          >
+            {isSubmitting ? <SpinnerMini /> : "Register"}
           </Button>
         </div>
         <div className="col-span-full text-center text-sm text-muted-foreground">

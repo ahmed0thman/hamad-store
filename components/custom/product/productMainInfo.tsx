@@ -24,7 +24,7 @@ const ProductMainInfo = ({ product }: { product: Product }) => {
   return (
     <section className="wrapper grid grid-cols-1 sm:grid-cols-5 gap-8 items-start">
       {/* Product Image */}
-      <ProductImages images={product.images} />
+      <ProductImages images={product.gallery} />
 
       <div className="col-span-1 sm:col-span-3 grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Product Text Info */}
@@ -85,63 +85,69 @@ const ProductMainInfo = ({ product }: { product: Product }) => {
       <div className="col-span-full">
         <h3 className="text-xl font-semibold mt-6 mb-2">تفاصيل المنتج</h3>
         {/* Product detailed info table */}
-        <Table className="w-full border rounded-lg">
-          <TableBody className="divide-y">
+        <Table className="w-full border bg-muted/20">
+          <TableBody className="divide-y text-base">
             <TableRow>
-              <TableCell className="flex items-center gap-2 font-semibold">
+              <TableCell className="flex items-center gap-2 font-semibold bg-muted">
                 <FileText className="w-4 h-4" />
                 الاسم العلمي
               </TableCell>
-              <TableCell>{product.generic_name}</TableCell>
+              <TableCell className="font-medium">
+                {product.generic_name}
+              </TableCell>
             </TableRow>
             <TableRow>
-              <TableCell className="flex items-center gap-2 font-semibold">
+              <TableCell className="flex items-center gap-2 font-semibold bg-muted">
                 <Layers className="w-4 h-4" />
                 الفئة
               </TableCell>
-              <TableCell>{product.categoryName}</TableCell>
+              <TableCell className="font-medium">
+                {product.categoryName}
+              </TableCell>
             </TableRow>
             <TableRow>
-              <TableCell className="flex items-center gap-2 font-semibold">
+              <TableCell className="flex items-center gap-2 font-semibold bg-muted">
                 <Tag className="w-4 h-4" />
                 العلامة التجارية
               </TableCell>
-              <TableCell>{product.brandName}</TableCell>
+              <TableCell className="font-medium">{product.brandName}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell className="flex items-center gap-2 font-semibold">
+              <TableCell className="flex items-center gap-2 font-semibold bg-muted">
                 <Tag className="w-4 h-4" />
                 النوع
               </TableCell>
-              <TableCell>{product.type}</TableCell>
+              <TableCell className="font-medium">{product.type}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell className="flex items-center gap-2 font-semibold">
+              <TableCell className="flex items-center gap-2 font-semibold bg-muted">
                 <Box className="w-4 h-4" />
                 الشكل
               </TableCell>
-              <TableCell>{product.form}</TableCell>
+              <TableCell className="font-medium">{product.form}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell className="flex items-center gap-2 font-semibold">
+              <TableCell className="flex items-center gap-2 font-semibold bg-muted">
                 <Zap className="w-4 h-4" />
                 القوة
               </TableCell>
-              <TableCell>{product.strength}</TableCell>
+              <TableCell className="font-medium">{product.strength}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell className="flex items-center gap-2 font-semibold">
+              <TableCell className="flex items-center gap-2 font-semibold bg-muted">
                 <Calendar className="w-4 h-4" />
                 تاريخ الإنتاج
               </TableCell>
-              <TableCell>{product.production_date}</TableCell>
+              <TableCell className="font-medium">
+                {product.production_date}
+              </TableCell>
             </TableRow>
             <TableRow>
-              <TableCell className="flex items-center gap-2 font-semibold">
+              <TableCell className="flex items-center gap-2 font-semibold bg-muted">
                 <PackageCheck className="w-4 h-4" />
                 حجم العبوة
               </TableCell>
-              <TableCell>{product.pack_size}</TableCell>
+              <TableCell className="font-medium">{product.pack_size}</TableCell>
             </TableRow>
           </TableBody>
         </Table>

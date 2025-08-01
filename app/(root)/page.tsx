@@ -13,8 +13,8 @@ import { auth } from "@/lib/auth";
 import getLocaleStrings from "@/localization";
 
 export default async function Home() {
-  // const session = await auth();
-  // console.log("token:", session?.accessToken);
+  const session = await auth();
+  console.log("token:", session?.accessToken);
   const locals = await getLocaleStrings();
   // Get Products
   const offersProducts = await getProductsBytitle("offers");

@@ -39,13 +39,13 @@ function CommentCard({
   return (
     <div className="p-4 space-y-2">
       <div className="flex items-center gap-3">
-        {avatarUrl ? (
+        {avatarUrl?.endsWith(".jpg") || avatarUrl?.endsWith(".png") ? (
           <Image
             src={avatarUrl}
             width={40}
             height={40}
             alt={name}
-            className="rounded-full object-cover"
+            className="rounded-full object-cover overflow-hidden w-10 h-10"
           />
         ) : (
           <div className="w-10 h-10 rounded-full bg-slate-300 dark:bg-muted flex items-center justify-center text-sm font-bold font-sans">
@@ -114,6 +114,7 @@ function CommentTabs({
               comment={comment.comment}
               type="customer"
               rating={comment.rate}
+              avatarUrl={comment.user_image || undefined}
             />
           ))
         ) : (
@@ -166,7 +167,9 @@ const ProductRatingsComments = ({ product }: { product: Product }) => {
                 {product.average_rating.user.toFixed(1)}
               </span>
             </div>
-            <span className="text-muted-foreground text-sm">(185 ratings)</span>
+            <span className="text-muted-foreground text-sm">
+              ({product.average_rating.count_user_rate})
+            </span>
           </div>
 
           <div className="flex items-center flex-col gap-2 p-4 ">
@@ -180,7 +183,9 @@ const ProductRatingsComments = ({ product }: { product: Product }) => {
                 {product.average_rating.pharmacist.toFixed(1)}
               </span>
             </div>
-            <span className="text-muted-foreground text-sm">(64 ratings)</span>
+            <span className="text-muted-foreground text-sm">
+              ({product.average_rating.count_pharmacist_rate})
+            </span>
           </div>
         </div>
       </div>

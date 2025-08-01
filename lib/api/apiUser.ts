@@ -5,6 +5,7 @@ import { api } from "../axios";
 import { AxiosError } from "axios";
 import { signInSchema } from "../validators";
 import { signIn, signOut } from "../auth";
+import { delay } from "../utils";
 
 export async function registerUser(data: RegisterFormData) {
   try {

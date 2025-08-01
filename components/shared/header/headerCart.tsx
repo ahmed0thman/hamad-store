@@ -27,7 +27,7 @@ const HeaderCart = ({ session, cartData }: { session: any; cartData: any }) => {
     if (cartData?.empty) {
       isEmpty = true;
     }
-    cart = cartData;
+    cart = cartData.data;
   }
 
   if (!isAuthenticated) {

@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/carousel";
 import { ImageOff } from "lucide-react";
 
-const ProductImages = ({ images }: { images: string[] }) => {
+const ProductImages = ({ images }: { images: string[] | null }) => {
   const [current, setCurrnet] = useState(0);
   if (!images || images.length === 0)
     return (

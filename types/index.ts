@@ -74,6 +74,7 @@ export type Pharmacy = {
 
 export type Comment = {
   user_name: string;
+  user_image: string | null;
   rate: number;
   comment: string;
 };
@@ -106,9 +107,15 @@ export type Product = {
   form: string;
   strength: string;
   price: number;
+  quantity: number;
+  brand_id: number;
+  category_id: number;
+  image: string | null;
   average_rating: {
     user: number;
+    count_user_rate: number;
     pharmacist: number;
+    count_pharmacist_rate: number;
   };
   tax_rate: number;
   production_date: string;
@@ -118,8 +125,7 @@ export type Product = {
   description: string;
   categoryName: string;
   brandName: string;
-  images: string[];
-  gallery: string | null;
+  gallery: string[] | null;
   offer: ProductOffer | null;
   user_comments: Comment[];
   pharmacist_comments: Comment[];

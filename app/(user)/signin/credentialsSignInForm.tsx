@@ -17,21 +17,7 @@ import { signInSchema } from "@/lib/validators";
 import { SignInFormData } from "@/types";
 import { useState } from "react";
 import { revalidatePath } from "next/cache";
-
-const ButtonSignIn = () => {
-  const { pending } = useFormStatus();
-  if (pending)
-    return (
-      <div className="flex-center">
-        <Image src={loader} width={20} height={20} alt="loader" />
-      </div>
-    );
-  return (
-    <Button className="w-full" variant="default">
-      Sign In
-    </Button>
-  );
-};
+import SpinnerMini from "@/components/custom/SpinnerMini";
 
 const CredentialsSignInForm = () => {
   const searchParams = useSearchParams();
@@ -41,7 +27,7 @@ const CredentialsSignInForm = () => {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { isSubmitting, isLoading, errors },
   } = useForm<SignInFormData>({
     resolver: zodResolver(signInSchema),
     defaultValues: {
@@ -49,6 +35,8 @@ const CredentialsSignInForm = () => {
       password: signInDefaultValues.password,
     },
   });
+
+  const pending = isLoading || isSubmitting;
 
   const onSubmit = async (data: SignInFormData) => {
     // Add your sign-in logic here
@@ -100,7 +88,9 @@ const CredentialsSignInForm = () => {
               </ul>
             </div>
           )}
-          <ButtonSignIn />
+          <Button className="w-full" variant="default">
+            {pending ? <SpinnerMini /> : "Sign In"}
+          </Button>
         </div>
         <div className="text-center text-sm text-muted-foreground">
           <span className="me-1">Don&apos;t have an account?</span>
