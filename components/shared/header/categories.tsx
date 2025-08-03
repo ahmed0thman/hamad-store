@@ -7,7 +7,7 @@ import React from "react";
 export const Categories = async () => {
   const categories: category[] = await getAllCategories();
   return (
-    <div className="hidden lg:flex items-center justify-center bg-primary font-sans">
+    <div className="hidden  items-center justify-center bg-primary font-sans">
       {categories.map((ele) => (
         <Link
           key={`category-${ele.id}`}

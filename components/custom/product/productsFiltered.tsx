@@ -16,10 +16,10 @@ const ProductsFiltered = async ({
   if (!productsRes.success) return <NoData message="Something went wrong" />;
   return (
     <>
-      <div className=" flex-grow grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 justify-center">
+      <div className=" grid grid-cols-1 gap-3 md:gap-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 lg:gap-3 xl:gap-2 justify-center">
         {products.length > 0 ? (
           products.map((productItem) => (
-            <div className="mx-auto sm:mx-0" key={productItem.id}>
+            <div className=" sm:mx-0" key={productItem.id}>
               <ProductCard productItem={productItem} />
             </div>
           ))

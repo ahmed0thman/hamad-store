@@ -1,50 +1,47 @@
-"use client";
-
-import React, { useEffect, useState } from "react";
 import { Heart, Star } from "lucide-react";
 import Image from "next/image";
 import { formatCurrencyEGP } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { ProductItem } from "@/types";
+import { FavoriteItem, ProductItem } from "@/types";
 import StarRating from "../starRating";
+import { auth } from "@/lib/auth";
+import { getFavorites } from "@/lib/api/apiFavorites";
+import ButtonFavorite from "./buttonFavorite";
+import { Badge } from "@/components/ui/badge";
 
-const ProductCard = ({ productItem }: { productItem: ProductItem }) => {
-  const [favorite, setFavorite] = useState(false);
-  const [isValidImage, setIsValidImage] = useState(true);
-
-  useEffect(() => {
-    if (!productItem.image || productItem.image.trim() === "") {
-      setIsValidImage(false);
-      return;
+const ProductCard = async ({ productItem }: { productItem: ProductItem }) => {
+  const session = await auth();
+  // let favorites: FavoriteItem[] | null = null;
+  let inFavorites = false;
+  if (session && session.user) {
+    const res = await getFavorites();
+    if (res && res.success && !res.empty) {
+      const favorites = res.data as FavoriteItem[];
+      inFavorites = favorites.some((item) => item.id === productItem.id);
     }
-    const img = new window.Image();
-    img.src = productItem.image;
-    img.onload = () => setIsValidImage(true);
-    img.onerror = () => setIsValidImage(false);
-  }, [productItem.image]);
+  }
+  const isValidImage =
+    productItem.image &&
+    (productItem.image.endsWith(".jpg") || productItem.image.endsWith(".png"));
 
   const image = isValidImage ? productItem.image : "/images/no-image.jpg";
 
   return (
-    <div className="bg-stone-100 dark:bg-slate-800 rounded-lg shadow-md p-6 pt-12 max-w-sm h-full max-h-[500px] relative flex flex-col">
-      <button
-        onClick={() => setFavorite(!favorite)}
-        className="absolute top-4 end-4 text-gray-400 hover:text-red-500 focus:outline-none"
+    <div className="bg-stone-100 dark:bg-slate-800 w-full md:max-w-sm rounded-sm md:rounded-md shadow-md p-2 py-4 md:p-4 md:pt-12  h-full max-h-[560px] relative flex gap-3 md:gap-0 md:flex-col overflow-hidden">
+      <div
+        // onClick={() => setFavorite(!favorite)}
+        className="absolute top-2 end-2 text-gray-400 hover:text-red-500 focus:outline-none"
       >
-        {favorite ? (
-          <Heart className="fill-red-500 text-white" />
-        ) : (
-          <Heart className="text-gray-500" />
-        )}
-      </button>
+        <ButtonFavorite inFavorites={inFavorites} productId={productItem.id} />
+      </div>
 
-      <div className="relative w-full aspect-square !max-h-[250px]">
+      <div className="md:relative w-2/5 md:w-full aspect-square !max-h-[250px]">
         <Image
           src={image || "/images/no-image.jpg"}
           fill
           alt="img"
-          className="w-full  object-cover rounded-md"
+          className="!w-2/5 md:!w-full  object-cover md:rounded-md"
         />
       </div>
 
@@ -53,7 +50,7 @@ const ProductCard = ({ productItem }: { productItem: ProductItem }) => {
           {productItem.name}
         </h3>
 
-        <div className="flex  gap-4 justify-between">
+        <div className="flex flex-col md:flex-row gap-2  md:gap-4 justify-between">
           <div className="flex flex-col ">
             {productItem.offer ? (
               <>
@@ -71,36 +68,53 @@ const ProductCard = ({ productItem }: { productItem: ProductItem }) => {
             )}
           </div>
 
-          <div className="flex items-end flex-col gap-2">
-            <div className="flex items-center text-yellow-500">
+          <div className="flex md:items-end flex-col md:gap-2">
+            <div className="flex items-center text-yellow-400 gap-1">
               <StarRating
                 value={productItem.average_rating.user}
                 outOf={5}
                 readOnly
                 color="text-yellow-500"
-                filledOnly
+                // filledOnly
               />
+              <span className="font-medium">
+                ({productItem.average_rating.count_user_rate})
+              </span>
             </div>
 
-            <div className="flex items-center text-green-500">
+            <div className="flex items-center text-green-500 gap-1">
               <StarRating
                 value={productItem.average_rating.pharmacist}
                 outOf={5}
                 readOnly
                 color="text-green-500"
-                filledOnly
+                // filledOnly
               />
+              <span className="font-medium">
+                ({productItem.average_rating.count_pharmacist_rate})
+              </span>
             </div>
           </div>
         </div>
-        <div className="flex items-center  gap-4 mt-auto">
+        {productItem.quantity > 0 ? (
+          <span className="text-green-500 text-sm font-medium  mt-auto">
+            متوفر في المخزون ({productItem.quantity})
+          </span>
+        ) : (
+          <Badge variant="destructive" className="w-fit py-1 px-3  mt-auto">
+            غير متوفر
+          </Badge>
+        )}
+        <div className="flex items-center  gap-1">
           <Button
             asChild
-            className="flex-grow-1 text-stone-100 font-medium text-base"
+            className=" rounded-full text-stone-100 font-medium text-base"
           >
-            <Link href={`/product/${productItem.id}`}>اشتري</Link>
+            <Link href={`/product/${productItem.id}`}>
+              {productItem.quantity > 0 ? "اشتري الآن" : "التفاصيل"}
+            </Link>
           </Button>
-          <Button className="flex-grow-1 text-stone-100 font-medium text-base">
+          <Button className="rounded-full text-stone-100 font-medium text-base">
             مقارنة
           </Button>
         </div>

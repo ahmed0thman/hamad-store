@@ -17,10 +17,29 @@ import TextExpander from "../textExpander";
 import ProductAddCart from "./productAddCart";
 import ProductImages from "./productImage";
 import ButtonShare from "../buttonShare";
-import { Product } from "@/types";
+import { FavoriteItem, Product } from "@/types";
 import Link from "next/link";
+import { auth } from "@/lib/auth";
+import { getFavorites } from "@/lib/api/apiFavorites";
+import ButtonFavorite from "./buttonFavorite";
+import { revalidatePath } from "next/cache";
 
-const ProductMainInfo = ({ product }: { product: Product }) => {
+const ProductMainInfo = async ({ product }: { product: Product }) => {
+  const session = await auth();
+  // let favorites: FavoriteItem[] | null = null;
+  let inFavorites = false;
+  if (session && session.user) {
+    const res = await getFavorites();
+    if (res && res.success && !res.empty) {
+      const favorites = res.data as FavoriteItem[];
+      inFavorites = favorites.some((item) => item.id === product.id);
+    }
+  }
+
+  async function revalidate() {
+    "use server";
+    revalidatePath(`/product/${product.id}`);
+  }
   return (
     <section className="wrapper grid grid-cols-1 sm:grid-cols-5 gap-8 items-start">
       {/* Product Image */}
@@ -67,13 +86,11 @@ const ProductMainInfo = ({ product }: { product: Product }) => {
             </Button>
             <div className="flex justify-end gap-2 mb-2">
               <ButtonShare />
-              <Button
-                variant="ghost"
-                size="icon"
-                className="text-red-500  hover:bg-red-100 dark:hover:bg-red-900"
-              >
-                <Heart className="!w-7 !h-7" />
-              </Button>
+              <ButtonFavorite
+                inFavorites={inFavorites}
+                productId={product.id}
+                revalidate={revalidate}
+              />
             </div>
           </div>
         </div>

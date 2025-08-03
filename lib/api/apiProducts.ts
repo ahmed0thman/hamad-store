@@ -2,6 +2,7 @@ import { Brand, category, Product, ProductItem } from "@/types";
 import { api } from "../axios";
 import { AxiosError } from "axios";
 import { delay } from "../utils";
+import { success } from "zod";
 
 // Get Endpoints
 
@@ -42,19 +43,34 @@ export async function getProductsBytitle(title: string) {
 }
 
 // Get Search Products
-export async function getSearchProducts(
-  categoryId?: string,
-  keyword?: string
-): Promise<ProductItem[]> {
+export async function getSearchProducts(categoryId: string, keyword: string) {
   try {
-    const response = await api.get(`products/search`, {
+    console.log("Searching products with:", { categoryId, keyword });
+    const response = await api.get(`header/search`, {
       params: { category_id: categoryId, keyword: keyword },
     });
-    const products: ProductItem[] = response.data.data;
-    return products;
+    // console.log("Search API response:", response.data.data.products);
+    if (
+      response.data.result === "Success" &&
+      response.data.data.products.length > 0
+    ) {
+      const products: ProductItem[] = response.data.data.products;
+      return {
+        success: true,
+        data: products,
+      };
+    }
+
+    return {
+      success: false,
+      data: [],
+      empty: true,
+    };
   } catch (error) {
     console.error("Error searching products:", error);
-    throw error;
+    return {
+      success: false,
+    };
   }
 }
 
@@ -64,6 +80,10 @@ interface filterParams {
   price_max?: string;
   user_rating_min?: string;
   pharmacist_rating_min?: string;
+  keyword?: string;
+  categoryId?: string;
+  brandId?: string;
+  inStock?: string;
   pageSize?: number;
   page?: number;
   sort?: string;
@@ -78,6 +98,10 @@ export async function getFilteredProducts(filterParams: filterParams = {}) {
         price_max: filterParams.price_max || "",
         user_rating_min: filterParams.user_rating_min || "",
         pharmacist_rating_min: filterParams.pharmacist_rating_min || "",
+        keyword: filterParams.keyword || "",
+        category_id: filterParams.categoryId || "",
+        brand_id: filterParams.brandId || "",
+        in_stock: filterParams.inStock || "",
       },
     });
     // console.log("Api response:", response.data.data);

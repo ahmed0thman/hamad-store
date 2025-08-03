@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { CartData, CartItem } from "@/types";
+import { CartData } from "@/types";
 import { Plus, ShoppingCart } from "lucide-react";
 import React, { useActionState, useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -9,6 +9,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { addToCart, removeCartItem, updateCartItem } from "@/lib/api/apiCart";
 import { useFormStatus } from "react-dom";
 import SpinnerMini from "../SpinnerMini";
+import { set } from "zod";
 
 const ButtonSubmit = ({ children }: { children: React.ReactNode }) => {
   const { pending } = useFormStatus();
@@ -60,6 +61,7 @@ const AddToCart = ({
   useEffect(
     function () {
       if (formRes && formRes.success) {
+        setInCart(true);
         revalidate(pathName);
         toast.success("Item added to cart successfully", {
           action: {
@@ -94,7 +96,7 @@ const AddToCart = ({
   useEffect(
     function () {
       if (removeRes && removeRes.success) {
-        revalidate(pathName);
+        setInCart(false);
         toast.success("Item removed from cart successfully", {
           action: {
             label: "View Cart",
@@ -103,6 +105,7 @@ const AddToCart = ({
             },
           },
         });
+        revalidate(pathName);
       }
     },
     [removeRes, pathName, router]

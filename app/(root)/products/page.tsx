@@ -19,13 +19,13 @@ const Products = async ({
   }
 
   return (
-    <div className="wrapper">
-      <div className="grid grid-cols-12 gap-6 px-3 sm:px-6 py-8 relative">
+    <div className="">
+      <div className="grid grid-cols-12 xl:grid-cols-11 gap-6 px-3 xl:gap-2 sm:px-6 py-8 relative">
         {/* Sidebar filters */}
         <ProductSidebar revalidate={refetchDataWithParams} />
 
         {/* Product grid */}
-        <section className="col-span-12 pt-4 lg:pt-0 lg:col-span-9 space-y-6 flex flex-col">
+        <section className="col-span-12 pt-4 lg:pt-0 lg:col-span-9 xl:col-span-9 space-y-6 flex flex-col">
           <Suspense fallback={<Spinner />} key={JSON.stringify(filterParams)}>
             <ProductsFiltered filterParams={filterParams} />
           </Suspense>

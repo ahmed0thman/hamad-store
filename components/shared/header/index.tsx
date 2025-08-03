@@ -1,4 +1,3 @@
-
 import HaederPages from "./headerPages";
 import HeaderButtons from "./headerButtons";
 import HeaderLogo from "./headerLogo";
@@ -10,10 +9,13 @@ import MobileNav from "./mobileNav";
 import { auth } from "@/lib/auth";
 import HeaderCart from "./headerCart";
 import { getCartData } from "@/lib/api/apiCart";
+import { category } from "@/types";
+import { getAllCategories } from "@/lib/api/apiProducts";
 
 const Header = async () => {
   const session = await auth();
   const cart = await getCartData();
+  const categories: category[] = await getAllCategories();
   let user = null;
   if (session?.user) {
     user = session.user;
@@ -25,7 +27,7 @@ const Header = async () => {
           <div className="flex-between gap-2">
             <HeaderLogo />
             <HaederPages />
-            <HeaderSearch />
+            <HeaderSearch categories={categories} />
             <HeaderButtons>
               <HeaderCart session={session} cartData={cart} />
             </HeaderButtons>

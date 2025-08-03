@@ -5,6 +5,44 @@
 @custom-variant dark (&:is(.dark *));
 
 @layer utilities {
+  /* Modern sleek scrollbar styles */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-muted);
+    border-radius: 8px;
+    transition: background 0.3s;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-accent);
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .dark ::-webkit-scrollbar-thumb {
+    background: var(--color-muted-foreground);
+  }
+
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-accent-foreground);
+  }
+
+  /* Firefox scrollbar */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-muted) transparent;
+  }
+
+  .dark * {
+    scrollbar-color: var(--color-slate-700) transparent;
+  }
   .wrapper {
     @apply max-w-7xl lg:mx-auto px-6 py-4 md:py-4 md:px-10 w-full;
   }

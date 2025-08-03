@@ -132,6 +132,15 @@ export type Product = {
   similar_products: ProductItem[];
 };
 
+export type FavoriteItem = {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+  image: string | null;
+  created_at: string;
+};
+
 export type category = {
   id: string;
   position: number | null;
