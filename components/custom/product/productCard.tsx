@@ -51,10 +51,10 @@ const ProductCard = async ({ productItem }: { productItem: ProductItem }) => {
         </h3>
 
         <div className="flex flex-col md:flex-row gap-2  md:gap-4 justify-between">
-          <div className="flex flex-col ">
+          <div className="flex items-center md:flex-col md:items-start gap-2 md:gap-0">
             {productItem.offer ? (
               <>
-                <span className="line-through text-gray-500 text-sm">
+                <span className="line-through text-gray-500 text-xs">
                   {formatCurrencyEGP(productItem.offer?.price_before as number)}
                 </span>
                 <span className="text-foreground font-semibold text-lg">
@@ -105,16 +105,16 @@ const ProductCard = async ({ productItem }: { productItem: ProductItem }) => {
             غير متوفر
           </Badge>
         )}
-        <div className="flex items-center  gap-1">
+        <div className="flex flex-col md:flex-row  gap-1">
           <Button
             asChild
-            className=" rounded-full text-stone-100 font-medium text-base"
+            className=" rounded-full text-stone-100 font-medium text-base flex-grow md:flex-grow-0"
           >
             <Link href={`/product/${productItem.id}`}>
               {productItem.quantity > 0 ? "اشتري الآن" : "التفاصيل"}
             </Link>
           </Button>
-          <Button className="rounded-full text-stone-100 font-medium text-base">
+          <Button className="rounded-full text-stone-100 font-medium text-base flex-grow md:flex-grow-0">
             مقارنة
           </Button>
         </div>

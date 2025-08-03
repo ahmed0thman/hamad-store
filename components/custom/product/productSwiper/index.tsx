@@ -43,7 +43,7 @@ const ProductSwiper = ({
           opts={{
             align: "center",
           }}
-          className="w-10/12 sm:w-11/12 mx-auto"
+          className="w-10/11 sm:w-11/12 mx-auto"
         >
           <CarouselContent className="-ms-1">
             {products?.map((productItem, index) => (
