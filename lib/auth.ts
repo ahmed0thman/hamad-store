@@ -100,7 +100,7 @@ export const config = {
         session.user = token.user as User;
         return session;
       } catch (error) {
-        // console.error("Error in session callback:", error);
+        console.error("Error in session callback:", error);
         return session;
       }
     },

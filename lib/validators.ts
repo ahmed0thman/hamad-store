@@ -1,4 +1,4 @@
-import z from "zod";
+import z, { optional } from "zod";
 import { formatCurrencyEGP } from "./utils";
 
 export const currency = z.string().refine(
@@ -81,4 +81,19 @@ export const registerSchema = z
 export const signInSchema = z.object({
   email: z.string().email("Email must be a valid email address"),
   password: z.string().min(8, "Password must be at least 8 characters"),
+});
+
+export const profileSchema = z.object({
+  id: z.string(),
+  first_name: z.string().min(2, "First name is required"),
+  last_name: z.string().optional(),
+  phone: z
+    .string()
+    .regex(/^\+20\d{10}$/, "Phone must be a valid Egyptian number"),
+  language: z.string().optional(),
+  gender: gender,
+  governorate: z.string().min(1, "Governorate is required"),
+  age: z.number().int().min(0, "Age must be a valid number"),
+  email: z.string().email("Email must be a valid email address"),
+  profile_image: z.string().url("Profile image must be a valid URL").optional(),
 });

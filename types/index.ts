@@ -2,6 +2,7 @@ import {
   cardSchema,
   cartItemSchema,
   insertCartSchema,
+  profileSchema,
   registerSchema,
   signInSchema,
 } from "@/lib/validators";
@@ -30,6 +31,7 @@ export type User = {
   emailVerified: boolean;
   profileImage: string | null;
 };
+export type UserProfile = z.infer<typeof profileSchema>;
 
 // -------------------
 
@@ -186,16 +188,8 @@ export type CartPharmacy = {
   total: number;
 };
 
-export type CartSummary = {
-  subtotal: number;
-  total: number;
-  count_items: number;
-  // user_address: any[];
-};
-
 export type CartData = {
   pharmacies: CartPharmacy[];
-  summary: CartSummary;
 };
 
 export type pagination = {

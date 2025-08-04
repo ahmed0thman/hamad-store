@@ -1,5 +1,6 @@
 "use client";
 
+import { useProfile } from "@/contexts/ProfileContext";
 import { CameraIcon, UserIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -17,6 +18,29 @@ const accountTabs = [
 
 const AccountNav = () => {
   const pathName = usePathname();
+  const { profile, loading, refreshProfile } = useProfile();
+
+  if (loading) {
+    return (
+      <aside className="col-span-1 hidden lg:block bg-teal-50 dark:bg-accent p-6 rounded-sm shadow-teal-900/10 shadow-sm sticky top-24 h-fit animate-pulse">
+        <div className="flex flex-col items-center mb-8">
+          <div className="relative">
+            <div className="w-24 h-24 rounded-full bg-gray-300 dark:bg-gray-700 flex items-center justify-center" />
+            <span className="absolute bottom-0 right-0 bg-gray-200 dark:bg-gray-600 rounded-full p-2 shadow-md" />
+          </div>
+          <div className="mt-4 h-6 w-32 bg-gray-300 dark:bg-gray-700 rounded" />
+        </div>
+        <nav className="space-y-2">
+          {Array.from({ length: accountTabs.length }).map((_, idx) => (
+            <div
+              key={idx}
+              className="h-8 bg-gray-300 dark:bg-gray-700 rounded-lg"
+            />
+          ))}
+        </nav>
+      </aside>
+    );
+  }
 
   return (
     <aside className="col-span-1 hidden lg:block bg-teal-50 dark:bg-accent p-6 rounded-sm shadow-teal-900/10 shadow-sm sticky top-24 h-fit">
@@ -30,7 +54,7 @@ const AccountNav = () => {
           </span>
         </div>
         <h2 className="mt-4 text-xl font-semibold text-accent-foreground">
-          أحمد هشام
+          {profile?.first_name} {profile?.last_name}
         </h2>
       </div>
       <nav className="space-y-2 text-sm font-medium text-accent-foreground">

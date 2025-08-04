@@ -68,7 +68,22 @@ const AddToCart = ({
   }
 
   async function handlePlus() {
-    await updateCartItem(productId, inCartCount + 1, token);
+    const response = await updateCartItem(productId, inCartCount + 1, token);
+    if (response && response.success) {
+      setInCartCount((prev) => prev + 1);
+      showToast("Item updated in cart successfully");
+    }
+    if (response && response.stockOut) {
+      toast.error("Not enough stock available", {
+        action: {
+          label: "View Cart",
+          onClick: () => {
+            router.push("/cart");
+          },
+        },
+      });
+      return;
+    }
   }
 
   async function handleMinus() {
@@ -146,8 +161,6 @@ const AddToCart = ({
             size="icon"
             onClick={() => {
               startTransition(handlePlus);
-              setInCartCount((prev) => prev + 1);
-              showToast("Item updated in cart successfully");
             }}
             className="w-6 h-6 text-lg text-green-600 hover:bg-green-100"
             disabled={pending || inCartCount >= stock}

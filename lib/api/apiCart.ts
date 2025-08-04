@@ -123,15 +123,26 @@ export const updateCartItem = async (
         },
       }
     );
+
+    console.log(response.data);
     if (response.data.result === "Success") {
       return {
         success: true,
         data: response.data.message,
       };
     }
+
+    if (response.data.result === "Error") {
+      return {
+        success: false,
+        stockOut: true,
+      };
+    }
   } catch (error) {
+    console.log(error);
     if (error instanceof AxiosError) {
       if (error.response?.statusText === "Unauthorized") {
+        console.log(error.response.data);
         return {
           success: false,
           message: "Unauthorized access",

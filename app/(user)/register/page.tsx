@@ -1,11 +1,5 @@
 "use client";
 
-import React from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { RegisterFormData } from "@/types";
-import { registerSchema } from "@/lib/validators";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -13,19 +7,23 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { registerSchema } from "@/lib/validators";
+import { RegisterFormData } from "@/types";
+import { zodResolver } from "@hookform/resolvers/zod";
+import React from "react";
+import { useForm } from "react-hook-form";
 
+import SpinnerMini from "@/components/custom/SpinnerMini";
+import { registerUser } from "@/lib/api/apiUser";
 import {
   APP_NAME,
   EGYPT_GOVERNORATES,
   signUpDefaultValues,
 } from "@/lib/constants";
-import { registerUser } from "@/lib/api/apiUser";
-import Link from "next/link";
 import Image from "next/image";
-import { useFormStatus } from "react-dom";
-import Spinner from "@/components/custom/spinner";
-import SpinnerMini from "@/components/custom/SpinnerMini";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 
 // 3|e8wTV7x6fnsJjPbowVI3OmVxM78DqkGSnj68G7BDc3155768
@@ -44,6 +42,7 @@ const RegisterPage = () => {
   const onSubmit = async (data: RegisterFormData) => {
     setFormErrors([]);
     const response = await registerUser(data);
+    console.log(response);
 
     if (response.status === "error") {
       const errorsArray = Object.entries(response.payload).map(

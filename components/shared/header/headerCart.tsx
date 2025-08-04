@@ -95,7 +95,7 @@ const HeaderCart = ({
           {!multiStores ? (
             <div className="flex items-center gap-2 text-foreground text-lg font-medium capitalize">
               <Badge variant="secondary" className="text-base">
-                {cart?.summary.count_items}
+                {cart?.pharmacies[0].items.length}
               </Badge>
               elements
             </div>
@@ -116,7 +116,14 @@ const HeaderCart = ({
         <DropdownMenuItem className="text-stone-700 dark:text-stone-300 text-sm font-semibold capitalize px-2 py-1.5 hover:bg-stone-100 dark:hover:bg-slate-700 rounded-md transition">
           <div className="flex items-center gap-2">
             <span>Total</span>
-            {formatCurrencyEGP(cart?.summary.total as number)}
+            {formatCurrencyEGP(
+              cart?.pharmacies.reduce(
+                (acc, pharmacy) =>
+                  acc +
+                  pharmacy.items.reduce((acc, item) => acc + item.total, 0),
+                0
+              ) as number
+            )}
           </div>
         </DropdownMenuItem>
 

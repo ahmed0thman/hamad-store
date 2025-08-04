@@ -8,7 +8,7 @@ import Link from "next/link";
 import { useFormStatus } from "react-dom";
 import loader from "@/assets/loader.gif";
 import Image from "next/image";
-import { redirect, useSearchParams } from "next/navigation";
+import { redirect, useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -23,6 +23,7 @@ const CredentialsSignInForm = () => {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/";
   const [formError, setFormError] = useState<string | null>(null);
+  const router = useRouter();
 
   const {
     register,
@@ -46,7 +47,7 @@ const CredentialsSignInForm = () => {
       return;
     }
     if (res?.success) {
-      redirect(callbackUrl);
+      router.push(callbackUrl);
     }
   };
 

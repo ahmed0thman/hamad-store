@@ -30,7 +30,6 @@ const HeaderSearch = ({ categories }: { categories: category[] }) => {
 
   async function handleSearch(categoryId: string, keyword: string) {
     const result = await getSearchProducts(categoryId, keyword);
-    console.log("Search result:", result);
     if (result.success && result.data && result.data.length > 0) {
       setProducts(result.data);
     }
@@ -43,7 +42,6 @@ const HeaderSearch = ({ categories }: { categories: category[] }) => {
     function () {
       if (isItemSelected) {
         setIsItemSelected(false);
-        console.log("Item selected, resetting search");
         return;
       }
       if (keyword.trim() === "") {
@@ -64,7 +62,6 @@ const HeaderSearch = ({ categories }: { categories: category[] }) => {
         <div className="flex-center py-2">
           <Select
             onValueChange={(value) => {
-              console.log("Selected category:", value);
               setCategoryId(value);
             }}
             value={categoryId || "all"}
@@ -143,7 +140,6 @@ const HeaderSearch = ({ categories }: { categories: category[] }) => {
                         href={`/products?category=${categoryId}&keyword=${product.name}`}
                         className=""
                         onClick={() => {
-                          console.log("Navigating to product:", product.id);
                           setIsItemSelected(true);
                           setKeyword(product.name);
                           setShowModalSearch(false);
