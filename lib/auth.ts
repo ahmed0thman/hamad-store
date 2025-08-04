@@ -5,6 +5,7 @@ import axios from "axios";
 import type { NextAuthConfig } from "next-auth";
 import type { User } from "next-auth";
 import { api } from "./axios";
+import { CartData } from "@/types";
 
 // Extend the User type to include additional fields from the API response
 declare module "next-auth" {
@@ -21,6 +22,7 @@ declare module "next-auth" {
     phone: string;
     emailVerified: boolean;
     profileImage: string | null;
+    cart?: CartData | null;
   }
   interface Session {
     accessToken?: string;

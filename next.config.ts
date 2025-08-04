@@ -2,6 +2,9 @@ import type { NextConfig } from "next";
 import { SERVER_URL_images } from "./lib/constants";
 
 const nextConfig: NextConfig = {
+  experimental: {
+    viewTransition: true,
+  },
   images: {
     remotePatterns: [
       {

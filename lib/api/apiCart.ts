@@ -6,12 +6,17 @@ import { CartData } from "@/types";
 import { AxiosError } from "axios";
 import { delay } from "../utils";
 
-export const getCartData = async () => {
-  const session = await auth();
-  if (!session || !session.user || !session.accessToken) {
-    return { success: false, message: "User not authenticated" };
+export const getCartData = async (userToken?: string) => {
+  let token: string = "";
+  if (!userToken) {
+    const session = await auth();
+    token = session?.user.token || session?.accessToken || "";
+    if (!session || !session.user || !session.accessToken) {
+      return { success: false, message: "User not authenticated" };
+    }
+  } else {
+    token = userToken;
   }
-  const token = session?.user.token || session?.accessToken;
   try {
     const response = await api.get("/cart", {
       headers: {
@@ -45,11 +50,12 @@ export const getCartData = async () => {
   }
 };
 
-export const addToCart = async (prevState: unknown, formData: FormData) => {
+export const addToCart = async (
+  productID: number,
+  quantity: number,
+  token: string | undefined
+) => {
   // await delay(2000);
-  const productID = formData.get("productId");
-  const quantity = formData.get("quantity") || 1; // Default to 1
-  const token = formData.get("token") as string | undefined;
 
   if (!token) {
     // console.log("User not authenticated");
@@ -96,14 +102,10 @@ export const addToCart = async (prevState: unknown, formData: FormData) => {
 };
 
 export const updateCartItem = async (
-  prevState: unknown,
-  formData: FormData
+  productID: number,
+  quantity: number,
+  token: string | undefined
 ) => {
-  // await delay(2000);
-  const productID = formData.get("productId");
-  const quantity = formData.get("quantity") || 1; // Default to 1
-  const token = formData.get("token") as string | undefined;
-
   if (!token) {
     // console.log("User not authenticated");
     return { success: false, message: "User not authenticated" };
@@ -121,7 +123,6 @@ export const updateCartItem = async (
         },
       }
     );
-    console.log("Update to cart response:", response.data);
     if (response.data.result === "Success") {
       return {
         success: true,
@@ -149,12 +150,9 @@ export const updateCartItem = async (
 };
 
 export const removeCartItem = async (
-  prevState: unknown,
-  formData: FormData
+  productID: number,
+  token: string | undefined
 ) => {
-  const productID = formData.get("productId");
-  const token = formData.get("token") as string | undefined;
-
   if (!token) {
     // console.log("User not authenticated");
     return { success: false, message: "User not authenticated" };

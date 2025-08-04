@@ -62,6 +62,7 @@ export async function signInWithCredentials(formData: SignInFormData) {
 export async function signOutUser() {
   try {
     await signOut();
+    
 
     // Redirect to the sign-in page after successful sign-out
   } catch (error) {

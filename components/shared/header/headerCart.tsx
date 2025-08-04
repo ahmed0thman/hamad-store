@@ -15,9 +15,16 @@ import { ShoppingCart } from "lucide-react";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
 
-const HeaderCart = ({ session, cartData }: { session: any; cartData: any }) => {
+const HeaderCart = ({
+  session,
+  cartData,
+}: {
+  session?: any;
+  cartData: any;
+}) => {
   let cart: CartData | null = null;
   let isEmpty = false;
+  let multiStores = false;
   const isAuthenticated = session && session.user && session.accessToken;
   if (isAuthenticated) {
     if (cartData?.notAuthenticated) {
@@ -28,6 +35,10 @@ const HeaderCart = ({ session, cartData }: { session: any; cartData: any }) => {
       isEmpty = true;
     }
     cart = cartData.data;
+
+    if (cart?.pharmacies && cart.pharmacies.length > 1) {
+      multiStores = true;
+    }
   }
 
   if (!isAuthenticated) {
@@ -81,12 +92,26 @@ const HeaderCart = ({ session, cartData }: { session: any; cartData: any }) => {
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56 p-3 ">
         <DropdownMenuLabel className="text-primary">
-          <div className="flex items-center gap-2 text-foreground text-lg font-medium capitalize">
-            <Badge variant="secondary" className="text-base">
-              {cart?.summary.count_items}
-            </Badge>
-            elements
-          </div>
+          {!multiStores ? (
+            <div className="flex items-center gap-2 text-foreground text-lg font-medium capitalize">
+              <Badge variant="secondary" className="text-base">
+                {cart?.summary.count_items}
+              </Badge>
+              elements
+            </div>
+          ) : (
+            <div className="flex flex-col gap-1">
+              <div className="flex items-center gap-2 text-foreground text-lg font-medium capitalize">
+                <Badge variant="secondary" className="text-base">
+                  {cart?.pharmacies.length}
+                </Badge>
+                Pharmacies
+              </div>
+              <span className="text-sm text-muted-foreground">
+                You have orders with {cart?.pharmacies.length} pharmacies
+              </span>
+            </div>
+          )}
         </DropdownMenuLabel>
         <DropdownMenuItem className="text-stone-700 dark:text-stone-300 text-sm font-semibold capitalize px-2 py-1.5 hover:bg-stone-100 dark:hover:bg-slate-700 rounded-md transition">
           <div className="flex items-center gap-2">

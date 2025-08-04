@@ -175,16 +175,7 @@ export type CartProductItem = {
   quantity: number;
   total: number;
   free_quantity: number;
-  offer: {
-    id?: number;
-    type?: string;
-    discount_type?: string;
-    value?: number;
-    price_before?: number;
-    price_after?: number;
-    start_date?: string | null;
-    end_date?: string | null;
-  } | null;
+  price_after_discount: number;
 };
 
 export type CartPharmacy = {
