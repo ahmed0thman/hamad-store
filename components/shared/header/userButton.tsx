@@ -50,7 +50,7 @@ const UserButton = ({ user }: { user: UserType | null }) => {
           </Button>
 
           <Button variant="outline" asChild>
-            <Link href="/signUp" className="flex-center  font-medium">
+            <Link href="/register" className="flex-center  font-medium">
               Signup
             </Link>
           </Button>

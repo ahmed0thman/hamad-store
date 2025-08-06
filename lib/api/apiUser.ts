@@ -27,7 +27,11 @@ export async function registerUser(data: RegisterFormData) {
         };
       }
     } else {
-      throw error;
+      console.log("Unexpected error during registration:", error);
+      return {
+        success: false,
+        payload: "An unexpected error occurred",
+      };
     }
   }
 }

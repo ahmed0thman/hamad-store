@@ -17,7 +17,7 @@ export async function getAllCategories() {
     if (error instanceof AxiosError) {
       console.error("Error fetching categories:", error.response);
     }
-    throw error;
+    return [];
   }
 }
 
@@ -48,7 +48,7 @@ export async function getProductsBytitle(title: string) {
     return products;
   } catch (error) {
     console.error("Error fetching products by title:", error);
-    throw error;
+    return [];
   }
 }
 
@@ -137,14 +137,14 @@ export async function getFilteredProducts(filterParams: filterParams = {}) {
 
 // Get a single product by ID
 
-export async function getProduct(productId: string): Promise<Product> {
+export async function getProduct(productId: string) {
   try {
     const response = await api.get(`products/${productId}`);
     const product: Product = response.data.data;
     return product;
   } catch (error) {
     console.error("Error fetching product:", error);
-    throw error;
+    return null;
   }
 }
 
