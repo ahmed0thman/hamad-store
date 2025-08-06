@@ -188,6 +188,106 @@ const AddressesPage = () => {
     return (
       <div className="space-y-6 px-4 py-6">
         <p className="text-sm text-muted-foreground">لا توجد عناوين متاحة</p>
+        <div className="pt-4">
+          <Dialog
+            open={isDialogOpen}
+            onOpenChange={(open) => {
+              setAddressToEdit(null);
+              if (!open) {
+                handleReset();
+              }
+            }}
+          >
+            <DialogTrigger asChild>
+              <Button
+                onClick={handleDialogOpen}
+                className="flex-center ms-auto w-fit"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                إضافة عنوان جديد
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-lg">
+              <DialogHeader>
+                <DialogTitle>إضافة عنوان جديد</DialogTitle>
+              </DialogHeader>
+              <form onSubmit={handleSubmit(handleAddAddress)}>
+                <div className="grid gap-4 py-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="name">الاسم</Label>
+                      <Input {...register("name")} type="text" />
+                      {errors.name && (
+                        <p className="text-red-500 text-sm">
+                          {errors.name.message}
+                        </p>
+                      )}
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="phone">رقم الهاتف</Label>
+                      <Input {...register("phone")} type="tel" />
+                      {errors.phone && (
+                        <p className="text-red-500 text-sm">
+                          {errors.phone.message}
+                        </p>
+                      )}
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="building"> المبنى</Label>
+                      <Input {...register("building")} type="text" />
+                      {errors.building && (
+                        <p className="text-red-500 text-sm">
+                          {errors.building.message}
+                        </p>
+                      )}
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="city">المدينة</Label>
+                      <Input {...register("city")} type="text" />
+                      {errors.city && (
+                        <p className="text-red-500 text-sm">
+                          {errors.city.message}
+                        </p>
+                      )}
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="area">المنطقة</Label>
+                      <Input {...register("area")} type="text" />
+                      {errors.area && (
+                        <p className="text-red-500 text-sm">
+                          {errors.area.message}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Switch
+                      onCheckedChange={(checked) =>
+                        setValue("is_default", checked ? 1 : 0)
+                      }
+                      id="isDefault"
+                      // checked={getValues("is_default") === 1}
+                    />
+                    <Label htmlFor="isDefault">اجعل العنوان افتراضي</Label>
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleDialogClose}
+                  >
+                    إلغاء
+                  </Button>
+                  <Button type="submit" disabled={isSubmitting}>
+                    حفظ
+                    {isSubmitting && <SpinnerMini />}
+                  </Button>
+                </DialogFooter>
+              </form>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
     );
   }
