@@ -25,12 +25,19 @@ export async function getAllCategories() {
 
 export async function getBrandsBytitle(title?: string) {
   try {
+    console.log("Fetching brands with title:", title);
     const response = await api.get(`home/brands/`);
     const brands: Brand[] = response.data.data;
+    console.log("Brands fetched successfully:", brands.length);
     return brands;
   } catch (error) {
-    console.error("Error fetching brands by title:", error);
-    throw error;
+    if (error instanceof AxiosError) {
+      console.log("Error fetching brands by title:", error);
+      // Return empty array instead of throwing to prevent app crashes
+      return [];
+    }
+    // console.error("Unknown error fetching brands:", error);
+    return [];
   }
 }
 
