@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState, useTransition } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { formatCurrencyEGP } from "@/lib/utils";
@@ -9,6 +9,9 @@ import { Badge } from "@/components/ui/badge";
 import { Search } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
+import { OrderItem } from "@/types";
+import { getUserOrders } from "@/lib/api/apiOrders";
 
 interface Order {
   id: string;
@@ -21,63 +24,89 @@ interface Order {
 
 const Orders = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const { data: session, status } = useSession();
+  const [userToken, setUserToken] = useState<string>("");
+  const [pending, startTransition] = useTransition();
+  const [orders, setOrders] = useState<OrderItem[]>([]);
 
-  const orders: Order[] = [
-    {
-      id: "123456",
-      status: "Delivered",
-      date: "July 20, 2024",
-      itemCount: 3,
-      total: 120,
-      image:
-        "https://lh3.googleusercontent.com/aida-public/AB6AXuCwj3WEVLdj7NhV2WVHhb7AjydwtUlcy58GnRdf-0qHgl-wcNuizbaDPEW5e3SPlbq9Elxc2uk2EPNbtjHAyqQ4UfO0ntz7mq7by-a6B8DyvNZQ1sLAyOiT5DQiCmvGOo0e_HuId2WC14RVyBKX-LCmxDCVxNtOJdK1_p8vbFJ6NnDi-cbs0c3jWBiw9lpgPBaqlEmYv8yN4wSoIWHD45X5luJGa5rvX3ySOt76u5BIGu1qeUuvExaMlMFdpKq9K02arjXWR7ZJNA0",
+  useEffect(
+    function () {
+      if (status === "authenticated" && session?.user.token) {
+        setUserToken(session.user.token);
+      } else {
+        setUserToken("");
+      }
     },
-    {
-      id: "789012",
-      status: "Shipped",
-      date: "July 15, 2024",
-      itemCount: 2,
-      total: 85,
-      image:
-        "https://lh3.googleusercontent.com/aida-public/AB6AXuB6-utMUAL5STwxoM3jUyMxZLOIe92cHUsr9p6-ulx-9ydyMW-24dvvV8X30-SyljtU3H7cAFXknHsQeLl2Oca9AogfpZ20kklPYtJAixXLJSR2-56qO7c9faHPYMBoSaslg18qMpVpO-ghe_7rsV51JN4y84OMiuPuOa9bgq9sAj5cyMBgh23na5wEw2KNJzeZ01ZGcS6Q568fGx6li9tukjbLBQ3phCnxbSstqGo76YGOTUZS_XIKknB9NpvXsyMGBO-sB5OJv4U",
-    },
-    {
-      id: "345678",
-      status: "Delivered",
-      date: "June 28, 2024",
-      itemCount: 4,
-      total: 150,
-      image:
-        "https://lh3.googleusercontent.com/aida-public/AB6AXuBMRSGM4pYU1r6tu_iC0Vfcjrp5wbEVmkF0FbCl0yAokT4ycNRODpvTrqiLN7cXOzeIMZzUP7Jn43kDy8_2uhkQagIJNR4ciHl2VrWV9ysduzwF5_h9_87oBJIEyFvVomJw6iBfnqL68HoyZKhPhrLJx1rd4tYPlcp2sF3MF4FyN63iCYN5C3DfyEbjd_Vf2IHa2gc3DDJLbmisl0j_hPatTVF8jIaochSaZr9WGRNaBtbV6SdIh0RmkdjM-5xUBq8lGXB6r4ayZoI",
-    },
-    {
-      id: "901234",
-      status: "Canceled",
-      date: "June 10, 2024",
-      itemCount: 1,
-      total: 40,
-      image:
-        "https://lh3.googleusercontent.com/aida-public/AB6AXuDdFqkzltY-4hVR05sgCb0wwjoAvttRxHnvAG7eoQmNl1ey4dUMdtUaW4BY2p0IDJRR6HJ4J5HPSvmPA8QcPLtqdKE2WEGDhw_ZBu_vek0GzV4VadX41LGsDAKqoHNJYps3LVYm-CKnmuT992bgOAGDZmEFY9ym0ba-2qfGIrkdARGYrB-Z9ntxfS5ta3KfdVRTBrvYFvneRLg2zuetViGTA1GPOdUJ-yboVZ8hTX5Jbm9Z11SuNtxfmbN034TKKACqKnkyziu2vnQ",
-    },
-  ];
+    [status]
+  );
 
-  const getStatusColor = (status: Order["status"]) => {
-    switch (status) {
-      case "Delivered":
-        return "bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100";
-      case "Shipped":
+  async function fetchOrders() {
+    const response = await getUserOrders(userToken);
+    console.log(response);
+    if (response?.success) {
+      setOrders(response.data as OrderItem[]);
+    }
+  }
+
+  useEffect(() => {
+    if (userToken) {
+      startTransition(fetchOrders);
+    }
+  }, [userToken]);
+
+  const getStatusColor = (status: string) => {
+    switch (status.toLowerCase()) {
+      case "pending":
+        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100";
+      case "confirmed":
         return "bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100";
-      case "Canceled":
+      case "shipped":
+        return "bg-indigo-100 text-indigo-800 dark:bg-indigo-800 dark:text-indigo-100";
+      case "delivered":
+        return "bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100";
+      case "cancelled":
+      case "canceled":
         return "bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100";
+      case "returned":
+        return "bg-purple-100 text-purple-800 dark:bg-purple-800 dark:text-purple-100";
+      case "completed":
+        return "bg-teal-100 text-teal-800 dark:bg-teal-800 dark:text-teal-100";
       default:
         return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-100";
     }
   };
 
   const filteredOrders = orders.filter((order) =>
-    order.id.toLowerCase().includes(searchQuery.toLowerCase())
+    order.id.toString().toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  if (pending) {
+    return (
+      <div className="animate-pulse">
+        {[...Array(5)].map((_, index) => (
+          <div
+            key={index}
+            className="flex items-stretch justify-between gap-4 py-4"
+          >
+            <div className="flex flex-[2_2_0px] flex-col gap-4">
+              <div className="flex flex-col gap-1">
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
+                <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/3"></div>
+                <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/4"></div>
+              </div>
+              <Button
+                variant="secondary"
+                size="sm"
+                className="rounded-full w-fit"
+              >
+                <span className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-24"></span>
+              </Button>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
   return (
     <section className="">
       <div className="wrapper px-4 py-8">
@@ -107,42 +136,34 @@ const Orders = () => {
             {filteredOrders.map((order) => (
               <div
                 key={order.id}
-                className="flex items-stretch justify-between gap-4 py-4"
+                className="flex flex-[2_2_0px] flex-col gap-4 pb-4"
               >
-                <div className="flex flex-[2_2_0px] flex-col gap-4">
-                  <div className="flex flex-col gap-1">
-                    <p className="text-sm text-muted-foreground">
-                      Order #{order.id}
-                    </p>
-                    <div className="flex items-center gap-2">
-                      <Badge className={getStatusColor(order.status)}>
-                        {order.status}
-                      </Badge>
-                    </div>
-                    <p className="text-sm text-muted-foreground">
-                      {order.date} · {order.itemCount} items ·{" "}
-                      {formatCurrencyEGP(order.total)}
-                    </p>
+                <div className="flex flex-col gap-1">
+                  {/* Pharmacy Name at top */}
+                  <div className="font-semibold text-base text-foreground flex items-center gap-2">
+                    <p className="capitalize">{order.pharmacy_name}</p> -{" "}
+                    <p>#{order.id}</p>
                   </div>
-                  <Button
-                    asChild
-                    variant="secondary"
-                    size="sm"
-                    className="rounded-full w-fit"
-                  >
-                    <Link href={`/account/orders/${order.id}`}>
-                      View Details
-                    </Link>
-                  </Button>
+
+                  {/* Status below order code */}
+                  <div className="flex items-center gap-2">
+                    <Badge className={getStatusColor(order.status)}>
+                      {order.status}
+                    </Badge>
+                  </div>
+                  {/* Total below status */}
+                  <p className="text-sm text-muted-foreground">
+                    {formatCurrencyEGP(Number(order.total))}
+                  </p>
                 </div>
-                <div className="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-xl flex-1 relative">
-                  <Image
-                    src={order.image}
-                    alt={`Order ${order.id}`}
-                    fill
-                    className="object-cover rounded-xl"
-                  />
-                </div>
+                <Button
+                  asChild
+                  variant="secondary"
+                  size="sm"
+                  className="rounded-full w-fit ms-auto hover:bg-secondary/50 transition-colors duration-200"
+                >
+                  <Link href={`/account/orders/${order.id}`}>View Details</Link>
+                </Button>
               </div>
             ))}
           </div>

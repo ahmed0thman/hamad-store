@@ -5,6 +5,7 @@ import {
   profileSchema,
   registerSchema,
   signInSchema,
+  userAddressSchema,
 } from "@/lib/validators";
 import { CredentialsSignin } from "next-auth";
 import z from "zod";
@@ -32,6 +33,10 @@ export type User = {
   profileImage: string | null;
 };
 export type UserProfile = z.infer<typeof profileSchema>;
+export type UserAddress = z.infer<typeof userAddressSchema> & {
+  id?: string;
+  user_id?: string;
+};
 
 // -------------------
 
@@ -39,7 +44,13 @@ export type CardFormData = z.infer<typeof cardSchema>;
 
 export type Cart = z.infer<typeof insertCartSchema>;
 export type CartItem = z.infer<typeof cartItemSchema>;
-
+export type ShippingMethod = {
+  id: number;
+  value: string;
+  type: string;
+  pharmacy_id: number;
+  duration: number;
+};
 // Product types
 
 export type TaxInfo = {
@@ -134,6 +145,11 @@ export type Product = {
   similar_products: ProductItem[];
 };
 
+export type addRate = {
+  rate: number;
+  rate_text: string;
+};
+
 export type FavoriteItem = {
   id: number;
   name: string;
@@ -184,8 +200,11 @@ export type CartPharmacy = {
   pharmacy_id: number;
   // shipping: any[];
   items: CartProductItem[];
-  subtotal: number;
   total: number;
+  coupon_discount: number;
+  total_after_coupon: number;
+  coupon_id: string | null;
+  coupon_code: string | null;
 };
 
 export type CartData = {
@@ -199,6 +218,58 @@ export type pagination = {
   total: number;
   next_page_url: string | null;
   prev_page_url: string | null;
+};
+
+// orders
+export type orderSaveParams = {
+  pharmacy_id: number;
+  shipping_id: number;
+  shipping_address: number;
+};
+
+export type OrderItem = {
+  id: number;
+  pharmacy_id: number;
+  order_number: string;
+  pharmacy_name: string;
+  status: string;
+  total: string;
+  is_paid: boolean;
+};
+export type OrderDetailsItem = {
+  id: number;
+  product_id: number;
+  product_name: string;
+  unit_price: string;
+  discount: string;
+  tax_rate: string;
+  tax_amount: string;
+  subtotal: string;
+  quantity: number;
+  total: string;
+};
+
+export type OrderDetails = {
+  id: number;
+  order_number: string;
+  pharmacy_id: number;
+  pharmacy_name: string;
+  status: string;
+  subtotal: string;
+  coupon_discount: string;
+  total: string;
+  shipping_address: string;
+  shipping_cost: string;
+  total_after_shipping: string;
+  paid_from_points: string;
+  paid_by_card: string;
+  is_paid: boolean;
+  earned_points: number;
+  payment_type: string;
+  due_date: string | null;
+  paid_amount: string;
+  remaining_amount: string;
+  items: OrderDetailsItem[];
 };
 
 // -------------

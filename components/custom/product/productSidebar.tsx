@@ -112,7 +112,7 @@ function SidebarContent({
           <Input
             id="customer-rating-slider"
             type="range"
-            min={1}
+            min={0}
             max={5}
             step={1}
             value={customerRating ?? 1}
@@ -140,7 +140,7 @@ function SidebarContent({
           <Input
             id="doctor-rating-slider"
             type="range"
-            min={1}
+            min={0}
             max={5}
             step={1}
             value={doctorRating ?? 1}

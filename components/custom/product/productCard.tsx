@@ -36,7 +36,7 @@ const ProductCard = async ({ productItem }: { productItem: ProductItem }) => {
         <ButtonFavorite inFavorites={inFavorites} productId={productItem.id} />
       </div>
 
-      <div className="md:relative w-2/5 md:w-full aspect-square !max-h-[250px]">
+      <div className="md:relative w-2/5 md:w-full aspect-square !max-h-[150px]">
         <Image
           src={image || "/images/no-image.jpg"}
           fill
@@ -47,6 +47,9 @@ const ProductCard = async ({ productItem }: { productItem: ProductItem }) => {
 
       <div className="space-y-3 mt-5 flex flex-col flex-grow">
         <h3 className="text-lg font-semibold text-foreground">
+          <span className="text-xs block text-muted-foreground underline font-medium">
+            {productItem.pharmacy_id}
+          </span>
           {productItem.name}
         </h3>
 

@@ -1,6 +1,12 @@
 "use server";
 
-import { RegisterFormData, SignInFormData, UserProfile } from "@/types";
+import {
+  RegisterFormData,
+  ShippingMethod,
+  SignInFormData,
+  UserAddress,
+  UserProfile,
+} from "@/types";
 import { api } from "../axios";
 import { AxiosError } from "axios";
 import { signInSchema } from "../validators";
@@ -105,17 +111,25 @@ export async function getProfile(userToken: string = "") {
 }
 
 export async function updateUserProfile(
-  userToken: string = '',
+  userToken: string = "",
   profileData: UserProfile
 ) {
+  if (!userToken) {
+    // console.log("User not authenticated");
+    return { success: false, message: "User not authenticated" };
+  }
   try {
-    const response = await api.put("user-profile", {
-      ...profileData
-    }, {
-      headers: {
-        Authorization: `Bearer ${userToken}`,
+    const response = await api.put(
+      "user-profile",
+      {
+        ...profileData,
       },
-    });
+      {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      }
+    );
     if (response.data.result === "Success") {
       return {
         success: true,
@@ -125,8 +139,157 @@ export async function updateUserProfile(
   } catch (error) {
     if (error instanceof AxiosError) {
       console.error("Error updating user profile:", error.response?.statusText);
-      return { success: false, message: error.response?.data?.message || "Failed to update profile" };
+      return {
+        success: false,
+        message: error.response?.data?.message || "Failed to update profile",
+      };
+    }
+  }
+}
+
+export async function getUserAddresses(userToken: string = "") {
+  if (!userToken) {
+    // console.log("User not authenticated");
+    return { success: false, message: "User not authenticated" };
+  }
+  try {
+    const response = await api.get("user-addresses", {
+      headers: {
+        Authorization: `Bearer ${userToken}`,
+      },
+    });
+    if (response.data.result === "Success") {
+      // console.log("User addresses:", response.data.data);
+      const addresses: UserAddress[] = response.data.data;
+      return {
+        success: true,
+        data: addresses,
+      };
+    }
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      console.error(
+        "Error fetching user addresses:",
+        error.response?.statusText
+      );
+      return {
+        success: false,
+        message: error.response?.data?.message || "Failed to fetch addresses",
+      };
+    }
+  }
+}
+
+export async function addUserAddress(
+  userToken: string = "",
+  addressData: UserAddress,
+  addressToUpdate: string = ""
+) {
+  console.log("Adding user address:", addressData);
+  if (!userToken) {
+    const session = await auth();
+    userToken = session?.user.token || session?.accessToken || "";
+    if (!session || !session.user || !session.accessToken) {
+      // console.log("User not authenticated");
+      return { success: false, message: "User not authenticated" };
+    }
+  }
+  try {
+    const response = await api[addressToUpdate ? "put" : "post"](
+      addressToUpdate ? `user-addresses/${addressToUpdate}` : "user-addresses",
+      {
+        ...addressData,
+        is_default: addressData.is_default ? 1 : 0,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      }
+    );
+    console.log(" address added:", response.data.data);
+    if (response.data.result === "Success") {
+      return {
+        success: true,
+        data: response.data.data as UserAddress,
+      };
+    }
+    return {
+      success: false,
+      message: response.data.message || "Failed to add address",
+    };
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      console.error("Error adding user address:", error.response);
+      return {
+        success: false,
+        message: error.response?.data?.message || "Failed to add address",
+      };
+    }
+  }
+}
+
+export async function deleteUserAddress(
+  userToken: string = "",
+  addressId: string
+) {
+  if (!userToken) {
+    const session = await auth();
+    userToken = session?.user.token || session?.accessToken || "";
+    if (!session || !session.user || !session.accessToken) {
+      // console.log("User not authenticated");
+      return { success: false, message: "User not authenticated" };
     }
   }
 
+  try {
+    const response = await api.delete(`user-addresses/${addressId}`, {
+      headers: {
+        Authorization: `Bearer ${userToken}`,
+      },
+    });
+    if (response.data.result === "Success") {
+      return {
+        success: true,
+        data: response.data.data as UserAddress,
+      };
+    }
+    return {
+      success: false,
+      message: response.data.message || "Failed to delete address",
+    };
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      console.error("Error deleting user address:", error.response);
+      return {
+        success: false,
+        message: error.response?.data?.message || "Failed to delete address",
+      };
+    }
+  }
+}
+
+export async function getPharmacyShippingMethods(pharmacyId: number) {
+  try {
+    const response = await api.get(`pharmacies/${pharmacyId}/shipping`);
+    console.log("Shipping methods response:", response.data);
+    if (response.data.result === "Success") {
+      return {
+        success: true,
+        data: response.data.data as ShippingMethod[],
+      };
+    }
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      console.error(
+        "Error fetching pharmacy shipping methods:",
+        error.response?.statusText
+      );
+      return {
+        success: false,
+        message:
+          error.response?.data?.message || "Failed to fetch shipping methods",
+      };
+    }
+  }
 }

@@ -1,95 +1,119 @@
 "use client";
 
-import { useState } from "react";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
-import ButtonStepNav from "./buttonStepNav";
+import { useOrder } from "@/contexts/OrderContext";
+import { getUserAddresses } from "@/lib/api/apiUser";
+import { UserAddress } from "@/types";
 import { ArrowRight } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-
-type Address = {
-  name: string;
-  address: string;
-};
+import { useSession } from "next-auth/react";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useState, useTransition } from "react";
+import Spinner from "../spinner";
+import ButtonStepNav from "./buttonStepNav";
+import Link from "next/link";
 
 export default function ChooseLocationTab({ onNext }: { onNext: () => void }) {
-  const [addresses, setAddresses] = useState<Address[]>([
-    {
-      name: "Sophia Clark",
-      address: "123 Elm Street, Apt 4B, Springfield, 62704",
-    },
-    {
-      name: "Liam Carter",
-      address: "456 Oak Avenue, Unit 2C, Springfield, 62704",
-    },
-    {
-      name: "Noah Bennett",
-      address: "789 Pine Lane, Suite 1A, Springfield, 62704",
-    },
-  ]);
-  const [selectedAddress, setSelectedAddress] = useState("Sophia Clark");
+  const searchParams = useSearchParams();
+  const [addresses, setAddresses] = useState<UserAddress[]>([]);
+  const { data: session, status } = useSession();
+  const [userToken, setUserToken] = useState<string>("");
+  const [pendingAddresses, startTransitionAddresses] = useTransition();
   const [open, setOpen] = useState(false);
-  const [newName, setNewName] = useState("");
-  const [newPhone, setNewPhone] = useState("");
-  const [newAddress, setNewAddress] = useState("");
-  const [setDefault, setSetDefault] = useState(false);
+  const { setShippingAddress, shippingAddress, setPharmacyId } = useOrder();
 
-  const handleAddAddress = () => {
-    const newEntry = { name: newName, address: newAddress };
-    setAddresses([...addresses, newEntry]);
-    if (setDefault) {
-      setSelectedAddress(newName);
+  async function fetchAddresses() {
+    const addressesData = await getUserAddresses(userToken);
+    if (addressesData?.success) {
+      setAddresses(addressesData?.data as UserAddress[]);
+      const defaultAddress = (addressesData?.data as UserAddress[])?.find(
+        (addr) => addr.is_default
+      );
+      setShippingAddress?.(
+        defaultAddress?.id || "",
+        `${defaultAddress?.city}, ${defaultAddress?.area}, ${defaultAddress?.building}` ||
+          ""
+      );
     }
-    setOpen(false);
-    setNewName("");
-    setNewAddress("");
-    setNewPhone("");
-    setSetDefault(false);
-  };
+  }
+
+  useEffect(() => {
+    const pharmacyId = searchParams.get("pharmacyId");
+    if (pharmacyId) {
+      setPharmacyId?.(parseInt(pharmacyId));
+    }
+  }, []);
+
+  useEffect(
+    function () {
+      if (status === "authenticated" && session?.user.token) {
+        setUserToken(session.user.token);
+      } else {
+        setUserToken("");
+      }
+    },
+    [status]
+  );
+
+  useEffect(() => {
+    if (userToken) {
+      startTransitionAddresses(fetchAddresses);
+    }
+  }, [userToken]);
+
+  if (pendingAddresses) {
+    return <Spinner />;
+  }
 
   return (
     <div className="space-y-4 pt-4">
       <h3 className="text-lg font-bold text-foreground">Choose Location</h3>
       <RadioGroup
-        value={selectedAddress}
-        onValueChange={setSelectedAddress}
+        value={shippingAddress || ""}
+        onValueChange={(value) => {
+          const selectedAddress = addresses.find((addr) => addr.id === value);
+          if (selectedAddress) {
+            setShippingAddress?.(
+              selectedAddress.id ?? "",
+              `${selectedAddress.city}, ${selectedAddress.area}, ${selectedAddress.building}`
+            );
+          }
+        }}
         className="space-y-3"
       >
-        {addresses.map((addr) => (
-          <label
-            key={addr.name}
-            className="flex items-center gap-4 border p-4 rounded-xl border-border"
-          >
-            <RadioGroupItem value={addr.name} />
-            <div className="flex flex-col">
-              <div className="flex items-center gap-2">
-                <p className="font-medium text-sm text-foreground">
-                  {addr.name}
+        {addresses &&
+          addresses.length > 0 &&
+          addresses.map((addr) => (
+            <label
+              key={addr.name}
+              className="flex items-center gap-4 border p-4 rounded-xl border-border"
+              // onClick={() => setShippingAddress?.(addr.id)}
+            >
+              <RadioGroupItem
+                value={addr.name}
+                checked={addr.id === shippingAddress}
+              />
+              <div className="flex flex-col">
+                <div className="flex items-center gap-2">
+                  <p className="font-medium text-sm text-foreground">
+                    {addr.name}
+                  </p>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  {addr.city}, {addr.area}, {addr.building}
                 </p>
               </div>
-              <p className="text-sm text-muted-foreground">{addr.address}</p>
-            </div>
-            {selectedAddress === addr.name && (
-              <Badge variant="outline" className="text-xs ms-auto">
-                default
-              </Badge>
-            )}
-          </label>
-        ))}
+              {addr.is_default ? (
+                <Badge variant="outline" className="text-xs ms-auto">
+                  default
+                </Badge>
+              ) : null}
+            </label>
+          ))}
       </RadioGroup>
       <div className="flex justify-between">
-        <Dialog open={open} onOpenChange={setOpen}>
+        {/* <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
             <Button variant="secondary">Add New Address</Button>
           </DialogTrigger>
@@ -129,10 +153,13 @@ export default function ChooseLocationTab({ onNext }: { onNext: () => void }) {
               </div>
             </div>
             <DialogFooter>
-              <Button onClick={handleAddAddress}>Add</Button>
+              <Button onClick={handleAddAddress}>Add</Button> 
             </DialogFooter>
           </DialogContent>
-        </Dialog>
+        </Dialog> */}
+        <Button asChild variant="secondary">
+          <Link href="/account/addresses">Add New Address</Link>
+        </Button>
         <ButtonStepNav handleClick={onNext}>
           Next
           <ArrowRight className="auto-dir" />

@@ -1,8 +1,9 @@
-import { Brand, category, Product, ProductItem } from "@/types";
+import { addRate, Brand, category, Product, ProductItem } from "@/types";
 import { api } from "../axios";
 import { AxiosError } from "axios";
 import { delay } from "../utils";
 import { success } from "zod";
+import { auth } from "../auth";
 
 // Get Endpoints
 
@@ -13,7 +14,9 @@ export async function getAllCategories() {
     const categories: category[] = response.data.data;
     return categories;
   } catch (error) {
-    console.error("Error fetching categories:", error);
+    if (error instanceof AxiosError) {
+      console.error("Error fetching categories:", error.response);
+    }
     throw error;
   }
 }
@@ -135,6 +138,44 @@ export async function getProduct(productId: string): Promise<Product> {
   } catch (error) {
     console.error("Error fetching product:", error);
     throw error;
+  }
+}
+
+export async function rateProduct(
+  productID: string,
+  rating: addRate,
+  userToken: string
+) {
+  let token: string = userToken;
+  if (!userToken) {
+    const session = await auth();
+    token = session?.user.token || session?.accessToken || "";
+    if (!session || !session.user || !session.accessToken) {
+      return { success: false, message: "User not authenticated" };
+    }
+  }
+
+  try {
+    const response = await api.post(
+      `products/${productID}/ratings`,
+      {
+        ...rating,
+      },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+
+    if (response.data.rating) {
+      return { success: true, message: "Product rated successfully" };
+    }
+
+    console.log("Rating response:", response.data);
+
+    return { success: false, message: "Failed to rate product" };
+  } catch (error) {
+    console.error("Error rating product:", error);
+    return { success: false, message: "Error rating product" };
   }
 }
 

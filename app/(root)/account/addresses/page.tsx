@@ -1,5 +1,7 @@
 "use client";
 
+import Spinner from "@/components/custom/spinner";
+import type { SubmitHandler } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -13,65 +15,154 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
-import { Pencil, Trash2, Plus } from "lucide-react";
-import { useState } from "react";
+import {
+  addUserAddress,
+  deleteUserAddress,
+  getUserAddresses,
+} from "@/lib/api/apiUser";
+import { UserAddress } from "@/types";
+import { userAddressSchema } from "@/lib/validators";
+import {
+  Pencil,
+  Trash2,
+  Plus,
+  Home,
+  Phone,
+  OctagonX,
+  CheckCircle2,
+} from "lucide-react";
+import { useSession } from "next-auth/react";
+import { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
-
-async function handleAddressSubmit(formData: FormData) {
-  // Process submitted form here
-}
-
-interface Address {
-  id: number;
-  name: string;
-  phone: string;
-  address: string;
-  isDefault: boolean;
-}
-
-const initialAddresses: Address[] = [
-  {
-    id: 1,
-    name: "أحمد هشام",
-    phone: "01001234567",
-    address: "شارع التحرير، شقة ٤، مدينة نصر، القاهرة",
-    isDefault: true,
-  },
-  {
-    id: 2,
-    name: "محمد علي",
-    phone: "01006543210",
-    address: "١٢ شارع النصر، المهندسين، الجيزة",
-    isDefault: false,
-  },
-];
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import SpinnerMini from "@/components/custom/SpinnerMini";
+import { set } from "zod";
 
 const AddressesPage = () => {
-  const [addresses, setAddresses] = useState(initialAddresses);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isDialogDeleteOpen, setIsDialogDeleteOpen] = useState(false);
+  const [addresses, setAddresses] = useState<UserAddress[]>([]);
+  const { data: session, status } = useSession();
+  const [userToken, setUserToken] = useState<string>("");
+  const [pendingAddresses, startTransitionAddresses] = useTransition();
+  const [pendingAction, startTransitionAction] = useTransition();
+  const [mounted, setMounted] = useState(false);
+  const [addressToEdit, setAddressToEdit] = useState<UserAddress | null>(null);
 
-  const handleAddAddress = () => {
-    // This function is no longer used for form submission
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting, isLoading },
+    reset,
+    setValue,
+    getValues,
+  } = useForm<UserAddress>({
+    resolver: zodResolver(userAddressSchema),
+    defaultValues: {
+      name: "",
+      phone: "",
+      city: "",
+      area: "",
+      building: "",
+      is_default: 0,
+    },
+  });
+
+  async function fetchAddresses() {
+    const addressesData = await getUserAddresses(userToken);
+    if (addressesData?.success) {
+      setAddresses(addressesData?.data as UserAddress[]);
+      const defaultAddress = (addressesData?.data as UserAddress[])?.find(
+        (addr) => addr.is_default
+      );
+    }
+    setMounted(true);
+  }
+
+  useEffect(
+    function () {
+      if (status === "authenticated" && session?.user.token) {
+        setUserToken(session.user.token);
+      } else {
+        setUserToken("");
+      }
+    },
+    [status]
+  );
+
+  useEffect(() => {
+    if (userToken) {
+      startTransitionAddresses(fetchAddresses);
+    }
+  }, [userToken]);
+
+  useEffect(() => {
+    if (!isDialogOpen) {
+      handleReset();
+    }
+  }, [isDialogOpen, reset]);
+
+  const handleReset = () => {
+    reset({
+      name: "",
+      phone: "",
+      building: "",
+      city: "",
+      area: "",
+      is_default: 0,
+    });
+    setAddressToEdit(null);
+    setIsDialogOpen(false);
   };
 
-  const handleDelete = (id: number) => {
-    const deletedAddress = addresses.find((a) => a.id === id);
-    setAddresses((prev) => prev.filter((a) => a.id !== id));
-
-    toast("تم حذف العنوان", {
-      description: deletedAddress?.name,
-      duration: 5000,
-      action: {
-        label: "تراجع",
-        onClick: () => {
-          setAddresses((prev) => [...prev, deletedAddress!]);
-        },
-      },
+  const handleAddAddress: SubmitHandler<UserAddress> = async (data) => {
+    startTransitionAction(async () => {
+      const response = await addUserAddress(
+        userToken,
+        data,
+        addressToEdit?.id ?? ""
+      );
+      if (response?.success) {
+        await fetchAddresses();
+        handleReset();
+        toast(
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-green-500" />
+            <span>تم حفظ العنوان بنجاح</span>
+          </div>
+        );
+      } else {
+        toast(
+          <div className="flex items-center gap-2">
+            <OctagonX className="w-4 h-4 text-red-500" />
+            <span>{"فشل في حفظ العنوان"}</span>
+          </div>
+        );
+      }
+      setAddressToEdit(null);
     });
   };
 
-  const handleEditClick = (address: Address) => {
-    // Editing functionality removed as per instructions
+  const handleDelete = (id: string) => {
+    startTransitionAction(async () => {
+      const response = await deleteUserAddress(userToken, id);
+      if (response?.success) {
+        await fetchAddresses();
+        toast(
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-green-500" />
+            <span>تم حذف العنوان بنجاح</span>
+          </div>
+        );
+      }
+    });
+  };
+
+  const handleEditClick = (address: UserAddress) => {
+    reset(address);
+    setAddressToEdit(address);
+    setIsDialogOpen(true);
   };
 
   const handleDialogClose = () => {
@@ -82,37 +173,83 @@ const AddressesPage = () => {
     setIsDialogOpen(true);
   };
 
+  if (pendingAddresses || !addresses || !mounted) {
+    return (
+      <div className="animate-pulse">
+        <div className="space-y-6 px-4 py-6">
+          <div className=" bg-muted rounded h-40"></div>
+          <div className=" bg-muted rounded h-40"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!addresses || addresses.length === 0) {
+    return (
+      <div className="space-y-6 px-4 py-6">
+        <p className="text-sm text-muted-foreground">لا توجد عناوين متاحة</p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6 px-4 py-6">
       {addresses.map((addr, idx) => (
         <div key={addr.id}>
           <div className="flex items-start justify-between">
-            <div>
+            <div className="space-y-1">
               <h3 className="font-semibold text-lg">{addr.name}</h3>
-              <p className="text-sm text-muted-foreground">{addr.address}</p>
-              <p className="text-sm text-muted-foreground">{addr.phone}</p>
-              {addr.isDefault && (
-                <span className="inline-block mt-1 text-xs font-medium bg-teal-100 text-teal-700 px-2 py-0.5 rounded">
+              <p className=" text-muted-foreground">
+                <Home className="inline-block me-2 w-4 h-4" />
+                {addr.city}, {addr.area}, {addr.building}
+              </p>
+              <p className=" text-muted-foreground">
+                <Phone className="inline-block me-2 w-4 h-4" />
+                {addr.phone}
+              </p>
+              {addr.is_default ? (
+                <span className="inline-block mt-1 text-sm font-medium bg-teal-100/80 text-teal-900 px-2 py-0.5 rounded">
                   العنوان الافتراضي
                 </span>
-              )}
+              ) : null}
             </div>
             <div className="flex items-center gap-2 mt-1">
               <Button
                 size="icon"
                 variant="ghost"
-                // Editing disabled per instructions
-                // onClick={() => handleEditClick(addr)}
+                onClick={() => handleEditClick(addr)}
               >
                 <Pencil className="w-4 h-4 text-muted-foreground" />
               </Button>
-              <Button
-                size="icon"
-                variant="ghost"
-                onClick={() => handleDelete(addr.id)}
-              >
-                <Trash2 className="w-4 h-4 text-destructive" />
-              </Button>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button size="icon" variant="ghost">
+                    <Trash2 className="w-4 h-4 text-destructive" />
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>حذف العنوان</DialogTitle>
+                  </DialogHeader>
+                  <p className="text-sm text-muted-foreground">
+                    هل أنت متأكد أنك تريد حذف هذا العنوان؟
+                  </p>
+                  <DialogFooter>
+                    <Button
+                      variant="outline"
+                      onClick={() => setIsDialogDeleteOpen(false)}
+                    >
+                      إلغاء
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      onClick={() => handleDelete(addr.id ?? "")}
+                    >
+                      حذف
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
             </div>
           </div>
           {idx < addresses.length - 1 && <Separator className="my-4" />}
@@ -123,7 +260,10 @@ const AddressesPage = () => {
         <Dialog
           open={isDialogOpen}
           onOpenChange={(open) => {
-            if (!open) handleDialogClose();
+            setAddressToEdit(null);
+            if (!open) {
+              handleReset();
+            }
           }}
         >
           <DialogTrigger asChild>
@@ -139,36 +279,63 @@ const AddressesPage = () => {
             <DialogHeader>
               <DialogTitle>إضافة عنوان جديد</DialogTitle>
             </DialogHeader>
-            <form action={handleAddressSubmit}>
+            <form onSubmit={handleSubmit(handleAddAddress)}>
               <div className="grid gap-4 py-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="name">الاسم</Label>
-                    <Input id="name" name="name" />
+                    <Input {...register("name")} type="text" />
+                    {errors.name && (
+                      <p className="text-red-500 text-sm">
+                        {errors.name.message}
+                      </p>
+                    )}
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="phone">رقم الهاتف</Label>
-                    <Input id="phone" name="phone" />
+                    <Input {...register("phone")} type="tel" />
+                    {errors.phone && (
+                      <p className="text-red-500 text-sm">
+                        {errors.phone.message}
+                      </p>
+                    )}
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="governorate">المحافظة</Label>
-                    <Input id="governorate" name="governorate" />
+                    <Label htmlFor="building"> المبنى</Label>
+                    <Input {...register("building")} type="text" />
+                    {errors.building && (
+                      <p className="text-red-500 text-sm">
+                        {errors.building.message}
+                      </p>
+                    )}
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="city">المدينة</Label>
-                    <Input id="city" name="city" />
+                    <Input {...register("city")} type="text" />
+                    {errors.city && (
+                      <p className="text-red-500 text-sm">
+                        {errors.city.message}
+                      </p>
+                    )}
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="street">الشارع</Label>
-                    <Input id="street" name="street" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="apartment">رقم المنزل أو الشقة</Label>
-                    <Input id="apartment" name="apartment" />
+                    <Label htmlFor="area">المنطقة</Label>
+                    <Input {...register("area")} type="text" />
+                    {errors.area && (
+                      <p className="text-red-500 text-sm">
+                        {errors.area.message}
+                      </p>
+                    )}
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <Switch id="isDefault" name="isDefault" />
+                  <Switch
+                    onCheckedChange={(checked) =>
+                      setValue("is_default", checked ? 1 : 0)
+                    }
+                    id="isDefault"
+                    // checked={getValues("is_default") === 1}
+                  />
                   <Label htmlFor="isDefault">اجعل العنوان افتراضي</Label>
                 </div>
               </div>
@@ -180,7 +347,10 @@ const AddressesPage = () => {
                 >
                   إلغاء
                 </Button>
-                <Button type="submit">إضافة</Button>
+                <Button type="submit" disabled={isSubmitting}>
+                  حفظ
+                  {isSubmitting && <SpinnerMini />}
+                </Button>
               </DialogFooter>
             </form>
           </DialogContent>

@@ -97,3 +97,14 @@ export const profileSchema = z.object({
   email: z.string().email("Email must be a valid email address"),
   profile_image: z.string().url("Profile image must be a valid URL").optional(),
 });
+
+export const userAddressSchema = z.object({
+  name: z.string().min(1, "Address name is required"),
+  phone: z
+    .string()
+    .regex(/^\+20\d{10}$/, "Phone must be a valid Egyptian number"),
+  building: z.string().min(1, "Building is required"),
+  area: z.string().min(1, "Area is required"),
+  city: z.string().min(1, "City is required"),
+  is_default: z.number().int().min(0).max(1).optional(),
+});

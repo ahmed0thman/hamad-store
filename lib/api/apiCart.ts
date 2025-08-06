@@ -76,6 +76,7 @@ export const addToCart = async (
     );
     // console.log("Add to cart response:", response.data);
     if (response.data.result === "Success") {
+      // console.log("Item added to cart successfully", response.data);
       return {
         success: true,
         data: response.data.message,
@@ -199,6 +200,63 @@ export const removeCartItem = async (
     return {
       success: false,
       message: "Failed to remove item from cart",
+      data: null,
+      notAuthenticated: null,
+    };
+  }
+};
+
+export const addCouponToCart = async (
+  couponCode: string,
+  pharamcyId: number,
+  token: string = ""
+) => {
+  if (!token) {
+    // console.log("User not authenticated");
+    return { success: false, message: "User not authenticated" };
+  }
+  try {
+    const response = await api.post(
+      "/add-coupon",
+      {
+        coupon_code: couponCode,
+        pharmacy_id: pharamcyId,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    console.log("Add coupon response:", response.data);
+    if (response.data.result === "Success") {
+      return {
+        success: true,
+        data: response.data.message,
+      };
+    }
+    if (response.data.result === "Error") {
+      return {
+        success: false,
+        message: response.data.message,
+      };
+    }
+  } catch (error) {
+    console.log("Error adding coupon to cart:", error);
+    if (error instanceof AxiosError) {
+      console.log("Error adding coupon to cart:", error.response?.statusText);
+      if (error.response?.statusText === "Unauthorized") {
+        return {
+          success: false,
+          message: "Unauthorized access",
+          data: null,
+          notAuthenticated: true,
+        };
+      }
+    }
+    return {
+      success: false,
+      message: "Failed to add coupon to cart",
       data: null,
       notAuthenticated: null,
     };
