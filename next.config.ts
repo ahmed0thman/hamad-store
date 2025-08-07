@@ -2,7 +2,6 @@ import type { NextConfig } from "next";
 import { SERVER_URL_images } from "./lib/constants";
 
 const nextConfig: NextConfig = {
-  output: "export",
   images: {
     remotePatterns: [
       {
