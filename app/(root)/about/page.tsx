@@ -2,6 +2,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import Image from "next/image";
 import { Briefcase, Users, ShoppingCart, Globe } from "lucide-react";
+import { aboutSEO } from "@/lib/seo";
+
+export const metadata = aboutSEO;
 
 const stats = [
   {

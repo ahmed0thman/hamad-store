@@ -11,6 +11,9 @@ import {
 } from "@/lib/api/apiProducts";
 import { auth } from "@/lib/auth";
 import getLocaleStrings from "@/localization";
+import { homeSEO } from "@/lib/seo";
+
+export const metadata = homeSEO;
 
 export default async function Home() {
   const session = await auth();

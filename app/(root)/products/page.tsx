@@ -5,6 +5,9 @@ import { delay } from "@/lib/utils";
 import { SearchParams } from "@/types";
 import { revalidatePath } from "next/cache";
 import { Suspense } from "react";
+import { productsSEO } from "@/lib/seo";
+
+export const metadata = productsSEO;
 
 const Products = async ({
   searchParams,
