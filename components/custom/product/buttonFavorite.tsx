@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { revalidate } from "@/lib/api/actions";
 import { addToFavorites, removeFromFavorites } from "@/lib/api/apiFavorites";
 import { Heart } from "lucide-react";
 import { redirect, usePathname, useRouter } from "next/navigation";
@@ -10,11 +11,9 @@ import { toast } from "sonner";
 const ButtonFavorite = ({
   inFavorites,
   productId,
-  revalidate,
 }: {
   inFavorites: boolean;
   productId: number;
-  revalidate?: () => void;
 }) => {
   const [addedToFavorites, setAddedToFavorites] = React.useState(inFavorites);
   const router = useRouter();
@@ -38,7 +37,11 @@ const ButtonFavorite = ({
       if (resAdd.success) {
         setAddedToFavorites(true);
         toast.success("Added to favorites");
-        revalidate?.();
+        if (pathName === "/favorites") {
+          revalidate("/favorites");
+        } else if (pathName.startsWith("/product/")) {
+          revalidate(`/product/${productId}`);
+        }
       }
     },
     [resAdd]
@@ -49,7 +52,7 @@ const ButtonFavorite = ({
       if (resRemove.success) {
         setAddedToFavorites(false);
         toast.success("Removed from favorites");
-        revalidate?.();
+        revalidate("/favorites");
       }
     },
     [resRemove]

@@ -1,5 +1,6 @@
 import Footer from "@/components/shared/footer";
 import Header from "@/components/shared/header";
+import CompareProvider from "@/contexts/CompareContext";
 
 export default function RootLayout({
   children,
@@ -8,9 +9,11 @@ export default function RootLayout({
 }>) {
   return (
     <div className="flex min-h-screen flex-col relative">
-      <Header />
-      <main className="flex-1 ">{children}</main>
-      <Footer />
+      <CompareProvider>
+        <Header />
+        <main className="flex-1 ">{children}</main>
+        <Footer />
+      </CompareProvider>
     </div>
   );
 }

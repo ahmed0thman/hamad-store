@@ -9,6 +9,7 @@ import { auth } from "@/lib/auth";
 import { getFavorites } from "@/lib/api/apiFavorites";
 import ButtonFavorite from "./buttonFavorite";
 import { Badge } from "@/components/ui/badge";
+import ButtonAddToCompare from "./buttonAddToCompare";
 
 const ProductCard = async ({ productItem }: { productItem: ProductItem }) => {
   const session = await auth();
@@ -47,9 +48,9 @@ const ProductCard = async ({ productItem }: { productItem: ProductItem }) => {
 
       <div className="space-y-3 mt-5 flex flex-col flex-grow">
         <h3 className="text-lg font-semibold text-foreground">
-          <span className="text-xs block text-muted-foreground underline font-medium">
+          {/* <span className="text-xs block text-muted-foreground underline font-medium">
             {productItem.pharmacy_id}
-          </span>
+          </span> */}
           {productItem.name}
         </h3>
 
@@ -117,9 +118,12 @@ const ProductCard = async ({ productItem }: { productItem: ProductItem }) => {
               {productItem.quantity > 0 ? "اشتري الآن" : "التفاصيل"}
             </Link>
           </Button>
-          <Button className="rounded-full text-stone-100 font-medium text-base flex-grow md:flex-grow-0">
-            مقارنة
-          </Button>
+
+          <ButtonAddToCompare id={productItem.id}>
+            <Button className="rounded-full text-stone-100 font-medium text-base flex-grow md:flex-grow-0">
+              مقارنة
+            </Button>
+          </ButtonAddToCompare>
         </div>
       </div>
     </div>

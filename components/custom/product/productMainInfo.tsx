@@ -23,6 +23,7 @@ import { auth } from "@/lib/auth";
 import { getFavorites } from "@/lib/api/apiFavorites";
 import ButtonFavorite from "./buttonFavorite";
 import { revalidatePath } from "next/cache";
+import ButtonAddToCompare from "./buttonAddToCompare";
 
 const ProductMainInfo = async ({ product }: { product: Product }) => {
   const session = await auth();
@@ -80,16 +81,18 @@ const ProductMainInfo = async ({ product }: { product: Product }) => {
           <TextExpander content={product.description} />
 
           <div className="flex flex-wrap gap-3">
-            <Button variant="outline" className="flex items-center gap-2">
+            <ButtonAddToCompare id={product.id}>
+              <Button variant="outline" className="flex items-center gap-2">
               <Scaling className="w-5 h-5" />
               أضف للمقارنة
             </Button>
+            </ButtonAddToCompare>
+
             <div className="flex justify-end gap-2 mb-2">
               <ButtonShare />
               <ButtonFavorite
                 inFavorites={inFavorites}
                 productId={product.id}
-                revalidate={revalidate}
               />
             </div>
           </div>

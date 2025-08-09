@@ -111,6 +111,36 @@ export type ProductItem = {
   offer?: ProductOffer | null;
 };
 
+export type ProductItemCompare = {
+  id: number;
+  name: string;
+  pharmacy: Pharmacy;
+  generic_name: string;
+  type: string;
+  form: string;
+  brand_id: number;
+  category_id: number;
+  strength: string;
+  price: number;
+  quantity: number;
+  image: string | null;
+  average_rating: {
+    user: number;
+    count_user_rate: number;
+    pharmacist: number;
+    count_pharmacist_rate: number;
+  };
+  tax_rate: string;
+  production_date: string;
+  expiry_date: string;
+  pack_size: string | null;
+  description: string;
+  show_home: number;
+  categoryName: string;
+  brandName: string;
+  offer?: ProductOffer | null;
+};
+
 export type Product = {
   id: number;
   name: string;

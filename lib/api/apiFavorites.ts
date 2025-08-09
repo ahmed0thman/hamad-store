@@ -5,6 +5,7 @@ import { AxiosError } from "axios";
 import { auth } from "../auth";
 import { delay } from "../utils";
 import { FavoriteItem } from "@/types";
+import { revalidatePath } from "next/cache";
 
 export const getFavorites = async () => {
   const session = await auth();
@@ -72,6 +73,8 @@ export const addToFavorites = async (
     );
     console.log("response", response.data);
     if (response.data.result === "Success") {
+      // revalidatePath("/favorites");
+      // await delay(100); // Delay to ensure revalidation is processed
       return {
         success: true,
         message: "Added to favorites",
@@ -128,6 +131,8 @@ export const removeFromFavorites = async (
     });
     console.log("response", response.data);
     if (response.data.result === "Success") {
+      // revalidatePath("/favorites");
+      // await delay(100); // Delay to ensure revalidation is processed
       return {
         success: true,
         message: "Removed from favorites",

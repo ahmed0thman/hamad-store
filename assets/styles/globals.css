@@ -44,7 +44,7 @@
     scrollbar-color: var(--color-slate-700) transparent;
   }
   .wrapper {
-    @apply max-w-7xl lg:mx-auto px-6 py-4 md:py-4 md:px-10 w-full;
+    @apply max-w-7xl lg:mx-auto px-3 py-1 sm:py-2 md:py-4 md:px-10 w-full;
   }
 
   .flex-start {
@@ -408,6 +408,9 @@ html[dir="rtl"] {
   }
   body {
     @apply bg-background text-foreground;
+  }
+  .nextjs-toast {
+    @apply !hidden;
   }
 }
 

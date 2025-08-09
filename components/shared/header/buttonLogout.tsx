@@ -1,4 +1,5 @@
 "use client";
+import SpinnerMini from "@/components/custom/SpinnerMini";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -10,22 +11,28 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { signOutUser } from "@/lib/api/apiUser";
+import { User as UserType } from "@/types";
 import { LogOut } from "lucide-react";
 import { signOut } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import React from "react";
+import React, { useTransition } from "react";
 
 const ButtonLogout = ({
   dialogOpen,
   setDialogOpen,
+  user,
 }: {
   dialogOpen: boolean;
   setDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  user: UserType | null;
 }) => {
-  const router = useRouter();
+  const [pending, startTransition] = useTransition();
 
   const handleLogout = () => {
-    signOut({ callbackUrl: "/signin" });
+    signOut({ redirectTo: "/" });
+    startTransition(async () => {
+      await signOutUser(user?.token as string);
+    });
   };
   return (
     <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
@@ -47,7 +54,7 @@ const ButtonLogout = ({
             <Button variant="outline">Cancel</Button>
           </DialogClose>
           <Button variant="destructive" onClick={handleLogout}>
-            Yes, Logout
+            {pending ? <SpinnerMini /> : "Yes, Logout"}
           </Button>
         </DialogFooter>
       </DialogContent>

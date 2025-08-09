@@ -70,9 +70,19 @@ export async function signInWithCredentials(formData: SignInFormData) {
   }
 }
 
-export async function signOutUser() {
+export async function signOutUser(token: string) {
   try {
-    await signOut();
+    const response = await api.post(
+      "logout",
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    console.log("Sign out response:", response.data);
 
     // Redirect to the sign-in page after successful sign-out
   } catch (error) {

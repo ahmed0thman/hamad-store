@@ -24,7 +24,7 @@ const userMenuItems = [
   },
   {
     title: "Notification",
-    href: "/account/notifications",
+    href: "/notifications",
     icon: <Bell />,
   },
   {
@@ -121,7 +121,11 @@ const UserButton = ({ user }: { user: UserType | null }) => {
           </DropdownMenu>
         </div>
       )}
-      <ButtonLogout dialogOpen={dialogOpen} setDialogOpen={setDialogOpen} />
+      <ButtonLogout
+        user={user}
+        dialogOpen={dialogOpen}
+        setDialogOpen={setDialogOpen}
+      />
     </div>
   );
 };

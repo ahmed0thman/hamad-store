@@ -22,7 +22,7 @@ const ProductSwiper = ({
   showAll?: boolean;
 }) => {
   return (
-    <section className="py-6">
+    <section className="py-6 overflow-hidden">
       <div className="wrapper !px-8">
         <div className="w-11/12 mx-auto">
           <div className="flex justify-between gap-6 items-center mb-4">

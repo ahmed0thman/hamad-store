@@ -31,6 +31,7 @@ declare module "next-auth" {
 }
 
 export const config = {
+  trustHost: true, // Add this to handle host verification
   pages: {
     signIn: "/signin",
     error: "/signin",

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import {
@@ -33,11 +34,17 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import Image from "next/image";
-import React, { ReactNode, useEffect, useState } from "react";
+import React, { ReactNode, useEffect, useState, useTransition } from "react";
 import profileImg from "/public/images/uploads/profile.png";
 import Link from "next/link";
 import { useTheme } from "next-themes";
 import { pharmacyCategories } from "@/lib/sampleData";
+import { getAllCategories } from "@/lib/api/apiProducts";
+import { category } from "@/types";
+import { signOut, useSession } from "next-auth/react";
+import { signOutUser } from "@/lib/api/apiUser";
+import { revalidate } from "@/lib/api/actions";
+import { usePathname } from "next/navigation";
 
 const headerPages = [
   { title: "Home", path: "/", icon: <Home /> },
@@ -46,21 +53,57 @@ const headerPages = [
 ];
 
 const accountPages = [
-  { title: "Personal Info", path: "/profile", icon: <UserCircle /> },
-  { title: "Addresses", path: "/addresses", icon: <MapPin /> },
-  { title: "Returns", path: "/returns", icon: <RotateCcw /> },
-  { title: "Payment Methods", path: "/payment-methods", icon: <CreditCard /> },
-  { title: "Wallet", path: "/wallet", icon: <Wallet /> },
-  { title: "Compare Products", path: "/compare", icon: <PanelLeft /> },
-  { title: "Wishlist", path: "/wishlist", icon: <Heart /> },
-  { title: "Settings", path: "/settings", icon: <Settings /> },
+  { title: "Personal Info", path: "/account/profile", icon: <UserCircle /> },
+  { title: "Addresses", path: "/account/addresses", icon: <MapPin /> },
+  { title: "Returns", path: "/account/refund", icon: <RotateCcw /> },
+  {
+    title: "Payment Methods",
+    path: "/account/payment-methods",
+    icon: <CreditCard />,
+  },
+  { title: "Wallet", path: "/account/wallet", icon: <Wallet /> },
+  { title: "Compare Products", path: "/account/compare", icon: <PanelLeft /> },
+  { title: "Favorites", path: "/favorites", icon: <Heart /> },
+  // { title: "Settings", path: "/settings", icon: <Settings /> },
 ];
-
-const HeaderMenu = () => {
+const HeaderMenu = ({ session }: { session: any }) => {
   const { theme, setTheme } = useTheme();
+  const [pending, startTransition] = useTransition();
   const [mounted, setMounted] = useState(false);
+  const [categories, setCategories] = useState<category[]>([]);
+  const [isAuth, setIsAuth] = useState<boolean>(
+    session?.user?.token || session?.accessToken ? true : false
+  );
+  const [initials, setInitials] = useState<string>("");
+  const pathName = usePathname();
+
+  async function handleGetCategories() {
+    const categories = await getAllCategories();
+    setCategories(categories);
+  }
+
+  async function handleSignOut() {
+    const responses = await Promise.all([
+      signOutUser(session?.user.token as string),
+      signOut({ redirect: false }),
+      revalidate(pathName),
+    ]);
+    setIsAuth(false);
+    setInitials("");
+  }
+
+  useEffect(() => {
+    if (isAuth) {
+      setInitials(
+        `${session?.user.firstName?.charAt(0)} ${session?.user.lastName?.charAt(
+          0
+        )}`
+      );
+    }
+  }, [isAuth]);
 
   useEffect(function () {
+    startTransition(handleGetCategories);
     setMounted(true);
   }, []);
 
@@ -75,15 +118,32 @@ const HeaderMenu = () => {
         </SheetTrigger>
         <SheetContent className="flex flex-col items-start p-4 overflow-auto">
           <SheetTitle></SheetTitle>
-          <div className="flex-center gap-3">
-            <Image src={profileImg} width={50} height={50} alt="profile" />
-            <p className="text-gray-600 font-medium text-lg">Ahmed Othman</p>
-          </div>
+          {isAuth && (
+            <div className="flex-center gap-3">
+              {session?.user.image?.endsWith(".svg") ? (
+                <Image
+                  src={session?.user.image}
+                  width={50}
+                  height={50}
+                  alt="profile"
+                />
+              ) : (
+                <div className="w-[50px] h-[50px] rounded-full bg-primary flex items-center justify-center">
+                  <span className="text-white font-medium">{initials}</span>
+                </div>
+              )}
+              <p className="text-gray-600 font-medium text-lg">
+                {session?.user.firstName} {session?.user.lastName}
+              </p>
+            </div>
+          )}
           {/* Menus */}
           <div className="flex-grow-1 w-full flex flex-col divide-y divide-gray-200 dark:divide-slate-700">
-            <Menu>
-              <MenuItem href="/signin" title="signin" icon={<LogIn />} />
-            </Menu>
+            {!isAuth ? (
+              <Menu>
+                <MenuItem href="/signin" title="signin" icon={<LogIn />} />
+              </Menu>
+            ) : null}
             {/* Menu Main Pages */}
             <Menu>
               {headerPages.map((ele) => (
@@ -104,11 +164,11 @@ const HeaderMenu = () => {
                 </AccordionTrigger>
                 <AccordionContent>
                   <Menu>
-                    {pharmacyCategories.map((ele) => (
+                    {categories.map((ele) => (
                       <MenuItem
                         key={`${ele.name}-category`}
                         title={ele.name}
-                        href={ele.href}
+                        href={`products/${ele.id}`}
                       />
                     ))}
                   </Menu>
@@ -117,25 +177,27 @@ const HeaderMenu = () => {
             </Accordion>
 
             {/* Account */}
-            <Accordion type="single" collapsible>
-              <AccordionItem value="account">
-                <AccordionTrigger className="py-3 px-6 text-lg hover:no-underline">
-                  Account
-                </AccordionTrigger>
-                <AccordionContent>
-                  <Menu>
-                    {accountPages.map((ele) => (
-                      <MenuItem
-                        key={`${ele.title}-account`}
-                        title={ele.title}
-                        href={ele.path}
-                        icon={ele.icon}
-                      />
-                    ))}
-                  </Menu>
-                </AccordionContent>
-              </AccordionItem>
-            </Accordion>
+            {isAuth ? (
+              <Accordion type="single" collapsible>
+                <AccordionItem value="account">
+                  <AccordionTrigger className="py-3 px-6 text-lg hover:no-underline">
+                    Account
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <Menu>
+                      {accountPages.map((ele) => (
+                        <MenuItem
+                          key={`${ele.title}-account`}
+                          title={ele.title}
+                          href={ele.path}
+                          icon={ele.icon}
+                        />
+                      ))}
+                    </Menu>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            ) : null}
 
             {/* Menu Actions */}
             <Menu>
@@ -152,14 +214,16 @@ const HeaderMenu = () => {
             </Menu>
 
             {/* Logout */}
-            <Menu>
-              <MenuItem
-                title="Logout"
-                icon={<LogOut />}
-                color="text-destructive"
-                handleClick={() => console.log("logged out")}
-              />
-            </Menu>
+            {isAuth ? (
+              <Menu>
+                <MenuItem
+                  title="Logout"
+                  icon={<LogOut />}
+                  color="text-destructive"
+                  handleClick={() => startTransition(handleSignOut)}
+                />
+              </Menu>
+            ) : null}
           </div>
         </SheetContent>
       </Sheet>

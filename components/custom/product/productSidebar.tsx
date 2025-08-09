@@ -79,7 +79,7 @@ function SidebarContent({
   }
 
   return (
-    <aside className="space-y-3 divide-y divide-y-reverse divide-accent/70 lg:bg-white dark:lg:bg-slate-900 p-4 rounded-md shadow  ">
+    <aside className="space-y-3 divide-y divide-y-reverse divide-accent/70 lg:bg-white dark:lg:bg-slate-900 p-4 rounded-md shadow overflow-y-auto  ">
       <div className="border-none">
         <h3 className="text-lg font-semibold mb-2">Price Range</h3>
         <div className="flex gap-2">
