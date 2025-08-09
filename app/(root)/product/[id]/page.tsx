@@ -6,10 +6,10 @@ import ProductRatingsComments from "@/components/custom/product/productRatingsCo
 import { getProduct } from "@/lib/api/apiProducts";
 import { Product } from "@/types";
 import { generateProductSEO, getProductCanonicalUrl } from "@/lib/seo";
-import { 
-  generateProductSchema, 
-  generateBreadcrumbSchema, 
-  generateReviewSchema 
+import {
+  generateProductSchema,
+  generateBreadcrumbSchema,
+  generateReviewSchema,
 } from "@/lib/structured-data";
 
 interface ProductPageProps {
@@ -26,7 +26,8 @@ export async function generateMetadata({
   if (!product) {
     return {
       title: "المنتج غير موجود | فاليديريا - الصيدلية الإلكترونية",
-      description: "المنتج المطلوب غير متوفر حالياً. تصفح مجموعتنا الواسعة من الأدوية والمنتجات الصحية.",
+      description:
+        "المنتج المطلوب غير متوفر حالياً. تصفح مجموعتنا الواسعة من الأدوية والمنتجات الصحية.",
       robots: {
         index: false,
         follow: false,
@@ -38,7 +39,11 @@ export async function generateMetadata({
   const metadata = generateProductSEO({
     id: product.id,
     name: product.name,
-    description: product.description || `${product.name} من ${product.brandName}. ${product.form} ${product.strength ? `بتركيز ${product.strength}` : ''}. متوفر في ${product.pharmacy.name}.`,
+    description:
+      product.description ||
+      `${product.name} من ${product.brandName}. ${product.form} ${
+        product.strength ? `بتركيز ${product.strength}` : ""
+      }. متوفر في ${product.pharmacy.name}.`,
     category: product.categoryName,
     brand: product.brandName,
     price: product.offer?.price_after || product.price,
@@ -55,28 +60,33 @@ export async function generateMetadata({
     brand: product.brandName,
     category: product.categoryName,
     availability: product.quantity > 0 ? "in_stock" : "out_of_stock",
-    offer: product.offer ? {
-      price_after: product.offer.price_after,
-      discount_percentage: product.offer.discount_percentage,
-    } : undefined,
+    offer: product.offer
+      ? {
+          price_after: product.offer.price_after,
+          discount_percentage: product.offer.discount_percentage,
+        }
+      : undefined,
   });
 
   const breadcrumbSchema = generateBreadcrumbSchema([
     { name: "الرئيسية", url: "/" },
     { name: "المنتجات", url: "/products" },
-    { name: product.categoryName, url: `/products?category=${product.categoryName}` },
+    {
+      name: product.categoryName,
+      url: `/products?category=${product.categoryName}`,
+    },
     { name: product.name },
   ]);
 
   // Add review schemas if available
   const allComments = [
-    ...product.user_comments.map(comment => ({
+    ...product.user_comments.map((comment) => ({
       rating: comment.rate,
       comment: comment.comment,
       author: comment.user_name,
       date: new Date().toISOString(),
     })),
-    ...product.pharmacist_comments.map(comment => ({
+    ...product.pharmacist_comments.map((comment) => ({
       rating: comment.rate,
       comment: comment.comment,
       author: `د. ${comment.user_name}`,
@@ -84,7 +94,8 @@ export async function generateMetadata({
     })),
   ];
 
-  const reviewSchemas = allComments.length > 0 ? generateReviewSchema(allComments) : [];
+  const reviewSchemas =
+    allComments.length > 0 ? generateReviewSchema(allComments) : [];
 
   // Create structured data script
   const structuredData = [productSchema, breadcrumbSchema, ...reviewSchemas];
@@ -93,16 +104,19 @@ export async function generateMetadata({
   return {
     ...metadata,
     other: {
-      'product:price:amount': String(product.offer?.price_after || product.price),
-      'product:price:currency': 'EGP',
-      'product:availability': product.quantity > 0 ? 'in stock' : 'out of stock',
-      'product:brand': product.brandName,
-      'product:category': product.categoryName,
-      'product:retailer_item_id': String(product.id),
-      'product:condition': 'new',
-      'og:price:amount': String(product.offer?.price_after || product.price),
-      'og:price:currency': 'EGP',
-      'structured-data': JSON.stringify(structuredData),
+      "product:price:amount": String(
+        product.offer?.price_after || product.price
+      ),
+      "product:price:currency": "EGP",
+      "product:availability":
+        product.quantity > 0 ? "in stock" : "out of stock",
+      "product:brand": product.brandName,
+      "product:category": product.categoryName,
+      "product:retailer_item_id": String(product.id),
+      "product:condition": "new",
+      "og:price:amount": String(product.offer?.price_after || product.price),
+      "og:price:currency": "EGP",
+      "structured-data": JSON.stringify(structuredData),
     },
   };
 }
@@ -110,7 +124,7 @@ export async function generateMetadata({
 const ProductPage = async ({ params }: ProductPageProps) => {
   const { id: productId } = await params;
   const product = await getProduct(productId);
-  
+
   if (!product) {
     return (
       <div className="flex-center h-screen">
@@ -129,28 +143,33 @@ const ProductPage = async ({ params }: ProductPageProps) => {
     brand: product.brandName,
     category: product.categoryName,
     availability: product.quantity > 0 ? "in_stock" : "out_of_stock",
-    offer: product.offer ? {
-      price_after: product.offer.price_after,
-      discount_percentage: product.offer.discount_percentage,
-    } : undefined,
+    offer: product.offer
+      ? {
+          price_after: product.offer.price_after,
+          discount_percentage: product.offer.discount_percentage,
+        }
+      : undefined,
   });
 
   const breadcrumbSchema = generateBreadcrumbSchema([
     { name: "الرئيسية", url: "/" },
     { name: "المنتجات", url: "/products" },
-    { name: product.categoryName, url: `/products?category=${product.categoryName}` },
+    {
+      name: product.categoryName,
+      url: `/products?category=${product.categoryName}`,
+    },
     { name: product.name },
   ]);
 
   // Add review schemas if available
   const allComments = [
-    ...product.user_comments.map(comment => ({
+    ...product.user_comments.map((comment) => ({
       rating: comment.rate,
       comment: comment.comment,
       author: comment.user_name,
       date: new Date().toISOString(),
     })),
-    ...product.pharmacist_comments.map(comment => ({
+    ...product.pharmacist_comments.map((comment) => ({
       rating: comment.rate,
       comment: comment.comment,
       author: `د. ${comment.user_name}`,
@@ -158,7 +177,8 @@ const ProductPage = async ({ params }: ProductPageProps) => {
     })),
   ];
 
-  const reviewSchemas = allComments.length > 0 ? generateReviewSchema(allComments) : [];
+  const reviewSchemas =
+    allComments.length > 0 ? generateReviewSchema(allComments) : [];
   const structuredData = [productSchema, breadcrumbSchema, ...reviewSchemas];
 
   return (
@@ -170,26 +190,48 @@ const ProductPage = async ({ params }: ProductPageProps) => {
           __html: JSON.stringify(structuredData),
         }}
       />
-      
+
       {/* Additional SEO Meta Tags */}
-      <link rel="canonical" href={getProductCanonicalUrl(product.id, product.name)} />
-      
+      <link
+        rel="canonical"
+        href={getProductCanonicalUrl(product.id, product.name)}
+      />
+
       <section className="space-y-12 pt-6 px-4 sm:px-8">
         {/* Breadcrumb Navigation for SEO */}
         <nav aria-label="Breadcrumb" className="text-sm text-gray-600">
           <ol className="flex items-center space-x-2 rtl:space-x-reverse">
-            <li><Link href="/" className="hover:text-primary">الرئيسية</Link></li>
+            <li>
+              <Link href="/" className="hover:text-primary">
+                الرئيسية
+              </Link>
+            </li>
             <span>/</span>
-            <li><Link href="/products" className="hover:text-primary">المنتجات</Link></li>
+            <li>
+              <Link href="/products" className="hover:text-primary">
+                المنتجات
+              </Link>
+            </li>
             <span>/</span>
-            <li><Link href={`/products?category=${product.categoryName}`} className="hover:text-primary">{product.categoryName}</Link></li>
+            <li>
+              <Link
+                href={`/products?category=${product.categoryName}`}
+                className="hover:text-primary"
+              >
+                {product.categoryName}
+              </Link>
+            </li>
             <span>/</span>
-            <li className="text-gray-900 font-medium" aria-current="page">{product.name}</li>
+            <li className="text-gray-900 font-medium" aria-current="page">
+              {product.name}
+            </li>
           </ol>
         </nav>
 
         {/* Product Name as H1 for SEO */}
-        <h1 className="sr-only">{product.name} - {product.brandName} | فاليديريا</h1>
+        <h1 className="sr-only">
+          {product.name} - {product.brandName} | فاليديريا
+        </h1>
 
         {/* Main Info */}
         <ProductMainInfo product={product as Product} />

@@ -12,10 +12,10 @@ import { Pharmacy } from "@/types";
 import React from "react";
 
 interface StorePageProps {
-  params: {
+  params: Promise<{
     id: string;
     [key: string]: string | undefined;
-  };
+  }>;
 }
 
 const StorePage = async ({ params }: StorePageProps) => {

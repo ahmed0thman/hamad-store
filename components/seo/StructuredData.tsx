@@ -5,7 +5,7 @@ interface StructuredDataProps {
 
 export function StructuredData({ data, className }: StructuredDataProps) {
   const jsonLd = Array.isArray(data) ? data : [data];
-  
+
   return (
     <script
       type="application/ld+json"

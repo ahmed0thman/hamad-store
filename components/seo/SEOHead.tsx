@@ -18,13 +18,13 @@ export function SEOHead({
     <>
       {/* Canonical URL */}
       {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
-      
+
       {/* No Index Meta Tag */}
       {noIndex && <meta name="robots" content="noindex, nofollow" />}
-      
+
       {/* Structured Data */}
       {structuredData && <StructuredData data={structuredData} />}
-      
+
       {/* Additional SEO elements */}
       {children}
     </>
@@ -50,28 +50,32 @@ export function createSEOMetadata({
   noIndex?: boolean;
 }): Metadata {
   const siteUrl = process.env.NEXTAUTH_URL || "https://valideria.com";
-  const fullTitle = title.includes("فاليديريا") ? title : `${title} | فاليديريا - الصيدلية الإلكترونية الرائدة`;
+  const fullTitle = title.includes("فاليديريا")
+    ? title
+    : `${title} | فاليديريا - الصيدلية الإلكترونية الرائدة`;
   const fullImage = ogImage || `${siteUrl}/images/logos/valideria-og.jpg`;
 
   return {
     title: fullTitle,
     description,
     keywords: keywords.join(", "),
-    
-    robots: noIndex ? {
-      index: false,
-      follow: false,
-    } : {
-      index: true,
-      follow: true,
-      googleBot: {
-        index: true,
-        follow: true,
-        "max-video-preview": -1,
-        "max-image-preview": "large",
-        "max-snippet": -1,
-      },
-    },
+
+    robots: noIndex
+      ? {
+          index: false,
+          follow: false,
+        }
+      : {
+          index: true,
+          follow: true,
+          googleBot: {
+            index: true,
+            follow: true,
+            "max-video-preview": -1,
+            "max-image-preview": "large",
+            "max-snippet": -1,
+          },
+        },
 
     openGraph: {
       type: "website",
@@ -103,9 +107,11 @@ export function createSEOMetadata({
       canonical: canonicalUrl,
     },
 
-    other: structuredData ? {
-      "structured-data": JSON.stringify(structuredData),
-    } : undefined,
+    other: structuredData
+      ? {
+          "structured-data": JSON.stringify(structuredData),
+        }
+      : undefined,
   };
 }
 

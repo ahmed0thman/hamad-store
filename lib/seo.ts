@@ -172,9 +172,9 @@ export function getProductUrl(productId: number, productName?: string): string {
     // Create SEO-friendly slug from product name
     const slug = productName
       .toLowerCase()
-      .replace(/[^\u0600-\u06FFa-z0-9\s-]/g, '') // Keep Arabic, English, numbers, spaces, hyphens
-      .replace(/\s+/g, '-') // Replace spaces with hyphens
-      .replace(/-+/g, '-') // Replace multiple hyphens with single
+      .replace(/[^\u0600-\u06FFa-z0-9\s-]/g, "") // Keep Arabic, English, numbers, spaces, hyphens
+      .replace(/\s+/g, "-") // Replace spaces with hyphens
+      .replace(/-+/g, "-") // Replace multiple hyphens with single
       .trim();
     return slug ? `${baseUrl}/${slug}` : baseUrl;
   }
@@ -182,7 +182,10 @@ export function getProductUrl(productId: number, productName?: string): string {
 }
 
 // Generate canonical URL for products
-export function getProductCanonicalUrl(productId: number, productName?: string): string {
+export function getProductCanonicalUrl(
+  productId: number,
+  productName?: string
+): string {
   const siteUrl = process.env.NEXTAUTH_URL || "https://valideria.com";
   return `${siteUrl}${getProductUrl(productId, productName)}`;
 }
