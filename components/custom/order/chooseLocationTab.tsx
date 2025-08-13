@@ -72,7 +72,9 @@ export default function ChooseLocationTab({ onNext }: { onNext: () => void }) {
       <RadioGroup
         value={shippingAddress || ""}
         onValueChange={(value) => {
-          const selectedAddress = addresses.find((addr) => addr.id === value);
+          const selectedAddress = addresses.find(
+            (addr) => addr.id?.toString() === value
+          );
           if (selectedAddress) {
             setShippingAddress?.(
               selectedAddress.id ?? "",
@@ -86,12 +88,12 @@ export default function ChooseLocationTab({ onNext }: { onNext: () => void }) {
           addresses.length > 0 &&
           addresses.map((addr) => (
             <label
-              key={addr.name}
+              key={addr.id}
               className="flex items-center gap-4 border p-4 rounded-xl border-border"
               // onClick={() => setShippingAddress?.(addr.id)}
             >
               <RadioGroupItem
-                value={addr.name}
+                value={addr.id?.toString() as string}
                 checked={addr.id === shippingAddress}
               />
               <div className="flex flex-col">

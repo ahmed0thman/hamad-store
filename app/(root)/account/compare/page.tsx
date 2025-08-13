@@ -82,9 +82,9 @@ const ProductComparison = () => {
                 <p className="text-sm text-muted-foreground text-center">
                   الاسم العلمي: {product.generic_name}
                 </p>
-                <p className="text-sm text-muted-foreground text-center">
+                <div className="text-sm text-muted-foreground text-center">
                   <TextExpander content={product.description} />
-                </p>
+                </div>
                 <div className="flex justify-center">
                   <Badge variant="secondary">{product.type}</Badge>
                 </div>

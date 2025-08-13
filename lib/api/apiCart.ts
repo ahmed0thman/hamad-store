@@ -74,7 +74,7 @@ export const addToCart = async (
         },
       }
     );
-    // console.log("Add to cart response:", response.data);
+    console.log("Add to cart response:", response.data);
     if (response.data.result === "Success") {
       // console.log("Item added to cart successfully", response.data);
       return {

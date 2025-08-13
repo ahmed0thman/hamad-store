@@ -6,13 +6,14 @@ export const APP_DESCRIPTION =
 export const NEXT_PUBLIC = "https://hamad-store.vercel.app/";
 
 export const SERVER_URL =
-  process.env.LARAVEL_PUBLIC_SERVER_URL || "https://backend.valideria.com/";
+  process.env.NEXT_PUBLIC_LARAVEL_PUBLIC_SERVER_URL ||
+  "https://backend.valideria.com/";
 export const SERVER_URL_images =
-  process.env.LARAVEL_PUBLIC_SERVER_URL_IMAGES ||
+  process.env.NEXT_PUBLIC_LARAVEL_PUBLIC_SERVER_URL_IMAGES ||
   "https://backend.valideria.com/storage";
 
 export const API_URL =
-  process.env.LARAVEL_PUBLIC_API_BASE_URL ||
+  process.env.NEXT_PUBLIC_LARAVEL_PUBLIC_API_BASE_URL ||
   "https://backend.valideria.com/api/";
 
 export const LATEST_PRODUCTS_LIMIT =

@@ -132,12 +132,12 @@ export const metadata: Metadata = {
       { url: "/favicon.ico", sizes: "32x32", type: "image/x-icon" },
       { url: "/favicon.ico", sizes: "96x96", type: "image/x-icon" },
     ],
-    apple: [
-      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
-    ],
-    other: [
-      { rel: "mask-icon", url: "/safari-pinned-tab.svg", color: "#0f766e" },
-    ],
+    // apple: [
+    //   { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    // ],
+    // other: [
+    //   { rel: "mask-icon", url: "/safari-pinned-tab.svg", color: "#0f766e" },
+    // ],
   },
 
   // Other
