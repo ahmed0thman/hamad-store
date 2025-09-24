@@ -27,8 +27,8 @@ export default function OrderPlacementPage() {
         <div className="flex border-b w-fit">
           {[
             { id: 1, label: "Choose Location" },
-            { id: 2, label: "Shipping Method" },
-            { id: 3, label: "Payment Method" },
+            { id: 2, label: "Payment Method" },
+            { id: 3, label: "Shipping Method" },
           ].map((tab) => (
             <div
               key={tab.id}
@@ -47,14 +47,19 @@ export default function OrderPlacementPage() {
 
         {step === 1 && <ChooseLocationTab onNext={() => setStep(2)} />}
 
-        {step === 2 && (
+        {step === 3 && (
           <ShippingMethodTab
-            onNext={() => setStep(3)}
-            onBack={() => setStep(1)}
+            // onNext={() => setStep(3)}
+            onBack={() => setStep(2)}
           />
         )}
 
-        {step === 3 && <PaymentMethodTab onBack={() => setStep(2)} />}
+        {step === 2 && (
+          <PaymentMethodTab
+            onBack={() => setStep(1)}
+            onNext={() => setStep(3)}
+          />
+        )}
       </div>
     </OrderPovider>
   );

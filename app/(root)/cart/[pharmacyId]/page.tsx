@@ -201,7 +201,7 @@ const PharamacyCart = () => {
                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
                   كود الخصم
                 </p>
-                {!cartPharmacy?.coupon_code && (
+                {!cartPharmacy?.promocoded && (
                   <div className="flex items-center gap-2">
                     <Input
                       placeholder="أدخل الكوبون"
@@ -218,7 +218,7 @@ const PharamacyCart = () => {
                     </Button>
                   </div>
                 )}
-                {cartPharmacy?.coupon_code && (
+                {cartPharmacy?.promocoded && (
                   <div className="flex flex-col gap-2 bg-teal-100 dark:bg-slate-700 rounded-lg p-4 mb-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
@@ -226,7 +226,7 @@ const PharamacyCart = () => {
                           كوبون الخصم:
                         </span>
                         <span className="text-sm bg-teal-200 dark:bg-teal-800 px-2 py-1 rounded text-teal-900 dark:text-teal-200 font-mono">
-                          {cartPharmacy.coupon_code}
+                          {cartPharmacy.promocoded}
                         </span>
                       </div>
                       {/* <Button
@@ -260,9 +260,7 @@ const PharamacyCart = () => {
                 <div className="flex justify-between font-bold text-teal-900 dark:text-teal-400 text-lg border-t border-teal-200 dark:border-teal-700 pt-4 mt-6">
                   <span>المجموع</span>
                   <span className="flex items-center">
-                    {formatCurrencyEGP(
-                      cartPharmacy?.total_after_coupon as number
-                    )}
+                    {formatCurrencyEGP(cartPharmacy?.total as number)}
                   </span>
                 </div>
               </div>

@@ -39,7 +39,7 @@ const Header = async () => {
             <div className="row-start-2 row-span-1 col-span-full">
               <HeaderSearch categories={categories} />
             </div>
-            <HeaderButtons>
+            <HeaderButtons session={session}>
               <HeaderCart session={session} cartData={cart} />
             </HeaderButtons>
             <UserButton user={user} />

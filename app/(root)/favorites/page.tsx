@@ -37,8 +37,10 @@ const Favorites = async () => {
   const products: ProductItem[] = productsRes.products as ProductItem[];
   // console.log(products.length);
 
-  const favoriteProducts = products.filter((product) =>
-    favorites.some((favorite) => favorite.id === product.id)
+  const favoriteProducts = products.filter(
+    (product) =>
+      Array.isArray(favorites) &&
+      favorites.some((favorite) => favorite.id === product.id)
   );
   // console.log(favoriteProducts.length);
   if (!productsRes.success) return <NoData message="Something went wrong" />;

@@ -34,6 +34,8 @@ export const signUpDefaultValues = {
   email: "admin@example.com",
   password: "12345678",
   password_confirmation: "12345678",
+  license_number: "123456",
+  specialization: "Cardiology",
 };
 
 export const EGYPT_GOVERNORATES = [

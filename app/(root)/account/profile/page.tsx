@@ -41,7 +41,7 @@ const Profile = () => {
         email: profile.email || "",
         age: profile.age ? Number(profile.age) : undefined,
         gender: profile.gender || "",
-        governorate: profile.governorate || "",
+        state: profile.state || "",
       });
     }
   }, [profile, reset]);
@@ -60,7 +60,7 @@ const Profile = () => {
       email: getValues("email"),
       age: getValues("age"),
       gender: getValues("gender"),
-      governorate: getValues("governorate"),
+      state: getValues("state"),
       language: profile?.language,
       profile_image: profile?.profile_image,
     };
@@ -210,7 +210,7 @@ const Profile = () => {
             htmlFor="gender"
             className="mb-1 block text-sm font-medium text-muted-foreground"
           >
-            الجنس *
+            النوع *
           </Label>
           <Input
             id="gender"
@@ -226,20 +226,14 @@ const Profile = () => {
         </div>
         <div className="md:col-span-2">
           <Label
-            htmlFor="governorate"
+            htmlFor="state"
             className="mb-1 block text-sm font-medium text-muted-foreground"
           >
-            المحافظة *
+            العنوان *
           </Label>
-          <Input
-            id="governorate"
-            {...register("governorate")}
-            placeholder="المحافظة"
-          />
-          {errors.governorate && (
-            <span className="text-red-500 text-xs">
-              {errors.governorate.message}
-            </span>
+          <Input id="state" {...register("state")} placeholder="العنوان" />
+          {errors.state && (
+            <span className="text-red-500 text-xs">{errors.state.message}</span>
           )}
         </div>
         <div className="mt-8 flex justify-end md:col-span-2">

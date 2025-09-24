@@ -30,3 +30,15 @@ export function formatCurrencyEGP(amount: number): string {
   }).format(amount);
   return `${formatted} LE`;
 }
+
+// Format number as currency in EGP (Egyptian Pound)
+export function formatCurrency(
+  amount: number,
+  currency: string = "EGP"
+): string {
+  const formatted = new Intl.NumberFormat("en-EG", {
+    style: "decimal",
+    minimumFractionDigits: 2,
+  }).format(amount);
+  return `${formatted} ${currency}`;
+}

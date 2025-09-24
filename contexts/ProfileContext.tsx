@@ -29,7 +29,7 @@ export const ProfileProvider = ({ children }: { children: ReactNode }) => {
 
   const loadProfile = async () => {
     const result = await getProfile(
-      session?.user.token || session?.accessToken || ""
+      session?.user?.token || session?.accessToken || ""
     );
     if (result?.success) {
       setProfile(result.data as UserProfile);
@@ -39,7 +39,7 @@ export const ProfileProvider = ({ children }: { children: ReactNode }) => {
 
   //   const updateProfile = async (profileData: UserProfile) => {
   //     await updateUserProfile(
-  //       session?.user.token || session?.accessToken || "",
+  //       session?.user?.token || session?.accessToken || "",
   //       profileData
   //     );
   //   };
@@ -64,7 +64,7 @@ export const ProfileProvider = ({ children }: { children: ReactNode }) => {
         profile: profile as UserProfile,
         loading,
         refreshProfile,
-        token: session?.user.token || session?.accessToken || "",
+        token: session?.user?.token || session?.accessToken || "",
       }}
     >
       {children}

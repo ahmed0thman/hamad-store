@@ -60,12 +60,12 @@ export const registerSchema = z
   .object({
     first_name: z.string().min(1, "First name is required"),
     last_name: z.string().min(1, "Last name is required"),
-    governorate: z.string().min(1, "Governorate is required"),
+    state: z.string().min(1, "Address is required"),
     gender: gender,
     age: z.string().regex(/^\d+$/, "Age must be a valid number"),
     phone: z
       .string()
-      .regex(/^\+20\d{10}$/, "Phone must be a valid Egyptian number"),
+      .regex(/^\+?[0-9]{7,15}$/, "Phone must be a valid phone number"),
     email: z.string().email("Email must be a valid email address"),
     password: z.string().min(8, "Password must be at least 8 characters"),
     password_confirmation: z
@@ -76,6 +76,26 @@ export const registerSchema = z
     message: "Passwords must match",
     path: ["password_confirmation"],
   });
+
+// Doctor Rigister schema
+export const doctorRegisterSchema = registerSchema.extend({
+  license_number: z.string().min(1, "License number is required"),
+  certificate_file: z.string().refine(
+    (val) => {
+      // Accept URLs ending with allowed extensions
+      return (
+        typeof val === "string" &&
+        /\.(pdf|doc|docx|jpg|jpeg|png|svg)$/i.test(val)
+      );
+    },
+    {
+      message:
+        "Certificate file must be a valid PDF, DOC, DOCX, JPG, PNG, JPEG, or SVG file URL",
+    }
+  ),
+  specialization: z.string().min(1, "Specialization is required"),
+  is_doctor: z.number().min(0).max(1).default(1).optional(),
+});
 
 // Create the signin schema
 export const signInSchema = z.object({
@@ -89,10 +109,10 @@ export const profileSchema = z.object({
   last_name: z.string().optional(),
   phone: z
     .string()
-    .regex(/^\+20\d{10}$/, "Phone must be a valid Egyptian number"),
+    .regex(/^\+?[0-9]{7,15}$/, "Phone must be a valid phone number"),
   language: z.string().optional(),
   gender: gender,
-  governorate: z.string().min(1, "Governorate is required"),
+  state: z.string().min(1, "address is required"),
   age: z.number().int().min(0, "Age must be a valid number"),
   email: z.string().email("Email must be a valid email address"),
   profile_image: z.string().url("Profile image must be a valid URL").optional(),

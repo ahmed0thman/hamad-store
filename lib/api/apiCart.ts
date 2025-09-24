@@ -10,7 +10,7 @@ export const getCartData = async (userToken?: string) => {
   let token: string = "";
   if (!userToken) {
     const session = await auth();
-    token = session?.user.token || session?.accessToken || "";
+    token = session?.user?.token || session?.accessToken || "";
     if (!session || !session.user || !session.accessToken) {
       return { success: false, message: "User not authenticated" };
     }

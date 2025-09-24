@@ -84,7 +84,7 @@ const HeaderMenu = ({ session }: { session: any }) => {
 
   async function handleSignOut() {
     const responses = await Promise.all([
-      signOutUser(session?.user.token as string),
+      signOutUser(session?.user?.token as string),
       signOut({ redirect: false }),
       revalidate(pathName),
     ]);

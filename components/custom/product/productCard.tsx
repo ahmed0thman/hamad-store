@@ -1,6 +1,6 @@
 import { Heart, Star } from "lucide-react";
-import Image from "next/image";
-import { formatCurrencyEGP } from "@/lib/utils";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { formatCurrency, formatCurrencyEGP } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { FavoriteItem, ProductItem } from "@/types";
@@ -10,6 +10,7 @@ import { getFavorites } from "@/lib/api/apiFavorites";
 import ButtonFavorite from "./buttonFavorite";
 import { Badge } from "@/components/ui/badge";
 import ButtonAddToCompare from "./buttonAddToCompare";
+import Image from "next/image";
 
 const ProductCard = async ({ productItem }: { productItem: ProductItem }) => {
   const session = await auth();
@@ -38,12 +39,22 @@ const ProductCard = async ({ productItem }: { productItem: ProductItem }) => {
       </div>
 
       <div className="md:relative w-2/5 md:w-full aspect-square !max-h-[150px]">
-        <Image
-          src={image || "/images/no-image.jpg"}
-          fill
-          alt="img"
-          className="!w-2/5 md:!w-full  object-cover md:rounded-md"
-        />
+        {/* Shadcn Avatar component for product image */}
+        <Avatar className="w-full h-full md:rounded-md">
+          <AvatarImage
+            src={image || "/images/no-image.jpg"}
+            alt="img"
+            className="object-cover"
+          />
+          <AvatarFallback>
+            <Image
+              src="/images/no-image.jpg"
+              alt="fallback"
+              fill
+              className="w-full h-full object-cover"
+            />
+          </AvatarFallback>
+        </Avatar>
       </div>
 
       <div className="space-y-3 mt-5 flex flex-col flex-grow">
@@ -56,18 +67,27 @@ const ProductCard = async ({ productItem }: { productItem: ProductItem }) => {
 
         <div className="flex flex-col md:flex-row gap-2  md:gap-4 justify-between">
           <div className="flex items-center md:flex-col md:items-start gap-2 md:gap-0">
-            {productItem.offer ? (
+            {productItem.offer_discount ? (
               <>
                 <span className="line-through text-gray-500 text-xs">
-                  {formatCurrencyEGP(productItem.offer?.price_before as number)}
+                  {formatCurrency(
+                    productItem.price as number,
+                    productItem.currency_symbol
+                  )}
                 </span>
                 <span className="text-foreground font-semibold text-lg">
-                  {formatCurrencyEGP(productItem.offer?.price_after as number)}
+                  {formatCurrency(
+                    productItem.final_price as number,
+                    productItem.currency_symbol
+                  )}
                 </span>
               </>
             ) : (
               <span className="text-foreground font-semibold text-xl">
-                {formatCurrencyEGP(productItem.price as number)}
+                {formatCurrency(
+                  productItem.price as number,
+                  productItem.currency_symbol
+                )}
               </span>
             )}
           </div>

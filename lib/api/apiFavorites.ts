@@ -12,7 +12,7 @@ export const getFavorites = async () => {
   if (!session || !session.user || !session.accessToken) {
     return { success: false, message: "User not authenticated" };
   }
-  const token = session?.user.token || session?.accessToken;
+  const token = session?.user?.token || session?.accessToken;
   try {
     const response = await api.get("/favorites", {
       headers: {
@@ -57,7 +57,7 @@ export const addToFavorites = async (
       data: null,
     };
   }
-  const token = session?.user.token || session?.accessToken;
+  const token = session?.user?.token || session?.accessToken;
   const productId = formInputs.get("productId");
   try {
     const response = await api.post(
@@ -121,7 +121,7 @@ export const removeFromFavorites = async (
       data: null,
     };
   }
-  const token = session?.user.token || session?.accessToken;
+  const token = session?.user?.token || session?.accessToken;
   const productId = formInputs.get("productId");
   try {
     const response = await api.delete(`/favorites/remove/${productId}`, {

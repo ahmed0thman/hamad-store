@@ -1,6 +1,7 @@
 import {
   cardSchema,
   cartItemSchema,
+  doctorRegisterSchema,
   insertCartSchema,
   profileSchema,
   registerSchema,
@@ -12,6 +13,8 @@ import z from "zod";
 
 // Authentication types
 export type RegisterFormData = z.infer<typeof registerSchema>;
+
+export type DoctorRegisterFormData = z.infer<typeof doctorRegisterSchema>;
 export type SignInFormData = z.infer<typeof signInSchema>;
 
 export class SignInError extends CredentialsSignin {
@@ -31,6 +34,8 @@ export type User = {
   phone: string;
   emailVerified: boolean;
   profileImage: string | null;
+  currency_code?: string | null;
+  is_doctor?: boolean;
 };
 export type UserProfile = z.infer<typeof profileSchema>;
 export type UserAddress = z.infer<typeof userAddressSchema> & {
@@ -108,7 +113,10 @@ export type ProductItem = {
     count_pharmacist_rate: number;
   };
   tax_rate: number;
-  offer?: ProductOffer | null;
+  final_price: number;
+  offer_discount?: number | null;
+  currency: string;
+  currency_symbol: string;
 };
 
 export type ProductItemCompare = {
@@ -157,8 +165,8 @@ export type Product = {
   average_rating: {
     user: number;
     count_user_rate: number;
-    pharmacist: number;
-    count_pharmacist_rate: number;
+    doctor: number;
+    count_doctor_rate: number;
   };
   tax_rate: number;
   production_date: string;
@@ -171,7 +179,7 @@ export type Product = {
   gallery: string[] | null;
   offer: ProductOffer | null;
   user_comments: Comment[];
-  pharmacist_comments: Comment[];
+  doctors_comments: Comment[];
   similar_products: ProductItem[];
 };
 
@@ -228,13 +236,14 @@ export type CartProductItem = {
 
 export type CartPharmacy = {
   pharmacy_id: number;
-  // shipping: any[];
+  pharmacy_name: string;
+  pharmacy_image: string;
   items: CartProductItem[];
   total: number;
   coupon_discount: number;
   total_after_coupon: number;
   coupon_id: string | null;
-  coupon_code: string | null;
+  promocoded: string | null;
 };
 
 export type CartData = {
@@ -255,6 +264,7 @@ export type orderSaveParams = {
   pharmacy_id: number;
   shipping_id: number;
   shipping_address: number;
+  payment_method: string;
 };
 
 export type OrderItem = {
@@ -304,3 +314,8 @@ export type OrderDetails = {
 
 // -------------
 export type SearchParams = { [key: string]: string | string[] | undefined };
+
+export type PaymentMethod = {
+  id: number;
+  name: { en: string; ar: string };
+};

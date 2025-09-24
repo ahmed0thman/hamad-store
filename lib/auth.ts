@@ -83,12 +83,19 @@ export const config = {
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
       try {
         if (user) {
           token.user = user;
           token.accessToken = user.token;
         }
+
+        // Handle session updates from client-side
+        if (trigger === "update" && session) {
+          // Update the token with new session data
+          token.user = { ...(token.user || {}), ...(session.user || {}) };
+        }
+
         return token;
       } catch (error) {
         // console.error("Error in jwt callback:", error);

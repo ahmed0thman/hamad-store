@@ -86,7 +86,7 @@ export async function generateMetadata({
       author: comment.user_name,
       date: new Date().toISOString(),
     })),
-    ...product.pharmacist_comments.map((comment) => ({
+    ...product.doctors_comments.map((comment) => ({
       rating: comment.rate,
       comment: comment.comment,
       author: `د. ${comment.user_name}`,
@@ -169,7 +169,7 @@ const ProductPage = async ({ params }: ProductPageProps) => {
       author: comment.user_name,
       date: new Date().toISOString(),
     })),
-    ...product.pharmacist_comments.map((comment) => ({
+    ...product.doctors_comments.map((comment) => ({
       rating: comment.rate,
       comment: comment.comment,
       author: `د. ${comment.user_name}`,

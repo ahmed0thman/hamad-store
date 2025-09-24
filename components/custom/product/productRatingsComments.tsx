@@ -107,9 +107,9 @@ function CommentTabs({
         className="divide-y divide-gray-200 dark:divide-slate-800 bg-muted/30 px-3 space-y-2 mt-4 overflow-auto"
       >
         {userComments && userComments.length > 0 ? (
-          userCommentsToShow.map((comment) => (
+          userCommentsToShow.map((comment, index) => (
             <CommentCard
-              key={comment.user_name}
+              key={`${comment.user_name}-${index}`}
               name={comment.user_name}
               comment={comment.comment}
               type="customer"
@@ -129,9 +129,9 @@ function CommentTabs({
         className="divide-y divide-gray-200 dark:divide-slate-800 bg-muted/30 px-3 space-y-2 mt-4 overflow-auto"
       >
         {doctorComments && doctorComments.length > 0 ? (
-          doctorCommentsToShow.map((comment) => (
+          doctorCommentsToShow.map((comment, index) => (
             <CommentCard
-              key={comment.user_name}
+              key={`${comment.user_name}-${index}`}
               name={comment.user_name}
               type="doctor"
               rating={comment.rate}
@@ -164,7 +164,7 @@ const ProductRatingsComments = ({ product }: { product: Product }) => {
             <div className="rounded-md shadow-sm py-3 px-6  bg-yellow-100 text-yellow-600 text-sm font-semibold flex flex-col items-center gap-1">
               <Star className="w-14 h-14 fill-current" />
               <span className="text-lg">
-                {product.average_rating.user.toFixed(1)}
+                {(+product.average_rating.user).toFixed(1)}
               </span>
             </div>
             <span className="text-muted-foreground text-sm">
@@ -180,11 +180,11 @@ const ProductRatingsComments = ({ product }: { product: Product }) => {
             <div className="rounded-md shadow-sm py-3 px-6  bg-green-100 text-green-600 text-sm font-semibold flex flex-col items-center gap-1">
               <Star className="w-14 h-14 fill-current" />
               <span className="text-lg">
-                {product.average_rating.pharmacist.toFixed(1)}
+                {(+product.average_rating.doctor).toFixed(1)}
               </span>
             </div>
             <span className="text-muted-foreground text-sm">
-              ({product.average_rating.count_pharmacist_rate})
+              ({product.average_rating.count_doctor_rate})
             </span>
           </div>
         </div>
@@ -193,7 +193,7 @@ const ProductRatingsComments = ({ product }: { product: Product }) => {
       <div className="relative">
         <CommentTabs
           userComments={product.user_comments}
-          doctorComments={product.pharmacist_comments}
+          doctorComments={product.doctors_comments}
           limit={4}
         />
 
@@ -212,7 +212,7 @@ const ProductRatingsComments = ({ product }: { product: Product }) => {
               <div className="mt-3">
                 <CommentTabs
                   userComments={product.user_comments}
-                  doctorComments={product.pharmacist_comments}
+                  doctorComments={product.doctors_comments}
                 />
               </div>
             </DialogHeader>

@@ -47,7 +47,7 @@ const ProductAddCart = async ({ product }: { product: Product }) => {
               cart={cart}
               stock={stock}
               productId={product.id}
-              token={session?.user.token || session?.accessToken || ""}
+              token={session?.user?.token || session?.accessToken || ""}
             />
           </div>
         )}

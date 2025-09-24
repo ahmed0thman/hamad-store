@@ -1,6 +1,7 @@
 "use server";
 
 import {
+  DoctorRegisterFormData,
   RegisterFormData,
   ShippingMethod,
   SignInFormData,
@@ -20,6 +21,62 @@ export async function registerUser(data: RegisterFormData) {
     return response.data.data;
   } catch (error) {
     if (error instanceof AxiosError) {
+      if (error.response?.data?.message) {
+        return {
+          status: "error",
+          payload: error.response.data.errors,
+        };
+      }
+    } else {
+      console.log("Unexpected error during registration:", error);
+      return {
+        success: false,
+        payload: "An unexpected error occurred",
+      };
+    }
+  }
+}
+
+export async function registerDoctor(
+  data: Omit<DoctorRegisterFormData, "certificate_file"> & {
+    certificate_file?: File | string;
+  }
+) {
+  console.log("Doctor registration data:", data);
+  try {
+    // Create FormData for file upload
+    const formData = new FormData();
+
+    // Append all form fields
+    Object.entries(data).forEach(([key, value]) => {
+      if (key === "certificate_file") {
+        // Handle both File object and string cases
+        if (value && typeof value === "object" && "name" in value) {
+          // It's a File object
+          formData.append(key, value as File);
+        } else if (typeof value === "string") {
+          // It's a string (filename), skip it for now as we need the actual file
+          console.warn(
+            "Certificate file is a string, not a File object. File upload may fail."
+          );
+        }
+      } else if (value !== undefined && value !== null) {
+        formData.append(key, String(value));
+      }
+    });
+
+    // Always set is_doctor to 1 for doctor registration
+    formData.append("is_doctor", "1");
+
+    const response = await api.post("doctor/register", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return response.data.data;
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      console.log("error during doctor registration:", error.response);
       if (error.response?.data?.message) {
         return {
           status: "error",
@@ -95,7 +152,7 @@ export async function getProfile(userToken: string = "") {
   try {
     if (userToken === "") {
       const session = await auth();
-      token = session?.user.token || session?.accessToken || "";
+      token = session?.user?.token || session?.accessToken || "";
       if (!session || !session.user || !session.accessToken) {
         return { success: false, message: "User not authenticated" };
       }
@@ -172,8 +229,9 @@ export async function getUserAddresses(userToken: string = "") {
         Authorization: `Bearer ${userToken}`,
       },
     });
+    console.log("User addresses response:", response.data);
     if (response.data.result === "Success") {
-      // console.log("User addresses:", response.data.data);
+      console.log("User addresses:", response.data.data);
       const addresses: UserAddress[] = response.data.data;
       return {
         success: true,
@@ -202,7 +260,7 @@ export async function addUserAddress(
   console.log("Adding user address:", addressData);
   if (!userToken) {
     const session = await auth();
-    userToken = session?.user.token || session?.accessToken || "";
+    userToken = session?.user?.token || session?.accessToken || "";
     if (!session || !session.user || !session.accessToken) {
       // console.log("User not authenticated");
       return { success: false, message: "User not authenticated" };
@@ -249,7 +307,7 @@ export async function deleteUserAddress(
 ) {
   if (!userToken) {
     const session = await auth();
-    userToken = session?.user.token || session?.accessToken || "";
+    userToken = session?.user?.token || session?.accessToken || "";
     if (!session || !session.user || !session.accessToken) {
       // console.log("User not authenticated");
       return { success: false, message: "User not authenticated" };
@@ -303,6 +361,76 @@ export async function getPharmacyShippingMethods(pharmacyId: number) {
         success: false,
         message:
           error.response?.data?.message || "Failed to fetch shipping methods",
+      };
+    }
+  }
+}
+
+export async function getSiteShippingMethods() {
+  try {
+    const response = await api.get(`site/shipping`);
+    console.log("Shipping methods response:", response.data);
+    if (response.data.result === "Success") {
+      return {
+        success: true,
+        data: response.data.data as ShippingMethod[],
+      };
+    }
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      console.error(
+        "Error fetching pharmacy shipping methods:",
+        error.response?.statusText
+      );
+      return {
+        success: false,
+        message:
+          error.response?.data?.message || "Failed to fetch shipping methods",
+      };
+    }
+  }
+}
+
+export async function updateUserLanguage(userToken: string, language: string) {
+  if (!userToken) {
+    const session = await auth();
+    userToken = session?.user?.token || session?.accessToken || "";
+    if (!session || !session.user || !session.accessToken) {
+      // console.log("User not authenticated");
+      return { success: false, message: "User not authenticated" };
+    }
+  }
+  try {
+    const response = await api.put(
+      "user-profile",
+      {
+        "user-language": language,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      }
+    );
+    if (response.data.result === "Success") {
+      // Return success with updated data
+      // The client should call update() from useSession to refresh the session
+      return {
+        success: true,
+        data: response.data.data as UserProfile,
+        message: "Language updated successfully",
+      };
+    }
+    return {
+      success: false,
+      message: response.data.message || "Failed to update language",
+    };
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      console.error("Error updating user language:", error.response);
+      return {
+        success: false,
+        message: error.response?.data?.message || "Failed to update language",
       };
     }
   }

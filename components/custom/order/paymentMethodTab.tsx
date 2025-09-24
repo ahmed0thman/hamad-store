@@ -1,9 +1,9 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   ArrowLeft,
+  ArrowRight,
   Banknote,
   CheckCircle,
   CreditCard,
@@ -15,39 +15,34 @@ import {
   WalletCards,
 } from "lucide-react";
 
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
-import Link from "next/link";
-import { use, useEffect, useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import ButtonStepNav from "./buttonStepNav";
 
-import { cardSchema } from "@/lib/validators";
-import { CardFormData, CartData, CartPharmacy, orderSaveParams } from "@/types";
-import { zodResolver } from "@hookform/resolvers/zod";
-import AddNewCardDialog from "./addNewCardDialog";
 import { useOrder } from "@/contexts/OrderContext";
-import { useSearchParams } from "next/navigation";
 import { getCartData } from "@/lib/api/apiCart";
+import { getPaymentMethods, saveOrder } from "@/lib/api/apiOrders";
+import { cardSchema } from "@/lib/validators";
+import {
+  CardFormData,
+  CartData,
+  CartPharmacy,
+  orderSaveParams,
+  PaymentMethod,
+} from "@/types";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useSession } from "next-auth/react";
-import { Card, CardContent } from "@/components/ui/card";
-import { formatCurrencyEGP } from "@/lib/utils";
+import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
-import { saveOrder } from "@/lib/api/apiOrders";
-import SpinnerMini from "../SpinnerMini";
-const paymentMethods = [
-  // "Card",
-  // "Zain Pay",
-  "Cash on Delivery",
-  //  "Pay Later"
-];
+import AddNewCardDialog from "./addNewCardDialog";
+// const paymentMethods = [
+//   // "Card",
+//   // "Zain Pay",
+//   "Cash on Delivery",
+//   //  "Pay Later"
+// ];
 const savedCards = [
   {
     name: "Visa",
@@ -87,40 +82,32 @@ const savedCards = [
   },
 ];
 
-export default function PaymentMethodTab({ onBack }: { onBack: () => void }) {
+export default function PaymentMethodTab({
+  onBack,
+  onNext,
+}: {
+  onBack: () => void;
+  onNext: () => void;
+}) {
   const searchParams = useSearchParams();
   const { data: session, status } = useSession();
   const [userToken, setUserToken] = useState<string>("");
-  const [pending, startTransition] = useTransition();
-  const [pendingSave, startTransitionSave] = useTransition();
-  const [mounted, setMounted] = useState(false);
-  const {
-    pharmacyId,
-    setPharmacyId,
-    shippingAddressValue,
-    shippingMethod,
-    shippingAddress,
-    shippingMethodValue,
-  } = useOrder();
-  const [pharmacyData, setPharmacyData] = useState<CartPharmacy | null>(null);
 
-  async function handleFetchCardDetails() {
-    if (!pharmacyId) return;
-    console.log("Fetching card details...");
-    const cartData = await getCartData(userToken);
-    if (cartData?.success) {
-      const cart = cartData.data as CartData;
-      const pharmacy = cart.pharmacies.find(
-        (ph) => ph.pharmacy_id === pharmacyId
-      );
-      setPharmacyData(pharmacy as CartPharmacy);
-      setMounted(true);
+  const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
+  const { setPharmacyId, setPaymentMethod, paymentMethod, paymentMethodValue } =
+    useOrder();
+
+  async function handleGetPaymentMethods() {
+    const response = await getPaymentMethods(userToken);
+    console.log(response);
+    if (response.success) {
+      setPaymentMethods(response.data as PaymentMethod[]);
     }
   }
 
   useEffect(() => {
     if (userToken) {
-      startTransition(handleFetchCardDetails);
+      handleGetPaymentMethods();
     }
   }, [userToken]);
 
@@ -139,46 +126,13 @@ export default function PaymentMethodTab({ onBack }: { onBack: () => void }) {
     }
   }, []);
 
-  async function handleSaveOrder() {
-    if (!shippingAddress || !shippingMethod || !pharmacyId) {
-      toast(
-        <div className="flex items-center gap-2">
-          <OctagonX className="inline-block ms-2 text-red-500" />
-          <span>
-            Please select a shipping address, shipping method, and payment
-            method.
-          </span>
-        </div>
-      );
-      return;
-    }
-    const orderParams: orderSaveParams = {
-      pharmacy_id: pharmacyId,
-      shipping_id: Number(shippingMethod),
-      shipping_address: Number(shippingAddress),
-    };
-    const response = await saveOrder(orderParams, userToken);
-    if (response.success) {
-      setShowSuccessDialog(true);
-    } else {
-      toast(
-        <div className="flex items-center gap-2">
-          <OctagonX className="inline-block ms-2 text-red-500" />
-          <span>{response.message}</span>
-        </div>
-      );
-    }
-  }
-
-  function handlePlaceOrder() {
-    startTransitionSave(handleSaveOrder);
-  }
-
-  const [selectedPayment, setSelectedPayment] = useState("Cash on Delivery");
+  const [selectedPayment, setSelectedPayment] = useState(
+    paymentMethods[0]?.name.en || paymentMethod || ""
+  );
   const [selectedCard, setSelectedCard] = useState("Visa");
   const [showNewCardDialog, setShowNewCardDialog] = useState(false);
   const [zainPayImage, setZainPayImage] = useState<string | null>(null);
-  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+
   const {
     register,
     handleSubmit,
@@ -195,17 +149,28 @@ export default function PaymentMethodTab({ onBack }: { onBack: () => void }) {
     <div className="space-y-4 pt-4">
       <h3 className="text-lg font-bold">Payment Method</h3>
       <RadioGroup
-        value={selectedPayment}
-        onValueChange={setSelectedPayment}
+        value={paymentMethodValue}
+        onValueChange={(value) =>
+          setPaymentMethod?.(
+            paymentMethods.find((pm) => pm.id.toString() === value)?.name.en ||
+              "",
+            value
+          )
+        }
         className="space-y-3"
       >
-        {paymentMethods.map((pm) => (
+        {paymentMethods.map((pm, idx) => (
           <label
-            key={pm}
+            key={pm.id}
             className="flex items-center gap-4 border border-border p-4 rounded-xl"
+            onClick={() =>
+              setSelectedPayment((prev) => pm.name.en || pm.name.ar)
+            }
           >
-            <RadioGroupItem value={pm} />
-            <div className="font-medium text-sm text-foreground">{pm}</div>
+            <RadioGroupItem value={pm.id.toString()} />
+            <div className="font-medium text-sm text-foreground">
+              {pm.name.en || pm.name.ar}
+            </div>
           </label>
         ))}
       </RadioGroup>
@@ -364,134 +329,17 @@ export default function PaymentMethodTab({ onBack }: { onBack: () => void }) {
           </span>
         </div>
       )}
-      {/* Order Summary Card */}
-      {pending && !mounted && (
-        <div className="max-w-xl mx-auto mt-8 mb-6 animate-pulse">
-          <Card className="bg-muted/50 dark:bg-muted/80">
-            <CardContent className="space-y-4">
-              <div className="h-6 bg-gray-300 dark:bg-gray-700 rounded w-1/4"></div>
-              <div className="h-6 bg-gray-300 dark:bg-gray-700 rounded w-full"></div>
-              <div className="h-6 bg-gray-300 dark:bg-gray-700 rounded w-full"></div>
-              <div className="h-6 bg-gray-300 dark:bg-gray-700 rounded w-full"></div>
-              <div className="h-6 bg-gray-300 dark:bg-gray-700 rounded w-full"></div>
-              <div className="h-6 bg-gray-300 dark:bg-gray-700 rounded w-full"></div>
-              <div className="h-6 bg-gray-300 dark:bg-gray-700 rounded w-full"></div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
-      {!pending && pharmacyData && (
-        <div className="max-w-xl mx-auto mt-8 mb-6">
-          <div className="bg-primary/10 dark:bg-muted border border-border rounded-xl shadow-sm p-6">
-            <h4 className="text-lg font-semibold mb-4">Order Summary</h4>
-            <div className="mb-4">
-              {pharmacyData.items.map((item) => (
-                <div
-                  key={item.product_id}
-                  className="flex items-center gap-3 py-2 border-b border-border last:border-b-0"
-                >
-                  <div className="flex-1">
-                    <div className="font-medium">{item.name}</div>
-                  </div>
-                  <div className="text-sm text-muted-foreground">
-                    Qty: {item.quantity}
-                  </div>
-                  <div className="text-sm">
-                    {formatCurrencyEGP(item.final_price * item.quantity)}
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="space-y-3 divide-y divide-accent text-sm">
-              <div className="flex justify-between">
-                <span>Products Total</span>
-                <span className="font-medium">
-                  {formatCurrencyEGP(pharmacyData.total)}
-                </span>
-              </div>
-              {pharmacyData.coupon_code && (
-                <div className="flex justify-between">
-                  <span>Coupon</span>
-                  <span className="font-medium text-green-600">
-                    - {formatCurrencyEGP(pharmacyData.coupon_discount)}
-                  </span>
-                </div>
-              )}
-              <div className="flex justify-between capitalize">
-                <span>Location</span>
-                <span className="font-medium">{shippingAddressValue}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Shipping Method</span>
-                <span className="font-medium capitalize">
-                  {shippingMethodValue}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span>Payment Method</span>
-                <span className="font-medium">{selectedPayment}</span>
-              </div>
-              {/* {selectedPayment === "Cash on Delivery" && (
-                <div className="flex justify-between">
-                  <span>Cash Handling Fee</span>
-                  <span className="font-medium">20 LE</span>
-                </div>
-              )} */}
-              <div className="border-t border-border my-3"></div>
-              <div className="flex justify-between text-base font-bold">
-                <span>Total</span>
-                <span>
-                  {formatCurrencyEGP(pharmacyData.total_after_coupon)}
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-      {/* Action Buttons */}
       <div className="flex justify-end items-center gap-3 pt-4">
         <ButtonStepNav handleClick={onBack}>
           <ArrowLeft className="auto-dir" />
           Back
         </ButtonStepNav>
-        <Button onClick={handlePlaceOrder}>
-          {pendingSave ? <SpinnerMini /> : "Place Order"}
-        </Button>
-      </div>
 
-      {/* Success Dialog */}
-      <Dialog open={showSuccessDialog}>
-        <DialogContent
-          className="max-w-sm mx-auto text-center"
-          showCloseButton={false}
-        >
-          <div className="flex flex-col items-center justify-center mb-2">
-            <CheckCircle className="w-12 h-12 text-green-500 mb-2" />
-          </div>
-          <DialogHeader>
-            <DialogTitle className="text-green-600 text-center">
-              Order Placed Successfully!
-            </DialogTitle>
-          </DialogHeader>
-          <div className="my-4">
-            <p className="text-base text-muted-foreground mb-2">
-              Your order has been placed. Thank you for shopping with us!
-            </p>
-          </div>
-          <DialogFooter className="flex flex-col gap-2">
-            <Button asChild variant="default" className="">
-              <Link href="/account/orders" replace>
-                Show Order
-              </Link>
-            </Button>
-            <Button asChild variant="secondary" className="">
-              <Link href="/" replace>
-                Keep Shopping
-              </Link>
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+        <ButtonStepNav handleClick={onNext}>
+          Next
+          <ArrowRight className="auto-dir" />
+        </ButtonStepNav>
+      </div>
     </div>
   );
 }

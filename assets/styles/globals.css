@@ -114,6 +114,10 @@
     background-image: none !important;
   }
 
+  input[type="file"]::file-selector-button {
+    @apply bg-primary/30 text-primary/80 border-0 rounded-md px-3 py-1.5 hover:bg-primary/90 transition-colors duration-200 cursor-pointer;
+  }
+
   footer {
     @apply bg-teal-600 text-white dark:bg-slate-700/50 dark:text-slate-300;
 

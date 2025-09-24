@@ -166,12 +166,12 @@ function SidebarContent({
         <div className="flex items-center gap-2">
           <input
             type="checkbox"
-            name="stock"
+            name="inStock"
             id="inStock"
             className="accent-primary"
             checked={inStock === "true"}
             onChange={(e) => {
-              setInStock(e.target.checked ? "true" : "false");
+              setInStock("true");
             }}
           />
           <label
@@ -184,12 +184,12 @@ function SidebarContent({
         <div className="flex items-center gap-2">
           <input
             type="checkbox"
-            name="stock"
+            name="outOfStock"
             id="outOfStock"
             className="accent-primary"
             checked={inStock === "false"}
             onChange={(e) => {
-              setInStock(e.target.checked ? "true" : "false");
+              setInStock("false");
             }}
           />
           <label
@@ -309,8 +309,8 @@ function ProductSidebar({ revalidate }: { revalidate: () => void }) {
   const searchParams = useSearchParams();
   const minRef = useRef<HTMLInputElement>(null);
   const maxRef = useRef<HTMLInputElement>(null);
-  const [customerRating, setCustomerRating] = useState<number | null>(null);
-  const [doctorRating, setDoctorRating] = useState<number | null>(null);
+  const [customerRating, setCustomerRating] = useState<number | null>(0);
+  const [doctorRating, setDoctorRating] = useState<number | null>(0);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [inStock, setInStock] = useState<string>("");
