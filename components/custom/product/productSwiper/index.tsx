@@ -33,7 +33,7 @@ const ProductSwiper = ({
               <Link href="/products">
                 <Button variant="link" className="text-primary">
                   عرض الكل
-                  <ArrowRight className="w-4 h-4 ms-1" />
+                  <ArrowRight className="w-4 h-4 ms-1 auto-dir" />
                 </Button>
               </Link>
             )}

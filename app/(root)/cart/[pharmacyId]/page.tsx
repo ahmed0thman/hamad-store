@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { addCouponToCart, getCartData } from "@/lib/api/apiCart";
+import { getAuthData } from "@/lib/api/apiUser";
 import { formatCurrencyEGP } from "@/lib/utils";
 import { CartData, CartPharmacy } from "@/types";
 import { CircleCheckBig, OctagonX } from "lucide-react";
@@ -18,31 +19,41 @@ import { toast } from "sonner";
 const PharamacyCart = () => {
   const params = useParams();
   const { pharmacyId } = params;
-  const { data: session, status } = useSession();
+  // const { data: session, status } = useSession();
   const [token, setToken] = useState<string | undefined>(undefined);
+
+  const [session, setSession] = useState<any>(null);
 
   const router = useRouter();
   const [cart, setCart] = useState<CartData | null>(null);
   const [cartPharmacy, setCartPharmacy] = useState<CartPharmacy | null>(null);
   const [pending, startTransition] = useTransition();
   const [pendingRefresh, startTransitionRefresh] = useTransition();
-  const [couponCode, setCouponCode] = useState<string>("");
   const [mounted, setMounted] = useState(false);
   const [authenticated, setAuthenticated] = useState(false);
+  const [currency, setCurrency] = useState("");
 
   useEffect(() => {
-    if (status === "authenticated") {
-      setToken(session?.user?.token || session?.accessToken || undefined);
-      setAuthenticated(true);
-    }
-  }, [status, session]);
+    getSessionData();
+  }, []);
 
   useEffect(() => {
     if (authenticated) {
       startTransition(fetchCartData);
       setMounted(true);
     }
-  }, [token, authenticated, pharmacyId, session, router]);
+  }, [authenticated]);
+
+  async function getSessionData() {
+    const session = await getAuthData();
+    if (session?.user && session?.accessToken) {
+      setSession(session);
+      setAuthenticated(true);
+      setToken(session?.user?.token || session?.accessToken || undefined);
+      setCurrency(session?.user?.currency_code || "EGP");
+      console.log("User currency:", session?.user?.currency_code);
+    }
+  }
 
   async function fetchCartData() {
     const cartData = await getCartData(token);
@@ -72,30 +83,6 @@ const PharamacyCart = () => {
       }
     } else {
       router.push("/signin?callbackUrl=/cart");
-    }
-  }
-
-  async function handleApplyCoupon() {
-    const response = await addCouponToCart(
-      couponCode,
-      Number(pharmacyId),
-      token
-    );
-    if (response?.success) {
-      toast(
-        <div className="text-sm text-green-500 flex items-center">
-          <CircleCheckBig className="me-2" />
-          <span>Coupon applied successfully</span>
-        </div>
-      );
-      await fetchCartData();
-    } else {
-      toast(
-        <div className="text-sm text-red-600 flex items-center">
-          <OctagonX className="me-2" />
-          <span>Coupon is not valid</span>
-        </div>
-      );
     }
   }
 
@@ -190,72 +177,14 @@ const PharamacyCart = () => {
               </div>
 
               <div className="mt-6 border-t border-teal-200 dark:border-teal-700 pt-6">
-                {/* <div className="flex justify-between items-center mb-4">
+                <div className="flex justify-between items-center mb-4">
                   <span className="text-lg font-semibold text-teal-800 dark:text-teal-400">
                     مجموع نقاط الولاء
                   </span>
                   <span className="text-xl font-bold text-teal-600 dark:text-teal-400">
                     1,800 نقطة
                   </span>
-                </div> */}
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-                  كود الخصم
-                </p>
-                {!cartPharmacy?.promocoded && (
-                  <div className="flex items-center gap-2">
-                    <Input
-                      placeholder="أدخل الكوبون"
-                      className="flex-grow"
-                      value={couponCode}
-                      onChange={(e) => setCouponCode(e.target.value)}
-                    />
-                    <Button
-                      variant="outline"
-                      className="bg-muted"
-                      onClick={() => startTransition(handleApplyCoupon)}
-                    >
-                      تطبيق
-                    </Button>
-                  </div>
-                )}
-                {cartPharmacy?.promocoded && (
-                  <div className="flex flex-col gap-2 bg-teal-100 dark:bg-slate-700 rounded-lg p-4 mb-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-semibold text-teal-900 dark:text-teal-300">
-                          كوبون الخصم:
-                        </span>
-                        <span className="text-sm bg-teal-200 dark:bg-teal-800 px-2 py-1 rounded text-teal-900 dark:text-teal-200 font-mono">
-                          {cartPharmacy.promocoded}
-                        </span>
-                      </div>
-                      {/* <Button
-                        variant="destructive"
-                        size="sm"
-                        className="ml-2"
-                        onClick={() => {
-                          // Handle remove coupon logic
-                        }}
-                      >
-                        إزالة
-                      </Button> */}
-                    </div>
-                    <div className="flex items-center justify-between mt-2">
-                      <span className="text-sm text-gray-700 dark:text-gray-300">
-                        قيمة الخصم:
-                      </span>
-                      <span className="text-sm font-bold text-green-700 dark:text-green-400">
-                        {formatCurrencyEGP(cartPharmacy.coupon_discount)}
-                      </span>
-                    </div>
-                    <Button
-                      disabled
-                      className="w-full mt-2 bg-green-500 hover:bg-green-600 text-white cursor-default"
-                    >
-                      تم تطبيق الخصم
-                    </Button>
-                  </div>
-                )}
+                </div>
 
                 <div className="flex justify-between font-bold text-teal-900 dark:text-teal-400 text-lg border-t border-teal-200 dark:border-teal-700 pt-4 mt-6">
                   <span>المجموع</span>

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState, useTransition } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -16,6 +16,15 @@ import {
   Clock,
   AlertCircle,
 } from "lucide-react";
+import { Notification } from "@/types";
+import {
+  getNotifications,
+  markAllNotificationsAsRead,
+  markNotificationAsRead,
+} from "@/lib/api/apiNotifications";
+import { toast } from "sonner";
+import { revalidate } from "@/lib/api/actions";
+import { usePathname } from "next/navigation";
 
 type NotificationType =
   | "order_placed"
@@ -27,94 +36,22 @@ type NotificationType =
   | "return_request_accepted"
   | "return_request_rejected";
 
-type Notification = {
-  id: string;
-  type: NotificationType;
-  title: string;
-  message: string;
-  orderId: string;
-  timestamp: string;
-  isRead: boolean;
-};
-
 const Notifications = () => {
-  const [notifications, setNotifications] = useState<Notification[]>([
-    {
-      id: "1",
-      type: "order_placed",
-      title: "تم وضع الطلب",
-      message: "تم تأكيد طلبك رقم #ORD-001 بنجاح وسيتم معالجته قريباً",
-      orderId: "ORD-001",
-      timestamp: "2025-08-09T10:30:00Z",
-      isRead: false,
-    },
-    {
-      id: "2",
-      type: "order_confirmed",
-      title: "تم تأكيد الطلب",
-      message: "تم تأكيد طلبك رقم #ORD-002 وجاري تجهيزه للشحن",
-      orderId: "ORD-002",
-      timestamp: "2025-08-09T09:15:00Z",
-      isRead: false,
-    },
-    {
-      id: "3",
-      type: "order_shipped",
-      title: "تم شحن الطلب",
-      message: "تم شحن طلبك رقم #ORD-003 وسيصل خلال 2-3 أيام عمل",
-      orderId: "ORD-003",
-      timestamp: "2025-08-08T14:20:00Z",
-      isRead: true,
-    },
-    {
-      id: "4",
-      type: "order_delivered",
-      title: "تم تسليم الطلب",
-      message:
-        "تم تسليم طلبك رقم #ORD-004 بنجاح. نتمنى أن تكون راضياً عن المنتجات",
-      orderId: "ORD-004",
-      timestamp: "2025-08-07T16:45:00Z",
-      isRead: true,
-    },
-    {
-      id: "5",
-      type: "order_canceled",
-      title: "تم إلغاء الطلب",
-      message:
-        "تم إلغاء طلبك رقم #ORD-005 وسيتم استرداد المبلغ خلال 3-5 أيام عمل",
-      orderId: "ORD-005",
-      timestamp: "2025-08-07T11:30:00Z",
-      isRead: true,
-    },
-    {
-      id: "6",
-      type: "return_request_placed",
-      title: "طلب إرجاع جديد",
-      message: "تم إرسال طلب إرجاع للطلب #ORD-006 وجاري مراجعته",
-      orderId: "ORD-006",
-      timestamp: "2025-08-06T13:20:00Z",
-      isRead: false,
-    },
-    {
-      id: "7",
-      type: "return_request_accepted",
-      title: "تم قبول طلب الإرجاع",
-      message:
-        "تم قبول طلب إرجاع الطلب #ORD-007. يرجى إرسال المنتج لاستكمال عملية الإرجاع",
-      orderId: "ORD-007",
-      timestamp: "2025-08-05T10:15:00Z",
-      isRead: true,
-    },
-    {
-      id: "8",
-      type: "return_request_rejected",
-      title: "تم رفض طلب الإرجاع",
-      message: "تم رفض طلب إرجاع الطلب #ORD-008 لعدم استوفاء شروط الإرجاع",
-      orderId: "ORD-008",
-      timestamp: "2025-08-04T15:45:00Z",
-      isRead: true,
-    },
-  ]);
+  const [notifications, setNotifications] = useState<Notification[]>();
+  const [pending, startTransition] = useTransition();
+  const currentPath = usePathname();
+
+  useEffect(function () {
+    startTransition(handleGetNotifications);
+  }, []);
+
+  async function handleGetNotifications() {
+    const response = await getNotifications();
+    if (response.success && response.data) {
+      const notifications = response.data.notifications as Notification[];
+      setNotifications(notifications);
+    }
+  }
 
   const getNotificationIcon = (type: NotificationType) => {
     const iconProps = { size: 20 };
@@ -189,23 +126,118 @@ const Notifications = () => {
     }
   };
 
-  const markAsRead = (notificationId: string) => {
-    setNotifications((prev) =>
-      prev.map((notification) =>
-        notification.id === notificationId
-          ? { ...notification, isRead: true }
-          : notification
-      )
-    );
+  const markAsRead = async (notificationId: string) => {
+    const response = await markNotificationAsRead(notificationId);
+    if (response.success) {
+      setNotifications((prev) =>
+        prev?.map((notification) =>
+          notification.id === notificationId
+            ? { ...notification, read_at: new Date().toISOString() }
+            : notification
+        )
+      );
+      toast.success("تم تعيين الإشعار كمقروء");
+    } else {
+      toast.error(response.message || "فشل في تعيين الإشعار كمقروء");
+    }
   };
 
-  const markAllAsRead = () => {
-    setNotifications((prev) =>
-      prev.map((notification) => ({ ...notification, isRead: true }))
-    );
+  const markAllAsRead = async () => {
+    const response = await markAllNotificationsAsRead();
+    if (response.success) {
+      setNotifications((prev) =>
+        prev?.map((notification) => ({
+          ...notification,
+          read_at: new Date().toISOString(),
+        }))
+      );
+      toast.success("تم تعيين جميع الإشعارات كمقروءة");
+    } else {
+      toast.error(response.message || "فشل في تعيين جميع الإشعارات كمقروءة");
+    }
   };
 
-  const unreadCount = notifications.filter((n) => !n.isRead).length;
+  if (pending) {
+    return (
+      <div className="wrapper min-h-screen py-8">
+        <div className="max-w-4xl mx-auto">
+          {/* Header */}
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center gap-3">
+              <Bell className="h-8 w-8 text-primary" />
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+                  الإشعارات
+                </h1>
+                <p className="text-sm text-muted-foreground">
+                  جاري تحميل الإشعارات...
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Loading State */}
+          <div className="space-y-4">
+            {[...Array(3)].map((_, index) => (
+              <Card key={index} className="animate-pulse">
+                <CardContent className="p-4">
+                  <div className="flex items-start gap-4">
+                    <div className="flex-shrink-0 mt-1">
+                      <div className="h-10 w-10 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-2"></div>
+                      <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-full mb-2"></div>
+                      <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-5/6"></div>
+                      <div className="mt-3 h-8 bg-gray-200 dark:bg-gray-700 rounded w-24"></div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!notifications || notifications.length === 0) {
+    return (
+      <div className="wrapper min-h-screen py-8">
+        <div className="max-w-4xl mx-auto">
+          {/* Header */}
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center gap-3">
+              <Bell className="h-8 w-8 text-primary" />
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+                  الإشعارات
+                </h1>
+                <p className="text-sm text-muted-foreground">
+                  جميع الإشعارات مقروءة
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Notifications List */}
+          <div className="space-y-4">
+            <Card>
+              <CardContent className="flex flex-col items-center justify-center py-12">
+                <Bell className="h-16 w-16 text-muted-foreground mb-4" />
+                <h3 className="text-lg font-semibold mb-2">لا توجد إشعارات</h3>
+                <p className="text-muted-foreground text-center">
+                  ستظهر هنا جميع إشعاراتك المتعلقة بالطلبات والإرجاعات
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const unreadCount = notifications?.filter((n) => !n.read_at).length || 0;
 
   return (
     <div className="wrapper min-h-screen py-8">
@@ -251,7 +283,7 @@ const Notifications = () => {
               <Card
                 key={notification.id}
                 className={`transition-all duration-200 hover:shadow-md ${
-                  !notification.isRead
+                  !notification.read_at
                     ? "border-l-4 border-l-primary bg-primary/5"
                     : ""
                 }`}
@@ -259,9 +291,9 @@ const Notifications = () => {
                 <CardContent className="p-4">
                   <div className="flex items-start gap-4">
                     {/* Icon */}
-                    <div className="flex-shrink-0 mt-1">
+                    {/* <div className="flex-shrink-0 mt-1">
                       {getNotificationIcon(notification.type)}
-                    </div>
+                    </div> */}
 
                     {/* Content */}
                     <div className="flex-1 min-w-0">
@@ -271,30 +303,30 @@ const Notifications = () => {
                             <h3 className="font-semibold text-gray-900 dark:text-white">
                               {notification.title}
                             </h3>
-                            {getNotificationBadge(notification.type)}
-                            {!notification.isRead && (
+                            {/* {getNotificationBadge(notification.type)} */}
+                            {!notification.read_at && (
                               <div className="w-2 h-2 bg-primary rounded-full"></div>
                             )}
                           </div>
 
-                          <p className="text-sm text-muted-foreground mb-2">
-                            {notification.message}
+                          <p className="text-sm text-muted-foreground mb-2 ">
+                            {notification.body}
                           </p>
 
                           <div className="flex items-center gap-4 text-xs text-muted-foreground">
                             <span className="flex items-center gap-1">
                               <Clock className="h-3 w-3" />
-                              {formatTimestamp(notification.timestamp)}
+                              {formatTimestamp(notification.created_at)}
                             </span>
                             <span className="flex items-center gap-1">
                               <Package className="h-3 w-3" />
-                              {notification.orderId}
+                              ORDER-{notification.order_id}
                             </span>
                           </div>
                         </div>
                       </div>
 
-                      {!notification.isRead && (
+                      {!notification.read_at && (
                         <div className="mt-3">
                           <Button
                             onClick={() => markAsRead(notification.id)}

@@ -39,22 +39,24 @@ const ProductCard = async ({ productItem }: { productItem: ProductItem }) => {
       </div>
 
       <div className="md:relative w-2/5 md:w-full aspect-square !max-h-[150px]">
-        {/* Shadcn Avatar component for product image */}
-        <Avatar className="w-full h-full md:rounded-md">
-          <AvatarImage
-            src={image || "/images/no-image.jpg"}
-            alt="img"
-            className="object-cover"
-          />
-          <AvatarFallback>
-            <Image
-              src="/images/no-image.jpg"
-              alt="fallback"
-              fill
-              className="w-full h-full object-cover"
+        <Link href={`/product/${productItem.id}`}>
+          {/* Shadcn Avatar component for product image */}
+          <Avatar className="w-full h-full md:rounded-md">
+            <AvatarImage
+              src={image || "/images/no-image.jpg"}
+              alt="img"
+              className="object-cover"
             />
-          </AvatarFallback>
-        </Avatar>
+            <AvatarFallback>
+              <Image
+                src="/images/no-image.jpg"
+                alt="fallback"
+                fill
+                className="w-full h-full object-cover"
+              />
+            </AvatarFallback>
+          </Avatar>
+        </Link>
       </div>
 
       <div className="space-y-3 mt-5 flex flex-col flex-grow">
@@ -122,7 +124,8 @@ const ProductCard = async ({ productItem }: { productItem: ProductItem }) => {
         </div>
         {productItem.quantity > 0 ? (
           <span className="text-green-500 text-sm font-medium  mt-auto">
-            متوفر في المخزون ({productItem.quantity})
+            متوفر في المخزون
+            {/* ({productItem.quantity}) */}
           </span>
         ) : (
           <Badge variant="destructive" className="w-fit py-1 px-3  mt-auto">

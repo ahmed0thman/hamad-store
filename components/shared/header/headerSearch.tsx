@@ -59,7 +59,7 @@ const HeaderSearch = ({ categories }: { categories: category[] }) => {
   return (
     <div className="relative">
       <div className="!border-primary border rounded-md bg-secondary h-9 md:h-10 flex-center overflow-hidden">
-        <div className="flex-center py-2">
+        <div className="flex-center py-2 flex-grow-1">
           <Select
             onValueChange={(value) => {
               setCategoryId(value);

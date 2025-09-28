@@ -435,3 +435,8 @@ export async function updateUserLanguage(userToken: string, language: string) {
     }
   }
 }
+
+export async function getAuthData() {
+  const session = await auth();
+  return session;
+}

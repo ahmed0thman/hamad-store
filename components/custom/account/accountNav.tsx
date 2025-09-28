@@ -10,7 +10,7 @@ const accountTabs = [
   { name: "العناوين", href: "/account/addresses" },
   { name: "الطلبات", href: "/account/orders" },
   { name: "المرتجعات", href: "/account/refund" },
-  { name: "طرق الدفع", href: "/account/payment-methods" },
+  // { name: "طرق الدفع", href: "/account/payment-methods" },
   { name: "المحفظة", href: "/account/wallet" },
   { name: "مقارنة المنتجات", href: "/account/compare" },
   // { name: "استشر طبيب", href: "/account/doctor" },

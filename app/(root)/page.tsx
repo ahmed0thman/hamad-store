@@ -18,6 +18,7 @@ export const metadata = homeSEO;
 export default async function Home() {
   const session = await auth();
   console.log("token:", session?.accessToken);
+  console.log("user data:", session?.user);
   const locals = await getLocaleStrings();
   // Get Products
   const offersProducts = await getProductsBytitle("offers");
@@ -33,24 +34,39 @@ export default async function Home() {
     <>
       <Hero />
       <FeatureCards />
-      <ProductSwiper headLine={locals.offers} products={offersProducts} />
+      {offersProducts && offersProducts.length > 0 && (
+        <ProductSwiper
+          headLine={locals.offers}
+          products={offersProducts}
+          showAll
+        />
+      )}
       <BrandSwiper
         items={homeCategories}
         headLine="Browse all"
         highlight="Categories"
         subHeadign="Choose from a wide range of medicines, health products, and personal care products – everything you need in one place."
       />
-      <ProductSwiper products={uniqueProducts} headLine="Unique Products" />
+      {uniqueProducts && uniqueProducts.length > 0 && (
+        <ProductSwiper
+          products={uniqueProducts}
+          headLine="Unique Products"
+          showAll
+        />
+      )}
       <BrandSwiper
         items={brandCategories}
         headLine="Browse all"
         highlight="Brands"
         subHeadign="Choose from a wide range of medicines, health products, and personal care products – everything you need in one place."
       />
-      <ProductSwiper
-        products={topRatesProducts}
-        headLine="Top Rated Products"
-      />
+      {topRatesProducts && topRatesProducts.length > 0 && (
+        <ProductSwiper
+          products={topRatesProducts}
+          headLine="Top Rated Products"
+          showAll
+        />
+      )}
       {/* <Banner /> */}
       <BrandSwiper
         items={brandCategories}
@@ -58,10 +74,13 @@ export default async function Home() {
         highlight="Rated Brands"
         subHeadign=""
       />
-      <ProductSwiper
-        products={topSellingProducts}
-        headLine="Top Selling Products"
-      />
+      {topSellingProducts && topSellingProducts.length > 0 && (
+        <ProductSwiper
+          products={topSellingProducts}
+          headLine="Top Selling Products"
+          showAll
+        />
+      )}
     </>
   );
 }

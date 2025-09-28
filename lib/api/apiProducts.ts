@@ -104,7 +104,7 @@ export async function getFilteredProducts(filterParams: filterParams = {}) {
   try {
     const response = await api.get(`home/products/filter`, {
       params: {
-        price_min: filterParams.price_min || "100",
+        price_min: filterParams.price_min || "",
         price_max: filterParams.price_max || "",
         user_rating_min: filterParams.user_rating_min || "",
         pharmacist_rating_min: filterParams.pharmacist_rating_min || "",

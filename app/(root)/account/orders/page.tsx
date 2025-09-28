@@ -11,8 +11,18 @@ import Image from "next/image";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { OrderItem } from "@/types";
-import { getUserOrders } from "@/lib/api/apiOrders";
-
+import { cancelOrder, getUserOrders } from "@/lib/api/apiOrders";
+import { toast } from "sonner";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogDescription,
+} from "@/components/ui/dialog";
 interface Order {
   id: string;
   status: "Delivered" | "Shipped" | "Canceled";
@@ -42,7 +52,8 @@ const Orders = () => {
 
   async function fetchOrders() {
     const response = await getUserOrders(userToken);
-    console.log(response);
+    console.log("");
+    console.log("Fetched orders:", response);
     if (response?.success) {
       setOrders(response.data as OrderItem[]);
     }
@@ -75,6 +86,16 @@ const Orders = () => {
         return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-100";
     }
   };
+
+  async function handleCancelOrder(orderId: string) {
+    const response = await cancelOrder(Number(orderId), userToken);
+    if (response.success) {
+      toast.success("Order canceled successfully");
+      fetchOrders();
+    } else {
+      toast.error("Failed to cancel order");
+    }
+  }
 
   const filteredOrders = orders.filter((order) =>
     order.id.toString().toLowerCase().includes(searchQuery.toLowerCase())
@@ -156,14 +177,56 @@ const Orders = () => {
                     {formatCurrencyEGP(Number(order.total))}
                   </p>
                 </div>
-                <Button
-                  asChild
-                  variant="secondary"
-                  size="sm"
-                  className="rounded-full w-fit ms-auto hover:bg-secondary/50 transition-colors duration-200"
-                >
-                  <Link href={`/account/orders/${order.id}`}>View Details</Link>
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button
+                    asChild
+                    variant="secondary"
+                    size="sm"
+                    className="rounded-full w-fit ms-auto hover:bg-secondary/50 transition-colors duration-200"
+                  >
+                    <Link
+                      href={`/account/orders/${order.id}?remaining_days_to_return=${order.remaining_days_to_return}`}
+                    >
+                      View Details
+                    </Link>
+                  </Button>
+                  {order.status.toLowerCase() === "pending" && (
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          className="rounded-full w-fit hover:bg-red-600/50 transition-colors duration-200"
+                        >
+                          Cancel Order
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>
+                            Are you sure you want to cancel this order?
+                          </DialogTitle>
+                          <DialogDescription>
+                            This action cannot be undone. Please confirm your
+                            decision.
+                          </DialogDescription>
+                        </DialogHeader>
+                        <DialogFooter>
+                          <DialogClose asChild>
+                            <Button variant="outline">No</Button>
+                          </DialogClose>
+                          <Button
+                            onClick={() =>
+                              handleCancelOrder(order.id.toString())
+                            }
+                          >
+                            Yes
+                          </Button>
+                        </DialogFooter>
+                      </DialogContent>
+                    </Dialog>
+                  )}
+                </div>
               </div>
             ))}
           </div>

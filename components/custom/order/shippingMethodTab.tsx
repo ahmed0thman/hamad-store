@@ -29,10 +29,11 @@ import {
 } from "@/components/ui/dialog";
 import Link from "next/link";
 import SpinnerMini from "../SpinnerMini";
-import { getCartData } from "@/lib/api/apiCart";
+import { addCouponToCart, getCartData } from "@/lib/api/apiCart";
 import { toast } from "sonner";
 import { saveOrder } from "@/lib/api/apiOrders";
 import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 
 export default function ShippingMethodTab({ onBack }: { onBack: () => void }) {
   const searchParams = useSearchParams();
@@ -57,6 +58,7 @@ export default function ShippingMethodTab({ onBack }: { onBack: () => void }) {
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const [pendingShippingMethods, startTransitionShippingMethods] =
     useTransition();
+  const [couponCode, setCouponCode] = useState<string>("");
 
   async function fetchShippingMethods() {
     if (!pharmacyId) return;
@@ -136,6 +138,7 @@ export default function ShippingMethodTab({ onBack }: { onBack: () => void }) {
       return;
     }
     const orderParams: orderSaveParams = {
+      code: couponCode || undefined,
       pharmacy_id: pharmacyId,
       shipping_id: Number(shippingMethod),
       shipping_address: Number(shippingAddress),
@@ -153,6 +156,30 @@ export default function ShippingMethodTab({ onBack }: { onBack: () => void }) {
       );
     }
   }
+
+  // async function handleApplyCoupon() {
+  //   const response = await addCouponToCart(
+  //     couponCode,
+  //     Number(pharmacyId),
+  //     token
+  //   );
+  //   if (response?.success) {
+  //     toast(
+  //       <div className="text-sm text-green-500 flex items-center">
+  //         <CircleCheckBig className="me-2" />
+  //         <span>Coupon applied successfully</span>
+  //       </div>
+  //     );
+  //     await fetchCartData();
+  //   } else {
+  //     toast(
+  //       <div className="text-sm text-red-600 flex items-center">
+  //         <OctagonX className="me-2" />
+  //         <span>Coupon is not valid</span>
+  //       </div>
+  //     );
+  //   }
+  // }
 
   function handlePlaceOrder() {
     startTransitionSave(handleSaveOrder);
@@ -279,12 +306,24 @@ export default function ShippingMethodTab({ onBack }: { onBack: () => void }) {
                 <span>Payment Method</span>
                 <span className="font-medium capitalize">{paymentMethod}</span>
               </div>
-              {/* {selectedPayment === "Cash on Delivery" && (
-                <div className="flex justify-between">
-                  <span>Cash Handling Fee</span>
-                  <span className="font-medium">20 LE</span>
-                </div>
-              )} */}
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                use coupon code to earn points
+              </p>
+              <div className="flex items-center gap-2">
+                <Input
+                  placeholder="أدخل الكوبون"
+                  className="flex-grow"
+                  value={couponCode}
+                  onChange={(e) => setCouponCode(e.target.value)}
+                />
+                {/* <Button
+                  variant="outline"
+                  className="bg-muted"
+                  onClick={() => startTransition(handleApplyCoupon)}
+                >
+                  تطبيق
+                </Button> */}
+              </div>
               <div className="border-t border-border my-3"></div>
               <div className="flex justify-between text-base font-bold">
                 <span>Total</span>

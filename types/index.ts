@@ -261,6 +261,7 @@ export type pagination = {
 
 // orders
 export type orderSaveParams = {
+  code?: string;
   pharmacy_id: number;
   shipping_id: number;
   shipping_address: number;
@@ -274,7 +275,9 @@ export type OrderItem = {
   pharmacy_name: string;
   status: string;
   total: string;
+  total_after_shipping: string;
   is_paid: boolean;
+  remaining_days_to_return: number;
 };
 export type OrderDetailsItem = {
   id: number;
@@ -310,6 +313,7 @@ export type OrderDetails = {
   paid_amount: string;
   remaining_amount: string;
   items: OrderDetailsItem[];
+  currency: string;
 };
 
 // -------------
@@ -318,4 +322,24 @@ export type SearchParams = { [key: string]: string | string[] | undefined };
 export type PaymentMethod = {
   id: number;
   name: { en: string; ar: string };
+};
+
+// ----------------
+
+export type wallet = {
+  wallet_balance: string;
+  total_points: number;
+  available_points: number;
+  point_transctions: undefined;
+};
+
+export type Notification = {
+  id: string;
+  type: string;
+  title: string;
+  body: string;
+  order_id: number;
+  order_number: string;
+  created_at: string;
+  read_at: string | null;
 };

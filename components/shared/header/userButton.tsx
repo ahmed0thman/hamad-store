@@ -8,13 +8,12 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { signOut } from "@/lib/auth";
+import { getNotifications } from "@/lib/api/apiNotifications";
+import { Notification, User as UserType } from "@/types";
 import { Bell, Heart, LogOut, User } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState, useTransition } from "react";
 import ButtonLogout from "./buttonLogout";
-import { User as UserType } from "@/types";
 
 const userMenuItems = [
   {
@@ -36,9 +35,26 @@ const userMenuItems = [
 
 const UserButton = ({ user }: { user: UserType | null }) => {
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [totalNotifications, setTotalNotifications] = useState(0);
+  const [pending, startTransition] = useTransition();
   // const singedIn = true;
   // const fisrtInitial = session.user?.name?.charAt(0).toUpperCase() ?? "U";
   // if (!session)
+
+  useEffect(function () {
+    if (user?.token) {
+      handleGetNotifications();
+    }
+  }, []);
+
+  async function handleGetNotifications() {
+    const response = await getNotifications(user?.token);
+    if (response.success && response.data) {
+      const notifications = response.data.notifications as Notification[];
+      console.log("Notifications:", notifications);
+      setTotalNotifications(notifications.filter((n) => !n.read_at).length);
+    }
+  }
   return (
     <div className="hidden lg:block">
       {!user ? (
@@ -62,7 +78,12 @@ const UserButton = ({ user }: { user: UserType | null }) => {
         >
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <div className="flex items-center">
+              <div className="flex items-center relative">
+                {totalNotifications > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs px-2 max-w-8  rounded-full flex items-center justify-center">
+                    {totalNotifications > 99 ? "99+" : totalNotifications}
+                  </span>
+                )}
                 <Button
                   variant="ghost"
                   className="w-8 h-8 aspect-square rounded-full ms-2 flex items-center justify-center bg-secondary text-primary"
@@ -102,6 +123,14 @@ const UserButton = ({ user }: { user: UserType | null }) => {
                     >
                       {item.icon}
                       <span>{item.title}</span>
+                      {item.title === "Notification" &&
+                        totalNotifications > 0 && (
+                          <span className="ms-auto bg-red-500 text-white text-xs px-2 max-w-8  rounded-full flex items-center justify-center">
+                            {totalNotifications > 99
+                              ? "99+"
+                              : totalNotifications}
+                          </span>
+                        )}
                     </Link>
                   </Button>
                 </DropdownMenuItem>

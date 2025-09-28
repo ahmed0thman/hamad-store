@@ -13,7 +13,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { getOrderDetails } from "@/lib/api/apiOrders";
-import { formatCurrencyEGP } from "@/lib/utils";
+import { formatCurrency, formatCurrencyEGP } from "@/lib/utils";
 import { CartItem, OrderDetails } from "@/types";
 import { CheckCircle } from "lucide-react";
 import { useSession } from "next-auth/react";
@@ -47,6 +47,17 @@ const getStatusColor = (status: string) => {
 
 export default function OrderDetailsPage() {
   const { id } = useParams();
+  const [remainingDaysToReturn, setRemainingDaysToReturn] = useState<
+    string | null
+  >(null);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const value = params.get("remaining_days_to_return");
+      setRemainingDaysToReturn(value);
+    }
+  }, []);
   const { data: session, status } = useSession();
   const [userToken, setUserToken] = useState<string>("");
   const [pending, startTransition] = useTransition();
@@ -156,7 +167,8 @@ export default function OrderDetailsPage() {
               <TableHead className="p-4 font-medium text-foreground">
                 Total
               </TableHead>
-              {orderDetails?.status.toLowerCase() === "delivered" && (
+              {(orderDetails?.status.toLowerCase() === "delivered" ||
+                orderDetails?.status.toLowerCase() === "completed") && (
                 <TableHead className="p-4 font-medium text-foreground">
                   Actions
                 </TableHead>
@@ -169,41 +181,48 @@ export default function OrderDetailsPage() {
                 <TableCell className="p-4">{item.product_name}</TableCell>
                 <TableCell className="p-4">{item.quantity}</TableCell>
                 <TableCell className="p-4 text-muted-foreground">
-                  {formatCurrencyEGP(+item.unit_price)}
+                  {formatCurrency(+item.unit_price, orderDetails?.currency)}
                 </TableCell>
                 <TableCell className="p-4 text-muted-foreground">
-                  {formatCurrencyEGP(+item.total)}
+                  {formatCurrency(+item.total, orderDetails?.currency)}
                 </TableCell>
                 {/* Rate Action */}
-                {orderDetails?.status.toLowerCase() === "delivered" && (
+                {(orderDetails?.status.toLowerCase() === "delivered" ||
+                  orderDetails?.status.toLowerCase() === "completed" ||
+                  orderDetails?.status.toLowerCase() === "returned") && (
                   <TableCell className="p-4 flex items-center gap-2">
-                    <RatingDialog userToken={userToken} item={item} />
-                    {/* Button ask refund */}
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="rounded-full bg-muted"
-                      onClick={() => {
-                        toast(
-                          <div className="space-y-2">
-                            <div className="flex gap-1 items-center">
-                              <p>
-                                Product added to refund request, you can add
-                                more or view the request
-                              </p>
-                              <CheckCircle className="w-8 h-8 text-green-500 ml-2" />
+                    {(orderDetails?.status.toLowerCase() === "delivered" ||
+                      orderDetails?.status.toLowerCase() === "completed" ||
+                      orderDetails?.status.toLowerCase() === "returned") && (
+                      <RatingDialog userToken={userToken} item={item} />
+                    )}
+                    {orderDetails?.status.toLowerCase() === "delivered" && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="rounded-full bg-muted"
+                        onClick={() => {
+                          toast(
+                            <div className="space-y-2">
+                              <div className="flex gap-1 items-center">
+                                <p>
+                                  Product added to refund request, you can add
+                                  more or view the request
+                                </p>
+                                <CheckCircle className="w-8 h-8 text-green-500 ml-2" />
+                              </div>
+                              <Button asChild variant="link" size={"sm"}>
+                                <Link href="/account/refund">
+                                  Complete Refund
+                                </Link>
+                              </Button>
                             </div>
-                            <Button asChild variant="link" size={"sm"}>
-                              <Link href="/account/refund">
-                                Complete Refund
-                              </Link>
-                            </Button>
-                          </div>
-                        );
-                      }}
-                    >
-                      refund
-                    </Button>
+                          );
+                        }}
+                      >
+                        refund
+                      </Button>
+                    )}
                   </TableCell>
                 )}
               </TableRow>
@@ -218,7 +237,12 @@ export default function OrderDetailsPage() {
           <h3 className="text-lg font-bold">Order Summary</h3>
           <div className="flex justify-between text-sm">
             <span className="text-muted-foreground">Subtotal</span>
-            <span>{formatCurrencyEGP(Number(orderDetails?.subtotal))}</span>
+            <span>
+              {formatCurrency(
+                Number(orderDetails?.total),
+                orderDetails?.currency
+              )}
+            </span>
           </div>
           {orderDetails?.coupon_discount && (
             <div className="flex justify-between text-sm">
@@ -231,13 +255,19 @@ export default function OrderDetailsPage() {
           <div className="flex justify-between text-sm">
             <span className="text-muted-foreground">Shipping</span>
             <span>
-              {formatCurrencyEGP(Number(orderDetails?.shipping_cost))}
+              {formatCurrency(
+                Number(orderDetails?.shipping_cost),
+                orderDetails?.currency
+              )}
             </span>
           </div>
           <div className="flex justify-between text-sm font-semibold">
             <span>Total</span>
             <span>
-              {formatCurrencyEGP(Number(orderDetails?.total_after_shipping))}
+              {formatCurrency(
+                Number(orderDetails?.total_after_shipping),
+                orderDetails?.currency
+              )}
             </span>
           </div>
         </CardContent>

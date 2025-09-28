@@ -1,4 +1,4 @@
-import z, { optional } from "zod";
+import z, { boolean, optional } from "zod";
 import { formatCurrencyEGP } from "./utils";
 
 export const currency = z.string().refine(
@@ -116,6 +116,7 @@ export const profileSchema = z.object({
   age: z.number().int().min(0, "Age must be a valid number"),
   email: z.string().email("Email must be a valid email address"),
   profile_image: z.string().url("Profile image must be a valid URL").optional(),
+  is_doctor: boolean().optional(),
 });
 
 export const userAddressSchema = z.object({

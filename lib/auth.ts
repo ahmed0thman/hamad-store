@@ -67,10 +67,12 @@ export const config = {
               age: response.data.data.user.age,
               gender: response.data.data.user.gender,
               language: response.data.data.user.language,
+              currency_code: response.data.data.user.currency_code,
               governorate: response.data.data.user.governorate,
               phone: response.data.data.user.phone,
               emailVerified: response.data.data.user.is_verified === 1,
               profileImage: response.data.data.user.profile_image,
+              is_doctor: response.data.data.user.is_doctor,
             };
 
             return user;

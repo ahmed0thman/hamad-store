@@ -1,3 +1,5 @@
+"use server";
+
 import { api } from "../axios";
 import { AxiosError } from "axios";
 import { auth } from "../auth";
@@ -122,6 +124,39 @@ export async function getOrderDetails(userToken: string, orderId: number) {
     return {
       success: false,
       message: response.data.message || "Failed to retrieve order details",
+    };
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      return { success: false, message: error.message };
+    }
+    return { success: false, message: "An unknown error occurred" };
+  }
+}
+export async function cancelOrder(orderId: number, userToken?: string) {
+  try {
+    if (!userToken) {
+      const session = await auth();
+      userToken = session?.user?.token || session?.accessToken || "";
+      if (!session || !session.user || !session.accessToken) {
+        return { success: false, message: "User not authenticated" };
+      }
+    }
+    const response = await api.post(
+      `/orders/${orderId}/cancel`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      }
+    );
+    console.log("Cancel order response:", response.data);
+    if (response.data.result === "Success") {
+      return { success: true, data: response.data.data };
+    }
+    return {
+      success: false,
+      message: response.data.message || "Failed to cancel order",
     };
   } catch (error) {
     if (error instanceof AxiosError) {
