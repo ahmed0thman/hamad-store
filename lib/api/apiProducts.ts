@@ -1,3 +1,5 @@
+"use server";
+
 import { addRate, Brand, category, Product, ProductItem } from "@/types";
 import { api } from "../axios";
 import { AxiosError } from "axios";

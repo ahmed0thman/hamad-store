@@ -1,3 +1,5 @@
+"use server";
+
 import { api } from "../axios";
 import { AxiosError } from "axios";
 import { auth } from "../auth";
@@ -13,7 +15,7 @@ export const getWalletDetails = async (token?: string) => {
         return { success: false, message: "User not authenticated" };
       }
     }
-    const response = await api.get("/user-wallet", {
+    const response = await api.get("user-wallet", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
