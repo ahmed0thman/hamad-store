@@ -8,6 +8,7 @@ import { addCouponToCart, getCartData } from "@/lib/api/apiCart";
 import { getAuthData } from "@/lib/api/apiUser";
 import { formatCurrencyEGP } from "@/lib/utils";
 import { CartData, CartPharmacy } from "@/types";
+import { Session } from "next-auth";
 import { CircleCheckBig, OctagonX } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
@@ -22,7 +23,7 @@ const PharamacyCart = () => {
   // const { data: session, status } = useSession();
   const [token, setToken] = useState<string | undefined>(undefined);
 
-  const [session, setSession] = useState<any>(null);
+  const [session, setSession] = useState<Session | undefined>(undefined);
 
   const router = useRouter();
   const [cart, setCart] = useState<CartData | null>(null);

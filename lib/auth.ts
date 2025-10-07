@@ -23,6 +23,7 @@ declare module "next-auth" {
     emailVerified: boolean;
     profileImage: string | null;
     cart?: CartData | null;
+    currency_code: string;
   }
   interface Session {
     accessToken?: string;
