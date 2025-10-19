@@ -5,6 +5,7 @@ import {
   RegisterFormData,
   ShippingMethod,
   SignInFormData,
+  UpdateUserPasswordData,
   UserAddress,
   UserProfile,
 } from "@/types";
@@ -14,6 +15,7 @@ import { signInSchema } from "../validators";
 import { auth, signIn, signOut } from "../auth";
 import { delay } from "../utils";
 import { redirect } from "next/navigation";
+import { getAuthToken } from "./helpers";
 
 export async function registerUser(data: RegisterFormData) {
   try {
@@ -147,18 +149,13 @@ export async function signOutUser(token: string) {
   }
 }
 
-export async function getProfile(userToken: string = "") {
-  let token: string = userToken;
+export async function getProfile(userToken?: string) {
   try {
-    if (userToken === "") {
-      const session = await auth();
-      token = session?.user?.token || session?.accessToken || "";
-      if (!session || !session.user || !session.accessToken) {
-        return { success: false, message: "User not authenticated" };
-      }
+    const authResult = await getAuthToken(userToken);
+    if (!authResult.success) {
+      redirect("/signin");
     }
-
-    token = userToken;
+    const token = authResult.token;
     const response = await api.get("user-profile", {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -205,6 +202,49 @@ export async function updateUserProfile(
       return {
         success: true,
         data: response.data.data as UserProfile,
+      };
+    }
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      console.error("Error updating user profile:", error.response?.statusText);
+      return {
+        success: false,
+        message: error.response?.data?.message || "Failed to update profile",
+      };
+    }
+  }
+}
+
+export async function updateUserPassword(
+  data: UpdateUserPasswordData,
+  userToken?: string
+) {
+  try {
+    const authResult = await getAuthToken(userToken);
+    if (!authResult.success) {
+      return { success: false, message: authResult.message };
+    }
+    const token = authResult.token;
+    const response = await api.put(
+      "user-update-password",
+      {
+        ...data,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    if (response.data.result === "Success") {
+      return {
+        success: true,
+        data: response.data.data as UserProfile,
+      };
+    } else {
+      return {
+        success: false,
+        message: response.data.message || "Failed to update profile",
       };
     }
   } catch (error) {
@@ -391,20 +431,20 @@ export async function getSiteShippingMethods() {
   }
 }
 
-export async function updateUserLanguage(userToken: string, language: string) {
-  if (!userToken) {
-    const session = await auth();
-    userToken = session?.user?.token || session?.accessToken || "";
-    if (!session || !session.user || !session.accessToken) {
-      // console.log("User not authenticated");
-      return { success: false, message: "User not authenticated" };
-    }
+export async function updateUserLanguage(language: string, userToken?: string) {
+  const authResult = await getAuthToken(userToken);
+  if (!authResult.success) {
+    return { success: false, message: authResult.message };
   }
+  userToken = authResult.token;
+  console.log("current :", language);
+  const newLanguage = language === "ar" ? "en" : "ar";
+  console.log("new lan: ", newLanguage);
   try {
     const response = await api.put(
       "user-profile",
       {
-        "user-language": language,
+        language: newLanguage,
       },
       {
         headers: {

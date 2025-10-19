@@ -20,10 +20,7 @@ const ProductAddCart = async ({ product }: { product: Product }) => {
   }
   const stock = product.quantity || 0;
   const price = product.offer ? product.offer.price_after : product.price;
-  async function refetchDataWithParams(pathName: string) {
-    "use server";
-    revalidatePath(pathName);
-  }
+
   return (
     <Card className="p-0">
       <CardContent className="p-4">
@@ -44,10 +41,9 @@ const ProductAddCart = async ({ product }: { product: Product }) => {
         {stock > 0 && (
           <div className="flex-center">
             <AddToCart
-              cart={cart}
+              // cart={cart}
               stock={stock}
               productId={product.id}
-              token={session?.user?.token || session?.accessToken || ""}
             />
           </div>
         )}

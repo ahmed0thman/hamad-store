@@ -3,9 +3,11 @@ import {
   cartItemSchema,
   doctorRegisterSchema,
   insertCartSchema,
+  planSubscriptionFormSchema,
   profileSchema,
   registerSchema,
   signInSchema,
+  updateUserPasswordSchema,
   userAddressSchema,
 } from "@/lib/validators";
 import { CredentialsSignin } from "next-auth";
@@ -16,6 +18,24 @@ export type RegisterFormData = z.infer<typeof registerSchema>;
 
 export type DoctorRegisterFormData = z.infer<typeof doctorRegisterSchema>;
 export type SignInFormData = z.infer<typeof signInSchema>;
+
+export type UpdateUserPasswordData = z.infer<typeof updateUserPasswordSchema>;
+
+export type PlanSubscriptionFormData = z.infer<
+  typeof planSubscriptionFormSchema
+>;
+
+export type plan = {
+  id: number;
+  type: "annual" | "monthly" | string;
+  description: string;
+  price: string;
+  currency: string;
+  duration_in_days: number;
+  is_default: boolean;
+  is_active: boolean;
+  created_at: string | null;
+};
 
 export class SignInError extends CredentialsSignin {
   message = "signin_error";
@@ -330,7 +350,13 @@ export type wallet = {
   wallet_balance: string;
   total_points: number;
   available_points: number;
-  point_transctions: undefined;
+  point_transctions: {
+    id: number;
+    type: string;
+    points: number;
+    description: string;
+    created_at: string;
+  }[];
 };
 
 export type Notification = {

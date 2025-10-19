@@ -1,4 +1,4 @@
-import z, { boolean, optional } from "zod";
+import z, { boolean } from "zod";
 import { formatCurrencyEGP } from "./utils";
 
 export const currency = z.string().refine(
@@ -129,3 +129,60 @@ export const userAddressSchema = z.object({
   city: z.string().min(1, "City is required"),
   is_default: z.number().int().min(0).max(1).optional(),
 });
+
+// Plan Subscription schema
+export const planSubscriptionFormSchema = z
+  .object({
+    plan_id: z.number().int().min(1, "Plan ID is required"),
+    name: z.string().min(1, "Name is required"),
+    email: z.string().email("Email must be a valid email address"),
+    phone: z
+      .string()
+      .regex(/^\+?[0-9]{7,15}$/, "Phone must be a valid phone number"),
+    password: z.string().min(8, "Password must be at least 8 characters"),
+    password_confirmation: z
+      .string()
+      .min(8, "Password confirmation must be at least 8 characters")
+      .optional(),
+    pharmacy_name_ar: z.string().min(1, "Pharmacy name in Arabic is required"),
+    pharmacy_name_en: z.string().min(1, "Pharmacy name in English is required"),
+    pharmacy_address_ar: z
+      .string()
+      .min(1, "Pharmacy address in Arabic is required"),
+    pharmacy_address_en: z
+      .string()
+      .min(1, "Pharmacy address in English is required"),
+    pharmacy_phone: z
+      .string()
+      .regex(/^\+?[0-9]{7,15}$/, "Pharmacy phone must be a valid phone number"),
+    pharmacy_email: z
+      .string()
+      .email("Pharmacy email must be a valid email address"),
+    payment_method: z
+      .enum(["card", "cash", "wallet"])
+      .refine((val) => ["card", "cash", "wallet"].includes(val), {
+        message: "Payment method must be either 'card', 'cash', or 'wallet'",
+      }),
+  })
+  .refine(
+    (data) =>
+      !data.password_confirmation ||
+      data.password === data.password_confirmation,
+    {
+      message: "Passwords must match",
+      path: ["password_confirmation"],
+    }
+  );
+
+export const updateUserPasswordSchema = z
+  .object({
+    current_password: z.string().min(8, "Current password is required"),
+    password: z.string().min(8, "New password must be at least 8 characters"),
+    password_confirmation: z
+      .string()
+      .min(8, "New password confirmation must be at least 8 characters"),
+  })
+  .refine((data) => data.password === data.password_confirmation, {
+    message: "New passwords must match",
+    path: ["new_password_confirmation"],
+  });

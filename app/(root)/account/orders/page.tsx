@@ -1,69 +1,35 @@
 "use client";
 
-import React, { useEffect, useState, useTransition } from "react";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { formatCurrencyEGP } from "@/lib/utils";
+import { useState } from "react";
 // Card removed as it's not used
 import { Badge } from "@/components/ui/badge";
-import { Search } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
-import { useSession } from "next-auth/react";
-import { OrderItem } from "@/types";
-import { cancelOrder, getUserOrders } from "@/lib/api/apiOrders";
-import { toast } from "sonner";
 import {
   Dialog,
   DialogClose,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  DialogDescription,
 } from "@/components/ui/dialog";
-interface Order {
-  id: string;
-  status: "Delivered" | "Shipped" | "Canceled";
-  date: string;
-  itemCount: number;
-  total: number;
-  image: string;
-}
+import { useGetOrders } from "@/hooks/useGetOrders";
+import { cancelOrder } from "@/lib/api/apiOrders";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Search } from "lucide-react";
+import { useSession } from "next-auth/react";
+import Link from "next/link";
+import { toast } from "sonner";
 
 const Orders = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const { data: session, status } = useSession();
   const [userToken, setUserToken] = useState<string>("");
-  const [pending, startTransition] = useTransition();
-  const [orders, setOrders] = useState<OrderItem[]>([]);
-
-  useEffect(
-    function () {
-      if (status === "authenticated" && session?.user.token) {
-        setUserToken(session.user.token);
-      } else {
-        setUserToken("");
-      }
-    },
-    [status]
-  );
-
-  async function fetchOrders() {
-    const response = await getUserOrders(userToken);
-    console.log("");
-    console.log("Fetched orders:", response);
-    if (response?.success) {
-      setOrders(response.data as OrderItem[]);
-    }
-  }
-
-  useEffect(() => {
-    if (userToken) {
-      startTransition(fetchOrders);
-    }
-  }, [userToken]);
+  const queryClient = useQueryClient();
+  const { ordersData, isLoadingOrders, errorOrders } = useGetOrders();
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
@@ -87,21 +53,24 @@ const Orders = () => {
     }
   };
 
+  const { mutate: cancelOrderMutation, isPending: isCancellingOrder } =
+    useMutation({
+      mutationFn: handleCancelOrder,
+      onSuccess: (response) => {
+        if (response && response.success) {
+          toast.success("Order canceled successfully");
+          queryClient.invalidateQueries({ queryKey: ["orders"] });
+        } else {
+          toast.error("Failed to cancel order");
+        }
+      },
+    });
+
   async function handleCancelOrder(orderId: string) {
-    const response = await cancelOrder(Number(orderId), userToken);
-    if (response.success) {
-      toast.success("Order canceled successfully");
-      fetchOrders();
-    } else {
-      toast.error("Failed to cancel order");
-    }
+    return await cancelOrder(Number(orderId), userToken);
   }
 
-  const filteredOrders = orders.filter((order) =>
-    order.id.toString().toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  if (pending) {
+  if (isLoadingOrders) {
     return (
       <div className="animate-pulse">
         {[...Array(5)].map((_, index) => (
@@ -128,6 +97,10 @@ const Orders = () => {
       </div>
     );
   }
+
+  const filteredOrders = ordersData?.data?.filter((order) =>
+    order.id.toString().toLowerCase().includes(searchQuery.toLowerCase())
+  );
   return (
     <section className="">
       <div className="wrapper px-4 py-8">
@@ -154,7 +127,7 @@ const Orders = () => {
 
           {/* Orders List */}
           <div className="space-y-4 divide-y divide-y-muted mt-4">
-            {filteredOrders.map((order) => (
+            {filteredOrders?.map((order) => (
               <div
                 key={order.id}
                 className="flex flex-[2_2_0px] flex-col gap-4 pb-4"
@@ -183,6 +156,7 @@ const Orders = () => {
                     variant="secondary"
                     size="sm"
                     className="rounded-full w-fit ms-auto hover:bg-secondary/50 transition-colors duration-200"
+                    disabled={isCancellingOrder}
                   >
                     <Link
                       href={`/account/orders/${order.id}?remaining_days_to_return=${order.remaining_days_to_return}`}
@@ -197,8 +171,9 @@ const Orders = () => {
                           variant="destructive"
                           size="sm"
                           className="rounded-full w-fit hover:bg-red-600/50 transition-colors duration-200"
+                          disabled={isCancellingOrder}
                         >
-                          Cancel Order
+                          {isCancellingOrder ? "Cancelling..." : "Cancel Order"}
                         </Button>
                       </DialogTrigger>
                       <DialogContent>
@@ -217,7 +192,7 @@ const Orders = () => {
                           </DialogClose>
                           <Button
                             onClick={() =>
-                              handleCancelOrder(order.id.toString())
+                              cancelOrderMutation(order.id.toString())
                             }
                           >
                             Yes

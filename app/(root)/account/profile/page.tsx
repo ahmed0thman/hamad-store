@@ -15,6 +15,7 @@ import SpinnerMini from "@/components/custom/SpinnerMini";
 import { delay } from "@/lib/utils";
 import { useProfile } from "@/contexts/ProfileContext";
 import { useRouter } from "next/navigation";
+import ChangePassword from "@/components/custom/profile/changePassword";
 
 const Profile = () => {
   const { profile, loading, refreshProfile, token } = useProfile();
@@ -253,55 +254,7 @@ const Profile = () => {
 
       <hr className="my-8 border-muted" />
 
-      <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-6">
-        كلمة المرور
-      </h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-          <Label
-            htmlFor="current-password"
-            className="mb-1 block text-sm font-medium text-muted-foreground"
-          >
-            كلمة المرور القديمة
-          </Label>
-          <Input
-            id="current-password"
-            type="password"
-            placeholder="كلمة المرور القديمة"
-          />
-        </div>
-        <div className="hidden md:block" />
-        <div>
-          <Label
-            htmlFor="new-password"
-            className="mb-1 block text-sm font-medium text-muted-foreground"
-          >
-            كلمة المرور الجديدة
-          </Label>
-          <Input
-            id="new-password"
-            type="password"
-            placeholder="كلمة المرور الجديدة"
-          />
-        </div>
-        <div>
-          <Label
-            htmlFor="confirm-password"
-            className="mb-1 block text-sm font-medium text-muted-foreground"
-          >
-            تأكيد كلمة المرور الجديدة
-          </Label>
-          <Input
-            id="confirm-password"
-            type="password"
-            placeholder="تأكيد كلمة المرور الجديدة"
-          />
-        </div>
-      </div>
-
-      <div className="mt-8 flex justify-end">
-        <Button type="submit">حفظ التغييرات</Button>
-      </div>
+      <ChangePassword />
     </div>
   );
 };

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useTransition } from "react";
+import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -18,13 +18,12 @@ import {
 } from "lucide-react";
 import { Notification } from "@/types";
 import {
-  getNotifications,
   markAllNotificationsAsRead,
   markNotificationAsRead,
 } from "@/lib/api/apiNotifications";
 import { toast } from "sonner";
-import { revalidate } from "@/lib/api/actions";
-import { usePathname } from "next/navigation";
+import { useGetNotifications } from "@/hooks/useGetNotifications";
+import { useQueryClient } from "@tanstack/react-query";
 
 type NotificationType =
   | "order_placed"
@@ -36,78 +35,74 @@ type NotificationType =
   | "return_request_accepted"
   | "return_request_rejected";
 
+// util functions to get icon and badge based on notification type
+
+const getNotificationIcon = (type: NotificationType) => {
+  const iconProps = { size: 20 };
+
+  switch (type) {
+    case "order_placed":
+      return <ShoppingCart {...iconProps} className="text-blue-600" />;
+    case "order_confirmed":
+      return <CheckCircle {...iconProps} className="text-green-600" />;
+    case "order_shipped":
+      return <Truck {...iconProps} className="text-purple-600" />;
+    case "order_delivered":
+      return <Package {...iconProps} className="text-green-700" />;
+    case "order_canceled":
+      return <XCircle {...iconProps} className="text-red-600" />;
+    case "return_request_placed":
+      return <RotateCcw {...iconProps} className="text-orange-600" />;
+    case "return_request_accepted":
+      return <CheckCircle {...iconProps} className="text-green-600" />;
+    case "return_request_rejected":
+      return <XCircle {...iconProps} className="text-red-600" />;
+    default:
+      return <Bell {...iconProps} className="text-gray-600" />;
+  }
+};
+
+const getNotificationBadge = (type: NotificationType) => {
+  switch (type) {
+    case "order_placed":
+      return <Badge variant="secondary">جديد</Badge>;
+    case "order_confirmed":
+      return <Badge variant="default">مؤكد</Badge>;
+    case "order_shipped":
+      return <Badge variant="secondary">مُرسل</Badge>;
+    case "order_delivered":
+      return (
+        <Badge variant="default" className="bg-green-600">
+          مُسلم
+        </Badge>
+      );
+    case "order_canceled":
+      return <Badge variant="destructive">ملغي</Badge>;
+    case "return_request_placed":
+      return <Badge variant="outline">طلب إرجاع</Badge>;
+    case "return_request_accepted":
+      return (
+        <Badge variant="default" className="bg-green-600">
+          مقبول
+        </Badge>
+      );
+    case "return_request_rejected":
+      return <Badge variant="destructive">مرفوض</Badge>;
+    default:
+      return <Badge variant="secondary">إشعار</Badge>;
+  }
+};
+// end util functions
+
 const Notifications = () => {
-  const [notifications, setNotifications] = useState<Notification[]>();
-  const [pending, startTransition] = useTransition();
-  const currentPath = usePathname();
+  const queryClient = useQueryClient();
+  const { notificationsData, isLoadingNotifications } = useGetNotifications();
 
-  useEffect(function () {
-    startTransition(handleGetNotifications);
-  }, []);
-
-  async function handleGetNotifications() {
-    const response = await getNotifications();
-    if (response.success && response.data) {
-      const notifications = response.data.notifications as Notification[];
-      setNotifications(notifications);
-    }
+  if (!notificationsData?.success) {
+    return <div className="text-red-500">Failed to load notifications</div>;
   }
 
-  const getNotificationIcon = (type: NotificationType) => {
-    const iconProps = { size: 20 };
-
-    switch (type) {
-      case "order_placed":
-        return <ShoppingCart {...iconProps} className="text-blue-600" />;
-      case "order_confirmed":
-        return <CheckCircle {...iconProps} className="text-green-600" />;
-      case "order_shipped":
-        return <Truck {...iconProps} className="text-purple-600" />;
-      case "order_delivered":
-        return <Package {...iconProps} className="text-green-700" />;
-      case "order_canceled":
-        return <XCircle {...iconProps} className="text-red-600" />;
-      case "return_request_placed":
-        return <RotateCcw {...iconProps} className="text-orange-600" />;
-      case "return_request_accepted":
-        return <CheckCircle {...iconProps} className="text-green-600" />;
-      case "return_request_rejected":
-        return <XCircle {...iconProps} className="text-red-600" />;
-      default:
-        return <Bell {...iconProps} className="text-gray-600" />;
-    }
-  };
-
-  const getNotificationBadge = (type: NotificationType) => {
-    switch (type) {
-      case "order_placed":
-        return <Badge variant="secondary">جديد</Badge>;
-      case "order_confirmed":
-        return <Badge variant="default">مؤكد</Badge>;
-      case "order_shipped":
-        return <Badge variant="secondary">مُرسل</Badge>;
-      case "order_delivered":
-        return (
-          <Badge variant="default" className="bg-green-600">
-            مُسلم
-          </Badge>
-        );
-      case "order_canceled":
-        return <Badge variant="destructive">ملغي</Badge>;
-      case "return_request_placed":
-        return <Badge variant="outline">طلب إرجاع</Badge>;
-      case "return_request_accepted":
-        return (
-          <Badge variant="default" className="bg-green-600">
-            مقبول
-          </Badge>
-        );
-      case "return_request_rejected":
-        return <Badge variant="destructive">مرفوض</Badge>;
-      default:
-        return <Badge variant="secondary">إشعار</Badge>;
-    }
-  };
+  const notifications = notificationsData.data.notifications as Notification[];
 
   const formatTimestamp = (timestamp: string) => {
     const date = new Date(timestamp);
@@ -129,13 +124,7 @@ const Notifications = () => {
   const markAsRead = async (notificationId: string) => {
     const response = await markNotificationAsRead(notificationId);
     if (response.success) {
-      setNotifications((prev) =>
-        prev?.map((notification) =>
-          notification.id === notificationId
-            ? { ...notification, read_at: new Date().toISOString() }
-            : notification
-        )
-      );
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
       toast.success("تم تعيين الإشعار كمقروء");
     } else {
       toast.error(response.message || "فشل في تعيين الإشعار كمقروء");
@@ -145,19 +134,14 @@ const Notifications = () => {
   const markAllAsRead = async () => {
     const response = await markAllNotificationsAsRead();
     if (response.success) {
-      setNotifications((prev) =>
-        prev?.map((notification) => ({
-          ...notification,
-          read_at: new Date().toISOString(),
-        }))
-      );
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
       toast.success("تم تعيين جميع الإشعارات كمقروءة");
     } else {
       toast.error(response.message || "فشل في تعيين جميع الإشعارات كمقروءة");
     }
   };
 
-  if (pending) {
+  if (isLoadingNotifications) {
     return (
       <div className="wrapper min-h-screen py-8">
         <div className="max-w-4xl mx-auto">

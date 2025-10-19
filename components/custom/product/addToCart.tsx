@@ -2,7 +2,12 @@
 
 import { Button } from "@/components/ui/button";
 import { revalidate } from "@/lib/api/actions";
-import { addToCart, removeCartItem, updateCartItem } from "@/lib/api/apiCart";
+import {
+  addToCart,
+  getCartData,
+  removeCartItem,
+  updateCartItem,
+} from "@/lib/api/apiCart";
 import { CartData } from "@/types";
 import { Plus, ShoppingCart } from "lucide-react";
 import { useSession } from "next-auth/react";
@@ -11,6 +16,8 @@ import React, { useEffect, useState, useTransition } from "react";
 import { useFormStatus } from "react-dom";
 import { toast } from "sonner";
 import SpinnerMini from "../SpinnerMini";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useGetCart } from "@/hooks/useGetCart";
 
 const ButtonSubmit = ({ children }: { children: React.ReactNode }) => {
   const { pending } = useFormStatus();
@@ -24,28 +31,71 @@ const ButtonSubmit = ({ children }: { children: React.ReactNode }) => {
 
 const AddToCart = ({
   productId,
-  token,
-  cart,
   stock,
-  refreshCart,
 }: {
   productId: number;
-  token: string | undefined;
-  cart: CartData | null | undefined;
   stock: number;
-  refreshCart?: () => void;
 }) => {
   const pathName = usePathname();
-  const [pending, startTransition] = useTransition();
   const router = useRouter();
   const [inCart, setInCart] = useState(false);
   const [inCartCount, setInCartCount] = useState(0);
   const [mounted, setMounted] = useState(false);
-  const { data: session, status } = useSession();
+
+  const { data, isLoading, error } = useGetCart();
+  const cart = data?.data as CartData | null | undefined;
+
+  const queryClient = useQueryClient();
+  const { mutate: cartAddMutation, isPending: isAddPending } = useMutation({
+    mutationFn: handleAddToCart,
+    onSuccess: (response) => {
+      if (response && response.success) {
+        setInCartCount(1);
+        setInCart(true);
+        showToast("Item added to cart successfully");
+        queryClient.invalidateQueries({ queryKey: ["cart"] });
+      }
+    },
+  });
+
+  const { mutate: cartPlusMutation, isPending: isPlusPending } = useMutation({
+    mutationFn: handlePlus,
+    onSuccess: (response) => {
+      if (response && response.success) {
+        setInCartCount((prev) => prev + 1);
+        showToast("Item updated in cart successfully");
+        queryClient.invalidateQueries({ queryKey: ["cart"] });
+      }
+      if (response && response.stockOut) {
+        toast.error("Not enough stock available", {
+          action: {
+            label: "View Cart",
+            onClick: () => {
+              router.push("/cart");
+            },
+          },
+        });
+      }
+    },
+  });
+
+  const { mutate: cartMinusMutation, isPending: isMinusPending } = useMutation({
+    mutationFn: handleMinus,
+    onSuccess: (response) => {
+      if (response && response.success) {
+        setInCartCount((prev) => Math.max(prev - 1, 0));
+        showToast("Item updated in cart successfully");
+        queryClient.invalidateQueries({ queryKey: ["cart"] });
+        if (inCartCount === 1) {
+          setInCart(false);
+        }
+      }
+    },
+  });
 
   useEffect(
     function () {
-      if (cart && cart.pharmacies && status === "authenticated") {
+      if (cart && cart.pharmacies && !data?.notAuthenticated) {
         setInCart(
           cart.pharmacies.some((pharmacy) => {
             const item = pharmacy.items.find(
@@ -64,42 +114,24 @@ const AddToCart = ({
   );
 
   async function handleAddToCart() {
-    await addToCart(productId, 1, token);
+    return await addToCart(productId, 1);
   }
 
   async function handlePlus() {
-    const response = await updateCartItem(productId, inCartCount + 1, token);
-    if (response && response.success) {
-      setInCartCount((prev) => prev + 1);
-      showToast("Item updated in cart successfully");
-    }
-    if (response && response.stockOut) {
-      toast.error("Not enough stock available", {
-        action: {
-          label: "View Cart",
-          onClick: () => {
-            router.push("/cart");
-          },
-        },
-      });
-      return;
-    }
+    return await updateCartItem(productId, inCartCount + 1);
   }
 
   async function handleMinus() {
     if (inCartCount > 1) {
-      await updateCartItem(productId, inCartCount - 1, token);
+      return await updateCartItem(productId, inCartCount - 1);
     } else {
-      await removeCartItem(productId, token);
-
-      setInCart(false);
+      return await removeCartItem(productId);
     }
   }
 
   function showToast(message: string) {
     // console.log("pathName", pathName);
-    revalidate(pathName);
-    refreshCart?.();
+    // revalidate(pathName);
     toast.success(message, {
       action: {
         label: "View Cart",
@@ -110,7 +142,7 @@ const AddToCart = ({
     });
   }
 
-  if (!token) {
+  if (data?.notAuthenticated) {
     return (
       <Button
         onClick={() => {
@@ -142,28 +174,22 @@ const AddToCart = ({
         <Button
           variant="ghost"
           size="icon"
-          onClick={() => {
-            startTransition(handleMinus);
-            setInCartCount((prev) => Math.max(prev - 1, 0));
-            showToast("Item updated in cart successfully");
-          }}
+          onClick={() => cartMinusMutation()}
           className="w-6 h-6 text-lg text-red-500 hover:bg-red-100"
-          disabled={pending || inCartCount < 1}
+          disabled={isMinusPending || isPlusPending || inCartCount < 1}
         >
           -
         </Button>
         <span className="text-sm font-medium w-6 text-center dark:text-white">
-          {pending ? <SpinnerMini /> : inCartCount}
+          {isMinusPending || isPlusPending ? <SpinnerMini /> : inCartCount}
         </span>
         {inCartCount < stock && (
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => {
-              startTransition(handlePlus);
-            }}
+            onClick={() => cartPlusMutation()}
             className="w-6 h-6 text-lg text-green-600 hover:bg-green-100"
-            disabled={pending || inCartCount >= stock}
+            disabled={isMinusPending || isPlusPending || inCartCount >= stock}
           >
             +
           </Button>
@@ -176,15 +202,10 @@ const AddToCart = ({
     <div>
       <Button
         type="submit"
-        onClick={() => {
-          startTransition(handleAddToCart);
-          setInCartCount(1);
-          setInCart(true);
-          showToast("Item added to cart successfully");
-        }}
-        disabled={pending || stock <= 0}
+        onClick={() => cartAddMutation()}
+        disabled={isAddPending || stock <= 0}
       >
-        {pending ? (
+        {isAddPending ? (
           <SpinnerMini />
         ) : (
           <>

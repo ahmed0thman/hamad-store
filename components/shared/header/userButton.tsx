@@ -8,12 +8,13 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { getNotifications } from "@/lib/api/apiNotifications";
+import { useGetNotifications } from "@/hooks/useGetNotifications";
 import { Notification, User as UserType } from "@/types";
 import { Bell, Heart, LogOut, User } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState, useTransition } from "react";
+import { useState } from "react";
 import ButtonLogout from "./buttonLogout";
+import SpinnerMini from "@/components/custom/SpinnerMini";
 
 const userMenuItems = [
   {
@@ -35,26 +36,31 @@ const userMenuItems = [
 
 const UserButton = ({ user }: { user: UserType | null }) => {
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [totalNotifications, setTotalNotifications] = useState(0);
-  const [pending, startTransition] = useTransition();
-  // const singedIn = true;
-  // const fisrtInitial = session.user?.name?.charAt(0).toUpperCase() ?? "U";
-  // if (!session)
+  let totalNotifications = 0;
+  const { notificationsData, isLoadingNotifications } = useGetNotifications();
 
-  useEffect(function () {
-    if (user?.token) {
-      handleGetNotifications();
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (!notificationsData?.success) {
+  //     const count = (notificationsData?.data as Notification[]).filter(
+  //       (n) => !n.read_at
+  //     ).length;
+  //     setTotalNotifications(count);
+  //     console.log("Notifications: ", notificationsData);
+  //   }
+  // }, [isLoadingNotifications, notificationsData?.success]);
 
-  async function handleGetNotifications() {
-    const response = await getNotifications(user?.token);
-    if (response.success && response.data) {
-      const notifications = response.data.notifications as Notification[];
-      console.log("Notifications:", notifications);
-      setTotalNotifications(notifications.filter((n) => !n.read_at).length);
-    }
+  if (isLoadingNotifications) {
+    return <SpinnerMini />;
   }
+
+  if (notificationsData?.success) {
+    console.log("Notifications:", notificationsData?.data);
+    totalNotifications = (
+      notificationsData.data.notifications as Notification[]
+    ).filter((n) => !n.read_at).length;
+    console.log("total notifications: ", totalNotifications);
+  }
+
   return (
     <div className="hidden lg:block">
       {!user ? (

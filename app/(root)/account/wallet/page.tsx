@@ -40,6 +40,31 @@ const Wallet = async () => {
             </p>
           </div>
         </div>
+
+        {/* Transaction History */}
+        <div className="mt-8">
+          <h3 className="text-lg font-medium">سجل المعاملات</h3>
+          {walletDetails.point_transctions ? (
+            <ul className="space-y-2">
+              {walletDetails.point_transctions.map((transaction) => (
+                <li
+                  key={transaction.id}
+                  className="p-4 border rounded-lg shadow-sm"
+                >
+                  <p className="text-sm text-gray-500">
+                    {transaction.created_at}
+                  </p>
+                  <p className="font-bold">{transaction.points} نقطة</p>
+                  <p className="text-sm text-gray-500">
+                    {transaction.description}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-gray-500">لا توجد معاملات بعد.</p>
+          )}
+        </div>
       </div>
     </div>
   );

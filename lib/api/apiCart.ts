@@ -1,22 +1,17 @@
+"use server";
+
 // Get Cart Data
-import { success } from "zod";
-import { auth } from "../auth";
 import { api } from "../axios";
 import { CartData } from "@/types";
 import { AxiosError } from "axios";
-import { delay } from "../utils";
+import { getAuthToken } from "./helpers";
 
 export const getCartData = async (userToken?: string) => {
-  let token: string = "";
-  if (!userToken) {
-    const session = await auth();
-    token = session?.user?.token || session?.accessToken || "";
-    if (!session || !session.user || !session.accessToken) {
-      return { success: false, message: "User not authenticated" };
-    }
-  } else {
-    token = userToken;
+  const authResult = await getAuthToken(userToken);
+  if (!authResult.success) {
+    return { success: false, message: authResult.message };
   }
+  const token = authResult.token;
   try {
     const response = await api.get("/cart", {
       headers: {
@@ -53,14 +48,13 @@ export const getCartData = async (userToken?: string) => {
 export const addToCart = async (
   productID: number,
   quantity: number,
-  token: string | undefined
+  userToken?: string
 ) => {
-  // await delay(2000);
-
-  if (!token) {
-    // console.log("User not authenticated");
-    return { success: false, message: "User not authenticated" };
+  const authResult = await getAuthToken(userToken);
+  if (!authResult.success) {
+    return { success: false, message: authResult.message };
   }
+  const token = authResult.token;
   try {
     const response = await api.post(
       "/add-to-cart",
@@ -105,12 +99,13 @@ export const addToCart = async (
 export const updateCartItem = async (
   productID: number,
   quantity: number,
-  token: string | undefined
+  userToken?: string
 ) => {
-  if (!token) {
-    // console.log("User not authenticated");
-    return { success: false, message: "User not authenticated" };
+  const authResult = await getAuthToken(userToken);
+  if (!authResult.success) {
+    return { success: false, message: authResult.message };
   }
+  const token = authResult.token;
   try {
     const response = await api.post(
       "/update-cart-item",
@@ -161,14 +156,12 @@ export const updateCartItem = async (
   }
 };
 
-export const removeCartItem = async (
-  productID: number,
-  token: string | undefined
-) => {
-  if (!token) {
-    // console.log("User not authenticated");
-    return { success: false, message: "User not authenticated" };
+export const removeCartItem = async (productID: number, userToken?: string) => {
+  const authResult = await getAuthToken(userToken);
+  if (!authResult.success) {
+    return { success: false, message: authResult.message };
   }
+  const token = authResult.token;
   try {
     const response = await api.post(
       `/remove-cart-item/${productID}`,
@@ -209,12 +202,13 @@ export const removeCartItem = async (
 export const addCouponToCart = async (
   couponCode: string,
   pharamcyId: number,
-  token: string = ""
+  userToken?: string
 ) => {
-  if (!token) {
-    // console.log("User not authenticated");
-    return { success: false, message: "User not authenticated" };
+  const authResult = await getAuthToken(userToken);
+  if (!authResult.success) {
+    return { success: false, message: authResult.message };
   }
+  const token = authResult.token;
   try {
     const response = await api.post(
       "/add-coupon",

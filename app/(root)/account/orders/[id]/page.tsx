@@ -1,6 +1,7 @@
 "use client";
 
 import RatingDialog from "@/components/custom/order/ratingDialog";
+import RefundRequestDialog from "@/components/custom/order/RefundRequestDialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -14,14 +15,16 @@ import {
 } from "@/components/ui/table";
 import { getOrderDetails } from "@/lib/api/apiOrders";
 import { formatCurrency, formatCurrencyEGP } from "@/lib/utils";
-import { CartItem, OrderDetails } from "@/types";
-import { CheckCircle } from "lucide-react";
+import { OrderDetails, OrderDetailsItem } from "@/types";
 import { useSession } from "next-auth/react";
-import Image from "next/image";
-import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
+import {
+  loadReturnRequest,
+  saveReturnRequest,
+  clearReturnRequest as clearReturnRequestStorage,
+} from "@/lib/utils/returnRequestStorage";
 
 const getStatusColor = (status: string) => {
   switch (status.toLowerCase()) {
@@ -51,6 +54,30 @@ export default function OrderDetailsPage() {
     string | null
   >(null);
 
+  const { data: session, status } = useSession();
+  const [userToken, setUserToken] = useState<string>("");
+  const [pending, startTransition] = useTransition();
+  const [orderDetails, setOrderDetails] = useState<OrderDetails | null>(null);
+  const [itemsToReturn, setItemsToReturn] = useState<OrderDetailsItem[]>([]);
+  const [isRefundDialogOpen, setIsRefundDialogOpen] = useState(false);
+
+  // Load return requests from localStorage on mount
+  useEffect(() => {
+    if (id && typeof id === "string") {
+      const savedItems = loadReturnRequest(id);
+      if (savedItems.length > 0) {
+        setItemsToReturn(savedItems);
+      }
+    }
+  }, [id]);
+
+  // Save return requests to localStorage whenever they change
+  useEffect(() => {
+    if (id && typeof id === "string") {
+      saveReturnRequest(id, itemsToReturn);
+    }
+  }, [itemsToReturn, id]);
+
   useEffect(() => {
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
@@ -58,10 +85,6 @@ export default function OrderDetailsPage() {
       setRemainingDaysToReturn(value);
     }
   }, []);
-  const { data: session, status } = useSession();
-  const [userToken, setUserToken] = useState<string>("");
-  const [pending, startTransition] = useTransition();
-  const [orderDetails, setOrderDetails] = useState<OrderDetails | null>(null);
 
   useEffect(
     function () {
@@ -74,6 +97,12 @@ export default function OrderDetailsPage() {
     [status]
   );
 
+  useEffect(() => {
+    if (userToken) {
+      startTransition(fetchOrderDetails);
+    }
+  }, [userToken]);
+
   async function fetchOrderDetails() {
     const response = await getOrderDetails(userToken, Number(id));
     console.log(response);
@@ -82,11 +111,31 @@ export default function OrderDetailsPage() {
     }
   }
 
-  useEffect(() => {
-    if (userToken) {
-      startTransition(fetchOrderDetails);
+  // Clear return request from localStorage (call this after successful submission)
+  const clearReturnRequest = () => {
+    if (id && typeof id === "string") {
+      clearReturnRequestStorage(id);
+      setItemsToReturn([]);
     }
-  }, [userToken]);
+  };
+
+  const handleAddToReturn = (item: OrderDetailsItem) => {
+    setItemsToReturn((prevItems) => {
+      if (isItemAlreadyAdded(item.product_id)) {
+        return prevItems;
+      }
+      return [...prevItems, item];
+    });
+  };
+
+  const isItemAlreadyAdded = (itemID: number) =>
+    itemsToReturn.some((prevItem) => prevItem.product_id === itemID);
+
+  const handleRemoveFromReturn = (item: OrderDetailsItem) => {
+    setItemsToReturn((prevItems) =>
+      prevItems.filter((prevItem) => prevItem.product_id !== item.product_id)
+    );
+  };
 
   if (pending)
     return (
@@ -135,7 +184,7 @@ export default function OrderDetailsPage() {
     );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 relative">
       {/* Order Header */}
       <div className="">
         <h1 className="flex gap-3 items-center text-2xl font-bold tracking-tight text-foreground">
@@ -196,31 +245,49 @@ export default function OrderDetailsPage() {
                       orderDetails?.status.toLowerCase() === "returned") && (
                       <RatingDialog userToken={userToken} item={item} />
                     )}
-                    {orderDetails?.status.toLowerCase() === "delivered" && (
+                    {(orderDetails?.status.toLowerCase() === "delivered" ||
+                      remainingDaysToReturn) && (
                       <Button
-                        variant="ghost"
+                        variant={
+                          isItemAlreadyAdded(item.product_id)
+                            ? "destructive"
+                            : "ghost"
+                        }
                         size="sm"
                         className="rounded-full bg-muted"
                         onClick={() => {
+                          if (isItemAlreadyAdded(item.product_id)) {
+                            handleRemoveFromReturn(item);
+                            return;
+                          }
+                          handleAddToReturn(item);
+                          // toast.success("Product added to refund request", {
+                          //   description: `${item.product_name} has been added. You can add more or view the request.`,
+                          //   action: {
+                          //     label: "View Request",
+                          //     onClick: () => setIsRefundDialogOpen(true),
+                          //   },
+                          // });
                           toast(
-                            <div className="space-y-2">
-                              <div className="flex gap-1 items-center">
-                                <p>
-                                  Product added to refund request, you can add
-                                  more or view the request
-                                </p>
-                                <CheckCircle className="w-8 h-8 text-green-500 ml-2" />
-                              </div>
-                              <Button asChild variant="link" size={"sm"}>
-                                <Link href="/account/refund">
-                                  Complete Refund
-                                </Link>
+                            <div className="space-y-2 ">
+                              <span>
+                                ${item.product_name} has been added. You can add
+                                more or view the request.
+                              </span>
+                              <Button
+                                variant="link"
+                                className="underline block ms-auto"
+                                onClick={() => setIsRefundDialogOpen(true)}
+                              >
+                                View Request
                               </Button>
                             </div>
                           );
                         }}
                       >
-                        refund
+                        {isItemAlreadyAdded(item.product_id)
+                          ? "remove from return"
+                          : "Add to Return"}
                       </Button>
                     )}
                   </TableCell>
@@ -230,6 +297,38 @@ export default function OrderDetailsPage() {
           </TableBody>
         </Table>
       </div>
+
+      {/* Floating Action Button for Return Request */}
+      {itemsToReturn.length > 0 && (
+        <div className="fixed bottom-8 right-8 z-50">
+          <Button
+            onClick={() => setIsRefundDialogOpen(true)}
+            size="lg"
+            className="shadow-lg h-14 px-6 rounded-full"
+          >
+            View Return Request ({itemsToReturn.length})
+          </Button>
+        </div>
+      )}
+
+      {/* if there are items to return show a dialog button that opens the return request dialog */}
+      {itemsToReturn.length > 0 && (
+        <Button onClick={() => setIsRefundDialogOpen(true)}>
+          Show Return Request ({itemsToReturn.length} item
+          {itemsToReturn.length > 1 ? "s" : ""})
+        </Button>
+      )}
+
+      {/* Refund Request Dialog */}
+      <RefundRequestDialog
+        open={isRefundDialogOpen}
+        onOpenChange={setIsRefundDialogOpen}
+        items={itemsToReturn}
+        orderId={Number(id)}
+        onRemoveItem={handleRemoveFromReturn}
+        currency={orderDetails?.currency}
+        onSubmitSuccess={clearReturnRequest}
+      />
 
       {/* Order Summary */}
       <Card>

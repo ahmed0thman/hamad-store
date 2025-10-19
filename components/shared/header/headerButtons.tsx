@@ -9,8 +9,10 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useGetProfile } from "@/hooks/useGetProfile";
 import { updateUserLanguage } from "@/lib/api/apiUser";
 import { formatCurrencyEGP } from "@/lib/utils";
+import { useQueryClient } from "@tanstack/react-query";
 import { Globe, Moon, ShoppingCart, Sun } from "lucide-react";
 import { Session } from "next-auth";
 import { useSession } from "next-auth/react";
@@ -26,44 +28,51 @@ const HeaderButtons = ({
   session: Session | null;
 }) => {
   const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-  const [language, setLanguage] = useState<string | undefined>();
+  // const [language, setLanguage] = useState<string>("");
+  let language = "ar";
+  const { profileData, isLoadoingProfile } = useGetProfile();
+  const queryClient = useQueryClient();
 
-  useEffect(
-    function () {
-      const localLang = localStorage?.getItem("Lan");
-      if (session?.user?.language) {
-        setLanguage(session.user.language);
-        setDocumentLanguage(session.user.language);
-        console.log("set from session");
-      } else if (localLang) {
-        setLanguage(localLang);
-        setDocumentLanguage(localLang);
-        console.log("set from localStorage");
-      } else {
-        setLanguage("ar"); // default language
-        setDocumentLanguage("ar");
-        console.log("set default");
-      }
+  // useEffect(
+  //   function () {
+  //     const localLang = localStorage?.getItem("Lan");
+  //     if (profileData?.success && profileData.data?.language) {
+  //       setLanguage(profileData.data.language);
+  //       setDocumentLanguage(profileData.data.language);
+  //       console.log("current lan:", profileData.data.language);
+  //       console.log("set from profileData");
+  //     } else if (localLang) {
+  //       setLanguage(localLang);
+  //       setDocumentLanguage(localLang);
+  //       console.log("set from localStorage");
+  //     } else {
+  //       setLanguage("ar"); // default language
+  //       setDocumentLanguage("ar");
+  //       console.log("set default");
+  //     }
 
-      setMounted(true);
-    },
-    [session?.user?.language]
-  );
+  //     setMounted(true);
+  //   },
+  //   [profileData?.data.language, profileData?.success]
+  // );
 
   async function handleChangeLanguage() {
-    const newLang = language === "ar" ? "en" : "ar";
-
-    if (session?.user) {
-      const response = await updateUserLanguage(
-        session.accessToken as string,
-        newLang
-      );
+    if (profileData?.success) {
+      const response = await updateUserLanguage(language);
       console.log(response);
+      if (response?.success) {
+        // Invalidate and refetch
+        language = language === "ar" ? "en" : "ar";
+        setDocumentLanguage(language);
+        queryClient.invalidateQueries({ queryKey: ["profile"] });
+        console.log("Language updated successfully");
+      } else {
+        console.log("Failed to update language");
+      }
     }
-    setLanguage(newLang);
-    localStorage?.setItem("Lan", newLang);
-    setDocumentLanguage(newLang);
+    // setLanguage(newLang);
+    // localStorage?.setItem("Lan", newLang);
+    // setDocumentLanguage(newLang);
   }
 
   function setDocumentLanguage(newLang: string) {
@@ -74,7 +83,23 @@ const HeaderButtons = ({
   function toggleTheme() {
     setTheme(theme === "light" ? "dark" : "light");
   }
-  if (!mounted) return null;
+  if (isLoadoingProfile) return null;
+
+  const localLang = localStorage?.getItem("Lan");
+  if (profileData?.success && profileData.data?.language) {
+    language = profileData.data.language;
+    setDocumentLanguage(profileData.data.language);
+    console.log("current lan:", profileData.data.language);
+    console.log("set from profileData");
+  } else if (localLang) {
+    language = localLang;
+    setDocumentLanguage(localLang);
+    console.log("set from localStorage");
+  } else {
+    language = "ar"; // default language
+    setDocumentLanguage("ar");
+    console.log("set default");
+  }
   return (
     <div className="flex-center text-stone-700 dark:text-stone-400 !hidden lg:!flex">
       <Button

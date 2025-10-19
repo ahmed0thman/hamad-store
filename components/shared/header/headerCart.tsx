@@ -9,23 +9,19 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useGetCart } from "@/hooks/useGetCart";
 import { formatCurrencyEGP } from "@/lib/utils";
 import { CartData } from "@/types";
 import { ShoppingCart } from "lucide-react";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
 
-const HeaderCart = ({
-  session,
-  cartData,
-}: {
-  session?: any;
-  cartData: any;
-}) => {
+const HeaderCart = ({ session }: { session?: any }) => {
   let cart: CartData | null = null;
   let isEmpty = false;
   let multiStores = false;
   const isAuthenticated = session && session.user && session.accessToken;
+  const { data: cartData, isLoading, error } = useGetCart();
   if (isAuthenticated) {
     if (cartData?.notAuthenticated) {
       cart = null;
@@ -34,7 +30,7 @@ const HeaderCart = ({
     if (cartData?.empty) {
       isEmpty = true;
     }
-    cart = cartData.data;
+    cart = cartData?.data as CartData;
 
     if (cart?.pharmacies && cart.pharmacies.length > 1) {
       multiStores = true;
@@ -86,8 +82,14 @@ const HeaderCart = ({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className=" p-0">
+        <Button variant="ghost" className=" relative p-0">
           <ShoppingCart className="!w-6 !h-6" />
+          {/* cart count badge */}
+          <span className="absolute -top-1 -right-1 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-red-600 rounded-full">
+            {multiStores
+              ? cart?.pharmacies.length
+              : cart?.pharmacies[0].items.length}
+          </span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56 p-3 ">

@@ -10,33 +10,33 @@ import {
   DollarSign,
   Info,
   Landmark,
-  OctagonX,
   Upload,
   WalletCards,
 } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import ButtonStepNav from "./buttonStepNav";
 
 import { useOrder } from "@/contexts/OrderContext";
-import { getCartData } from "@/lib/api/apiCart";
-import { getPaymentMethods, saveOrder } from "@/lib/api/apiOrders";
+import { getPaymentMethods } from "@/lib/api/apiOrders";
 import { cardSchema } from "@/lib/validators";
 import {
   CardFormData,
   CartData,
   CartPharmacy,
-  orderSaveParams,
   PaymentMethod,
+  wallet,
 } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
-import { toast } from "sonner";
 import AddNewCardDialog from "./addNewCardDialog";
+import { getCartData } from "@/lib/api/apiCart";
+import { useGetCart } from "@/hooks/useGetCart";
+import { useGetWallet } from "@/hooks/useGetWallet";
 // const paymentMethods = [
 //   // "Card",
 //   // "Zain Pay",
@@ -94,11 +94,22 @@ export default function PaymentMethodTab({
   const [userToken, setUserToken] = useState<string>("");
 
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
-  const { setPharmacyId, setPaymentMethod, paymentMethod, paymentMethodValue } =
-    useOrder();
+  const {
+    pharmacyId,
+    setPharmacyId,
+    setPaymentMethod,
+    paymentMethod,
+    paymentMethodValue,
+  } = useOrder();
+
+  const [pharmacyData, setPharmacyData] = useState<CartPharmacy | null>(null);
+  const [walletInfo, setWalletInfo] = useState<wallet | null>(null);
+
+  const { data: cartData, isLoading: isLoadingCart } = useGetCart();
+  const { walletDetails, isLoadingWallet } = useGetWallet();
 
   async function handleGetPaymentMethods() {
-    const response = await getPaymentMethods(userToken);
+    const response = await getPaymentMethods();
     console.log(response);
     if (response.success) {
       setPaymentMethods(response.data as PaymentMethod[]);
@@ -106,25 +117,22 @@ export default function PaymentMethodTab({
   }
 
   useEffect(() => {
-    if (userToken) {
-      handleGetPaymentMethods();
+    handleGetPaymentMethods();
+    if (cartData?.success && walletDetails?.success) {
+      const pharmacy = (cartData.data as CartData).pharmacies.find(
+        (ph) => ph.pharmacy_id === pharmacyId
+      );
+      setPharmacyData(pharmacy as CartPharmacy);
+      setWalletInfo(walletDetails.data as wallet);
     }
-  }, [userToken]);
-
-  useEffect(() => {
-    if (status === "authenticated" && session?.user.token) {
-      setUserToken(session.user.token || session.accessToken || "");
-    } else {
-      setUserToken("");
-    }
-  }, [status]);
+  }, [cartData, walletDetails, pharmacyId]);
 
   useEffect(() => {
     const pharmacyId = searchParams.get("pharmacyId");
     if (pharmacyId) {
       setPharmacyId?.(parseInt(pharmacyId));
     }
-  }, []);
+  }, [searchParams]);
 
   const [selectedPayment, setSelectedPayment] = useState(
     paymentMethods[0]?.name.en || paymentMethod || ""
@@ -167,7 +175,10 @@ export default function PaymentMethodTab({
               setSelectedPayment((prev) => pm.name.en || pm.name.ar)
             }
           >
-            <RadioGroupItem value={pm.id.toString()} />
+            <RadioGroupItem
+              value={pm.id.toString()}
+              //  disabled={pm.name.en === "wallet" && walletInfo?.wallet_balance < pharmacyData?.total}
+            />
             <div className="font-medium text-sm text-foreground">
               {pm.name.en || pm.name.ar}
             </div>

@@ -1,3 +1,5 @@
+import { title } from "process";
+
 export const pharmacyCategories = [
   { name: "Pain Relief", href: "?category=pain-relief" },
   { name: "Cold & Flu", href: "?category=cold-flu" },
@@ -13,4 +15,5 @@ export const headerPages = [
   { title: "Home", path: "/" },
   { title: "About", path: "/about" },
   { title: "Contact Us", path: "/contact-us" },
+  { title: "plans", path: "/plans" },
 ];

@@ -9,6 +9,7 @@ import {
   orderSaveParams,
   PaymentMethod,
 } from "@/types";
+import { getAuthToken } from "./helpers";
 
 export async function saveOrder(
   orderParams: orderSaveParams,
@@ -66,6 +67,7 @@ export async function saveOrder(
     return { success: false, message: "An unknown error occurred" };
   }
 }
+
 export async function getUserOrders(userToken?: string) {
   let token: string = "";
   if (!userToken) {
@@ -132,6 +134,7 @@ export async function getOrderDetails(userToken: string, orderId: number) {
     return { success: false, message: "An unknown error occurred" };
   }
 }
+
 export async function cancelOrder(orderId: number, userToken?: string) {
   try {
     if (!userToken) {
@@ -166,17 +169,12 @@ export async function cancelOrder(orderId: number, userToken?: string) {
   }
 }
 
-export async function getPaymentMethods(userToken: string) {
-  let token: string = "";
-  if (!userToken) {
-    const session = await auth();
-    token = session?.user?.token || session?.accessToken || "";
-    if (!session || !session.user || !session.accessToken) {
-      return { success: false, message: "User not authenticated" };
-    }
-  } else {
-    token = userToken;
+export async function getPaymentMethods(userToken?: string) {
+  const authResult = await getAuthToken(userToken);
+  if (!authResult.success) {
+    return { success: false, message: authResult.message };
   }
+  const token = authResult.token;
 
   try {
     const response = await api.get("payment-methods/index", {

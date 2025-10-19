@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { addCouponToCart, getCartData } from "@/lib/api/apiCart";
 import { getAuthData } from "@/lib/api/apiUser";
 import { formatCurrencyEGP } from "@/lib/utils";
-import { CartData, CartPharmacy } from "@/types";
+import { CartData, CartPharmacy, wallet } from "@/types";
 import { Session } from "next-auth";
 import { CircleCheckBig, OctagonX } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
@@ -16,78 +16,48 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
+import { getWalletDetails } from "@/lib/api/apiWallet";
+import { useGetCart } from "@/hooks/useGetCart";
+import { useGetWallet } from "@/hooks/useGetWallet";
 
 const PharamacyCart = () => {
   const params = useParams();
   const { pharmacyId } = params;
-  // const { data: session, status } = useSession();
-  const [token, setToken] = useState<string | undefined>(undefined);
-
-  const [session, setSession] = useState<Session | undefined>(undefined);
 
   const router = useRouter();
-  const [cart, setCart] = useState<CartData | null>(null);
   const [cartPharmacy, setCartPharmacy] = useState<CartPharmacy | null>(null);
-  const [pending, startTransition] = useTransition();
-  const [pendingRefresh, startTransitionRefresh] = useTransition();
-  const [mounted, setMounted] = useState(false);
-  const [authenticated, setAuthenticated] = useState(false);
-  const [currency, setCurrency] = useState("");
+  // const [currency, setCurrency] = useState("");
 
-  useEffect(() => {
-    getSessionData();
-  }, []);
-
-  useEffect(() => {
-    if (authenticated) {
-      startTransition(fetchCartData);
-      setMounted(true);
-    }
-  }, [authenticated]);
-
-  async function getSessionData() {
-    const session = await getAuthData();
-    if (session?.user && session?.accessToken) {
-      setSession(session);
-      setAuthenticated(true);
-      setToken(session?.user?.token || session?.accessToken || undefined);
-      setCurrency(session?.user?.currency_code || "EGP");
-      console.log("User currency:", session?.user?.currency_code);
-    }
+  const { data: cartData, isLoading, error } = useGetCart();
+  if (cartData?.notAuthenticated) {
+    signOut({ redirectTo: "/signin?callbackUrl=/cart" });
   }
 
-  async function fetchCartData() {
-    const cartData = await getCartData(token);
-    const isAuthenticated = session && session.user && session.accessToken;
-    if (isAuthenticated) {
-      if (cartData?.notAuthenticated) {
-        setCart(null);
-        signOut({ redirectTo: "/signin" });
-      }
-      if (cartData?.empty) {
-        router.push("/cart");
-      } else {
-        const data = cartData?.data as CartData;
-        setCart(data);
-        if (data?.pharmacies && data.pharmacies.length === 0) {
-          router.push("/cart");
-        } else {
-          console.log("cart pharmacies", data);
-          const pharmacy = data?.pharmacies.find(
-            (pharmacy) => pharmacy.pharmacy_id.toString() === pharmacyId
-          );
-          if (!pharmacy) {
-            router.push("/cart");
-          }
-          setCartPharmacy(pharmacy || null);
-        }
-      }
+  const { walletDetails, isLoadingWallet, errorWallet } = useGetWallet();
+  const walletInfo = walletDetails?.data as wallet;
+
+  if (cartData?.empty) {
+    router.push("/cart");
+  }
+
+  const cart = cartData?.data as CartData | null | undefined;
+
+  useEffect(() => {
+    if (cart?.pharmacies && cart.pharmacies.length === 0) {
+      router.push("/cart");
     } else {
-      router.push("/signin?callbackUrl=/cart");
+      console.log("cart pharmacies", cart);
+      const pharmacy = cart?.pharmacies.find(
+        (pharmacy) => pharmacy.pharmacy_id.toString() === pharmacyId
+      );
+      if (!pharmacy) {
+        router.push("/cart");
+      }
+      setCartPharmacy(pharmacy || null);
     }
-  }
+  }, [cart, pharmacyId, router]);
 
-  if (pending && !mounted) return <Spinner />;
+  if (isLoading || isLoadingWallet) return <Spinner />;
 
   return (
     <section className="wrapper">
@@ -122,13 +92,7 @@ const PharamacyCart = () => {
                     <span className="text-sm font-medium text-gray-800 dark:text-white text-nowrap">
                       {formatCurrencyEGP(item.total)}
                     </span>
-                    <AddToCart
-                      cart={cart}
-                      productId={item.product_id}
-                      token={token}
-                      stock={1000000}
-                      refreshCart={() => startTransitionRefresh(fetchCartData)}
-                    />
+                    <AddToCart productId={item.product_id} stock={1000000} />
                   </div>
                 </CardContent>
               </Card>
@@ -180,10 +144,12 @@ const PharamacyCart = () => {
               <div className="mt-6 border-t border-teal-200 dark:border-teal-700 pt-6">
                 <div className="flex justify-between items-center mb-4">
                   <span className="text-lg font-semibold text-teal-800 dark:text-teal-400">
-                    مجموع نقاط الولاء
+                    رصيد المحفظة
                   </span>
                   <span className="text-xl font-bold text-teal-600 dark:text-teal-400">
-                    1,800 نقطة
+                    {walletInfo?.wallet_balance
+                      ? walletInfo?.wallet_balance
+                      : 0}
                   </span>
                 </div>
 
