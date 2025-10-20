@@ -31,9 +31,9 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 
 interface PageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 const getStatusColor = (status: string) => {
@@ -77,7 +77,7 @@ const getStatusIcon = (status: string) => {
 };
 
 export default async function RefundRequestDetailsPage({ params }: PageProps) {
-  const { id } = params;
+  const { id } = await params;
   const response = await getReturnRequestDetails(id);
 
   if (!response?.success || !response.data) {

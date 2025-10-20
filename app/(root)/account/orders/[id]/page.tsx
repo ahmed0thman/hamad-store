@@ -17,6 +17,7 @@ import { getOrderDetails } from "@/lib/api/apiOrders";
 import { formatCurrency, formatCurrencyEGP } from "@/lib/utils";
 import { OrderDetails, OrderDetailsItem } from "@/types";
 import { useSession } from "next-auth/react";
+import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
@@ -322,12 +323,12 @@ export default function OrderDetailsPage() {
                 <p className="text-sm text-orange-700 dark:text-orange-300">
                   A return request has already been submitted for this order.
                   You can view the status in your{" "}
-                  <a
+                  <Link
                     href="/account/refund"
                     className="underline font-medium hover:text-orange-900 dark:hover:text-orange-100"
                   >
                     refund requests
-                  </a>
+                  </Link>
                   .
                 </p>
               </div>
