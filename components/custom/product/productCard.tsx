@@ -11,6 +11,7 @@ import ButtonFavorite from "./buttonFavorite";
 import { Badge } from "@/components/ui/badge";
 import ButtonAddToCompare from "./buttonAddToCompare";
 import Image from "next/image";
+import { CURRENCY_CODE } from "@/lib/constants";
 
 const ProductCard = async ({ productItem }: { productItem: ProductItem }) => {
   const session = await auth();
@@ -88,7 +89,7 @@ const ProductCard = async ({ productItem }: { productItem: ProductItem }) => {
               <span className="text-foreground font-semibold text-xl">
                 {formatCurrency(
                   productItem.price as number,
-                  productItem.currency_symbol
+                  session?.user.currency_code || CURRENCY_CODE
                 )}
               </span>
             )}

@@ -1,11 +1,12 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { formatCurrencyEGP } from "@/lib/utils";
+import { formatCurrency, formatCurrencyEGP } from "@/lib/utils";
 import { CartData, Product } from "@/types";
 import AddToCart from "./addToCart";
 import { auth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import { getCartData } from "@/lib/api/apiCart";
+import { CURRENCY_CODE } from "@/lib/constants";
 
 const ProductAddCart = async ({ product }: { product: Product }) => {
   const session = await auth();
@@ -26,13 +27,18 @@ const ProductAddCart = async ({ product }: { product: Product }) => {
       <CardContent className="p-4">
         <div className="mb-2 flex justify-between">
           <div>Price</div>
-          <div>{formatCurrencyEGP(price)}</div>
+          <div>
+            {formatCurrency(
+              price,
+              session?.user.currency_code || CURRENCY_CODE
+            )}
+          </div>
         </div>
         <div className="mb-2 flex justify-between">
           <div>Status</div>
           <div>
             {stock > 0 ? (
-              <Badge variant="outline">In Stock ({stock})</Badge>
+              <Badge variant="outline">In Stock </Badge>
             ) : (
               <Badge variant="destructive">Out Of Stock</Badge>
             )}

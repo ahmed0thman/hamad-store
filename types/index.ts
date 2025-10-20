@@ -57,7 +57,9 @@ export type User = {
   currency_code?: string | null;
   is_doctor?: boolean;
 };
-export type UserProfile = z.infer<typeof profileSchema>;
+export type UserProfile = z.infer<typeof profileSchema> & {
+  currency_code?: string | null;
+};
 export type UserAddress = z.infer<typeof userAddressSchema> & {
   id?: string;
   user_id?: string;
@@ -334,6 +336,46 @@ export type OrderDetails = {
   remaining_amount: string;
   items: OrderDetailsItem[];
   currency: string;
+  is_request_return: boolean;
+};
+
+export type ItemToReturn = {
+  order_item_id: number;
+  quantity: number;
+  image?: File | string | null;
+};
+
+export type ReturnRequest = {
+  order_id: string;
+  return_reason: string;
+  items: ItemToReturn[];
+};
+
+export type ReturnedRequest = {
+  id: number;
+  order_id: number;
+  order_number: string;
+  status: string;
+  return_reason: string;
+  platform_notes: string | null;
+  pharmacy_notes: string | null;
+  total_amount: string;
+  refund_amount: string;
+  refund_to_wallet: boolean;
+  is_refunded: boolean;
+};
+
+export type ReturnRequestDetails = ReturnedRequest & {
+  items: {
+    id: number;
+    product_id: number;
+    quantity_returned: number;
+    quantity_original: number;
+    unit_price: string;
+    total_price: string;
+    image: string | null;
+    approved: boolean;
+  }[];
 };
 
 // -------------

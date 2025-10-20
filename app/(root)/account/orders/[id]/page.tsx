@@ -25,6 +25,7 @@ import {
   saveReturnRequest,
   clearReturnRequest as clearReturnRequestStorage,
 } from "@/lib/utils/returnRequestStorage";
+import { AlertCircle } from "lucide-react";
 
 const getStatusColor = (status: string) => {
   switch (status.toLowerCase()) {
@@ -196,6 +197,15 @@ export default function OrderDetailsPage() {
           >
             {orderDetails?.status}
           </Badge>
+          {orderDetails?.is_request_return && (
+            <Badge
+              variant="outline"
+              className="text-base bg-orange-50 dark:bg-orange-950 border-orange-300 dark:border-orange-700 text-orange-700 dark:text-orange-300"
+            >
+              <AlertCircle className="w-4 h-4 me-1" />
+              Return Requested
+            </Badge>
+          )}
         </h1>
       </div>
 
@@ -245,51 +255,52 @@ export default function OrderDetailsPage() {
                       orderDetails?.status.toLowerCase() === "returned") && (
                       <RatingDialog userToken={userToken} item={item} />
                     )}
-                    {(orderDetails?.status.toLowerCase() === "delivered" ||
-                      remainingDaysToReturn) && (
-                      <Button
-                        variant={
-                          isItemAlreadyAdded(item.product_id)
-                            ? "destructive"
-                            : "ghost"
-                        }
-                        size="sm"
-                        className="rounded-full bg-muted"
-                        onClick={() => {
-                          if (isItemAlreadyAdded(item.product_id)) {
-                            handleRemoveFromReturn(item);
-                            return;
+                    {!orderDetails?.is_request_return &&
+                      (orderDetails?.status.toLowerCase() === "delivered" ||
+                        remainingDaysToReturn) && (
+                        <Button
+                          variant={
+                            isItemAlreadyAdded(item.product_id)
+                              ? "destructive"
+                              : "secondary"
                           }
-                          handleAddToReturn(item);
-                          // toast.success("Product added to refund request", {
-                          //   description: `${item.product_name} has been added. You can add more or view the request.`,
-                          //   action: {
-                          //     label: "View Request",
-                          //     onClick: () => setIsRefundDialogOpen(true),
-                          //   },
-                          // });
-                          toast(
-                            <div className="space-y-2 ">
-                              <span>
-                                ${item.product_name} has been added. You can add
-                                more or view the request.
-                              </span>
-                              <Button
-                                variant="link"
-                                className="underline block ms-auto"
-                                onClick={() => setIsRefundDialogOpen(true)}
-                              >
-                                View Request
-                              </Button>
-                            </div>
-                          );
-                        }}
-                      >
-                        {isItemAlreadyAdded(item.product_id)
-                          ? "remove from return"
-                          : "Add to Return"}
-                      </Button>
-                    )}
+                          size="sm"
+                          className="rounded-full"
+                          onClick={() => {
+                            if (isItemAlreadyAdded(item.product_id)) {
+                              handleRemoveFromReturn(item);
+                              return;
+                            }
+                            handleAddToReturn(item);
+                            // toast.success("Product added to refund request", {
+                            //   description: `${item.product_name} has been added. You can add more or view the request.`,
+                            //   action: {
+                            //     label: "View Request",
+                            //     onClick: () => setIsRefundDialogOpen(true),
+                            //   },
+                            // });
+                            toast(
+                              <div className="space-y-2 ">
+                                <span>
+                                  ${item.product_name} has been added. You can
+                                  add more or view the request.
+                                </span>
+                                <Button
+                                  variant="link"
+                                  className="underline block ms-auto"
+                                  onClick={() => setIsRefundDialogOpen(true)}
+                                >
+                                  View Request
+                                </Button>
+                              </div>
+                            );
+                          }}
+                        >
+                          {isItemAlreadyAdded(item.product_id)
+                            ? "remove from return"
+                            : "Add to Return"}
+                        </Button>
+                      )}
                   </TableCell>
                 )}
               </TableRow>
@@ -297,6 +308,33 @@ export default function OrderDetailsPage() {
           </TableBody>
         </Table>
       </div>
+
+      {/* Return Request Note */}
+      {orderDetails?.is_request_return && (
+        <Card className="border-orange-300 dark:border-orange-700 bg-orange-50 dark:bg-orange-950/30">
+          <CardContent className="pt-6">
+            <div className="flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-orange-600 dark:text-orange-400 flex-shrink-0 mt-0.5" />
+              <div className="space-y-1">
+                <h3 className="font-semibold text-orange-900 dark:text-orange-100">
+                  Return Request Submitted
+                </h3>
+                <p className="text-sm text-orange-700 dark:text-orange-300">
+                  A return request has already been submitted for this order.
+                  You can view the status in your{" "}
+                  <a
+                    href="/account/refund"
+                    className="underline font-medium hover:text-orange-900 dark:hover:text-orange-100"
+                  >
+                    refund requests
+                  </a>
+                  .
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Floating Action Button for Return Request */}
       {itemsToReturn.length > 0 && (

@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { addCouponToCart, getCartData } from "@/lib/api/apiCart";
 import { getAuthData } from "@/lib/api/apiUser";
-import { formatCurrencyEGP } from "@/lib/utils";
+import { formatCurrency, formatCurrencyEGP } from "@/lib/utils";
 import { CartData, CartPharmacy, wallet } from "@/types";
 import { Session } from "next-auth";
 import { CircleCheckBig, OctagonX } from "lucide-react";
@@ -19,6 +19,8 @@ import { toast } from "sonner";
 import { getWalletDetails } from "@/lib/api/apiWallet";
 import { useGetCart } from "@/hooks/useGetCart";
 import { useGetWallet } from "@/hooks/useGetWallet";
+import { useGetProfile } from "@/hooks/useGetProfile";
+import { CURRENCY_CODE } from "@/lib/constants";
 
 const PharamacyCart = () => {
   const params = useParams();
@@ -32,6 +34,8 @@ const PharamacyCart = () => {
   if (cartData?.notAuthenticated) {
     signOut({ redirectTo: "/signin?callbackUrl=/cart" });
   }
+
+  const { profileData, isLoadoingProfile } = useGetProfile();
 
   const { walletDetails, isLoadingWallet, errorWallet } = useGetWallet();
   const walletInfo = walletDetails?.data as wallet;
@@ -57,7 +61,9 @@ const PharamacyCart = () => {
     }
   }, [cart, pharmacyId, router]);
 
-  if (isLoading || isLoadingWallet) return <Spinner />;
+  if (isLoading || isLoadingWallet || isLoadoingProfile) return <Spinner />;
+
+  const currency = profileData?.data.currency_code || CURRENCY_CODE;
 
   return (
     <section className="wrapper">
@@ -84,13 +90,14 @@ const PharamacyCart = () => {
                         {item.name}
                       </h2>
                       <p className="text-sm text-gray-600 dark:text-gray-400">
-                        السعر للوحدة: {formatCurrencyEGP(item.final_price)}
+                        السعر للوحدة:{" "}
+                        {formatCurrency(item.final_price, currency)}
                       </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end">
                     <span className="text-sm font-medium text-gray-800 dark:text-white text-nowrap">
-                      {formatCurrencyEGP(item.total)}
+                      {formatCurrency(item.total, currency)}
                     </span>
                     <AddToCart productId={item.product_id} stock={1000000} />
                   </div>
@@ -109,23 +116,25 @@ const PharamacyCart = () => {
                 <div className="flex justify-between">
                   <span>المجموع الفرعي</span>
                   <span>
-                    {formatCurrencyEGP(
+                    {formatCurrency(
                       cartPharmacy?.items.reduce(
                         (acc, item) =>
                           acc + item.price_after_discount * item.quantity,
                         0
-                      ) as number
+                      ) as number,
+                      currency
                     )}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span>الضريبة المقدرة</span>
                   <span>
-                    {formatCurrencyEGP(
+                    {formatCurrency(
                       cartPharmacy?.items.reduce(
                         (acc, item) => acc + item.tax_amount * item.quantity,
                         0
-                      ) as number
+                      ) as number,
+                      currency
                     )}
                   </span>
                 </div>
@@ -136,7 +145,7 @@ const PharamacyCart = () => {
                 <div className="flex justify-between font-bold text-teal-900 dark:text-teal-400 text-lg border-t border-teal-200 dark:border-teal-700 pt-4">
                   <span>المجموع</span>
                   <span>
-                    {formatCurrencyEGP(cartPharmacy?.total as number)}
+                    {formatCurrency(cartPharmacy?.total as number, currency)}
                   </span>
                 </div>
               </div>
@@ -149,14 +158,15 @@ const PharamacyCart = () => {
                   <span className="text-xl font-bold text-teal-600 dark:text-teal-400">
                     {walletInfo?.wallet_balance
                       ? walletInfo?.wallet_balance
-                      : 0}
+                      : 0}{" "}
+                    {currency}
                   </span>
                 </div>
 
                 <div className="flex justify-between font-bold text-teal-900 dark:text-teal-400 text-lg border-t border-teal-200 dark:border-teal-700 pt-4 mt-6">
                   <span>المجموع</span>
                   <span className="flex items-center">
-                    {formatCurrencyEGP(cartPharmacy?.total as number)}
+                    {formatCurrency(cartPharmacy?.total as number, currency)}
                   </span>
                 </div>
               </div>

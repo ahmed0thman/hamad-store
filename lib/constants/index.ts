@@ -67,3 +67,5 @@ export const EGYPT_GOVERNORATES = [
   "North Sinai",
   "Sohag",
 ];
+
+export const CURRENCY_CODE = "IQD";

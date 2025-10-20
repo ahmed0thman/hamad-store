@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { formatCurrencyEGP } from "@/lib/utils";
+import { formatCurrency, formatCurrencyEGP } from "@/lib/utils";
 import { useState } from "react";
 // Card removed as it's not used
 import { Badge } from "@/components/ui/badge";
@@ -23,13 +23,14 @@ import { Search } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { toast } from "sonner";
+import { useGetProfile } from "@/hooks/useGetProfile";
+import { CURRENCY_CODE } from "@/lib/constants";
 
 const Orders = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const { data: session, status } = useSession();
-  const [userToken, setUserToken] = useState<string>("");
   const queryClient = useQueryClient();
   const { ordersData, isLoadingOrders, errorOrders } = useGetOrders();
+  const { profileData, isLoadoingProfile } = useGetProfile();
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
@@ -67,10 +68,10 @@ const Orders = () => {
     });
 
   async function handleCancelOrder(orderId: string) {
-    return await cancelOrder(Number(orderId), userToken);
+    return await cancelOrder(Number(orderId));
   }
 
-  if (isLoadingOrders) {
+  if (isLoadingOrders || isLoadoingProfile) {
     return (
       <div className="animate-pulse">
         {[...Array(5)].map((_, index) => (
@@ -97,6 +98,8 @@ const Orders = () => {
       </div>
     );
   }
+
+  const currency = profileData?.data?.currency_code || CURRENCY_CODE;
 
   const filteredOrders = ordersData?.data?.filter((order) =>
     order.id.toString().toLowerCase().includes(searchQuery.toLowerCase())
@@ -147,7 +150,7 @@ const Orders = () => {
                   </div>
                   {/* Total below status */}
                   <p className="text-sm text-muted-foreground">
-                    {formatCurrencyEGP(Number(order.total))}
+                    {formatCurrency(Number(order.total), currency)}
                   </p>
                 </div>
                 <div className="flex items-center gap-2">

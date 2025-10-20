@@ -18,7 +18,7 @@ import {
   getSiteShippingMethods,
 } from "@/lib/api/apiUser";
 import Spinner from "../spinner";
-import { formatCurrencyEGP } from "@/lib/utils";
+import { formatCurrency, formatCurrencyEGP } from "@/lib/utils";
 import { useSearchParams } from "next/navigation";
 import {
   Dialog,
@@ -34,6 +34,8 @@ import { toast } from "sonner";
 import { saveOrder } from "@/lib/api/apiOrders";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { useGetProfile } from "@/hooks/useGetProfile";
+import { CURRENCY_CODE } from "@/lib/constants";
 
 export default function ShippingMethodTab({ onBack }: { onBack: () => void }) {
   const searchParams = useSearchParams();
@@ -60,6 +62,8 @@ export default function ShippingMethodTab({ onBack }: { onBack: () => void }) {
     useTransition();
   const [couponCode, setCouponCode] = useState<string>("");
 
+  const { profileData, isLoadoingProfile } = useGetProfile();
+
   async function fetchShippingMethods() {
     if (!pharmacyId) return;
     // const shippingMethodsData = await getPharmacyShippingMethods(pharmacyId);
@@ -71,8 +75,9 @@ export default function ShippingMethodTab({ onBack }: { onBack: () => void }) {
       );
       setShippingMethod?.(
         defaultMethod?.id.toString() || "",
-        `${defaultMethod?.type} (${formatCurrencyEGP(
-          Number(defaultMethod?.value)
+        `${defaultMethod?.type} (${formatCurrency(
+          Number(defaultMethod?.value),
+          currency
         )})` || ""
       );
       setShippingFees(Number(defaultMethod?.value) || 0);
@@ -185,9 +190,11 @@ export default function ShippingMethodTab({ onBack }: { onBack: () => void }) {
     startTransitionSave(handleSaveOrder);
   }
 
-  if (pendingShippingMethods) {
+  if (pendingShippingMethods || isLoadoingProfile) {
     return <Spinner />;
   }
+
+  const currency = profileData?.data.currency_code || CURRENCY_CODE;
 
   return (
     <div className="space-y-4 pt-4">
@@ -203,8 +210,9 @@ export default function ShippingMethodTab({ onBack }: { onBack: () => void }) {
           if (selectedMethod) {
             setShippingMethod?.(
               selectedMethod.id.toString(),
-              `${selectedMethod.type} (${formatCurrencyEGP(
-                Number(selectedMethod.value)
+              `${selectedMethod.type} (${formatCurrency(
+                Number(selectedMethod.value),
+                currency
               )})`
             );
             setShippingFees(Number(selectedMethod.value) || 0);
@@ -232,7 +240,7 @@ export default function ShippingMethodTab({ onBack }: { onBack: () => void }) {
               </div>
               <div className="flex items-center">
                 <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-semibold">
-                  Fees: {formatCurrencyEGP(+method.value)}
+                  Fees: {formatCurrency(+method.value, currency)}
                 </span>
               </div>
             </label>
@@ -272,7 +280,7 @@ export default function ShippingMethodTab({ onBack }: { onBack: () => void }) {
                     Qty: {item.quantity}
                   </div>
                   <div className="text-sm">
-                    {formatCurrencyEGP(item.final_price * item.quantity)}
+                    {formatCurrency(item.final_price * item.quantity, currency)}
                   </div>
                 </div>
               ))}
@@ -281,14 +289,14 @@ export default function ShippingMethodTab({ onBack }: { onBack: () => void }) {
               <div className="flex justify-between">
                 <span>Products Total</span>
                 <span className="font-medium">
-                  {formatCurrencyEGP(pharmacyData.total)}
+                  {formatCurrency(pharmacyData.total, currency)}
                 </span>
               </div>
               {pharmacyData.promocoded && (
                 <div className="flex justify-between">
                   <span>Coupon</span>
                   <span className="font-medium text-green-600">
-                    - {formatCurrencyEGP(pharmacyData.coupon_discount)}
+                    - {formatCurrency(pharmacyData.coupon_discount, currency)}
                   </span>
                 </div>
               )}
@@ -328,7 +336,7 @@ export default function ShippingMethodTab({ onBack }: { onBack: () => void }) {
               <div className="flex justify-between text-base font-bold">
                 <span>Total</span>
                 <span>
-                  {formatCurrencyEGP(pharmacyData.total + shippingFees)}
+                  {formatCurrency(pharmacyData.total + shippingFees, currency)}
                 </span>
               </div>
             </div>

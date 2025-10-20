@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableRow, TableCell } from "@/components/ui/table";
-import { formatCurrencyEGP } from "@/lib/utils";
+import { formatCurrency, formatCurrencyEGP } from "@/lib/utils";
 import {
   Heart,
   Scaling,
@@ -24,6 +24,7 @@ import { getFavorites } from "@/lib/api/apiFavorites";
 import ButtonFavorite from "./buttonFavorite";
 import { revalidatePath } from "next/cache";
 import ButtonAddToCompare from "./buttonAddToCompare";
+import { CURRENCY_CODE } from "@/lib/constants";
 
 const ProductMainInfo = async ({ product }: { product: Product }) => {
   const session = await auth();
@@ -65,15 +66,24 @@ const ProductMainInfo = async ({ product }: { product: Product }) => {
             {product.offer ? (
               <>
                 <span className="line-through text-gray-500">
-                  {formatCurrencyEGP(product.offer.price_before)}
+                  {formatCurrency(
+                    product.offer.price_before,
+                    session?.user.currency_code || CURRENCY_CODE
+                  )}
                 </span>
                 <span className="text-primary font-semibold text-2xl">
-                  {formatCurrencyEGP(product.offer.price_after)}
+                  {formatCurrency(
+                    product.offer.price_after,
+                    session?.user.currency_code || CURRENCY_CODE
+                  )}
                 </span>
               </>
             ) : (
               <span className="text-primary font-semibold text-2xl">
-                {formatCurrencyEGP(product.price)}
+                {formatCurrency(
+                  product.price,
+                  session?.user.currency_code || CURRENCY_CODE
+                )}
               </span>
             )}
           </div>
@@ -83,9 +93,9 @@ const ProductMainInfo = async ({ product }: { product: Product }) => {
           <div className="flex flex-wrap gap-3">
             <ButtonAddToCompare id={product.id}>
               <Button variant="outline" className="flex items-center gap-2">
-              <Scaling className="w-5 h-5" />
-              أضف للمقارنة
-            </Button>
+                <Scaling className="w-5 h-5" />
+                أضف للمقارنة
+              </Button>
             </ButtonAddToCompare>
 
             <div className="flex justify-end gap-2 mb-2">

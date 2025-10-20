@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useTransition } from "react";
 import Image from "next/image";
-import { Upload, X, Package, DollarSign } from "lucide-react";
+import { Upload, X, Package, Minus, Plus } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -14,9 +14,15 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { formatCurrency } from "@/lib/utils";
 import { OrderDetailsItem } from "@/types";
 import FileDropzone from "@/components/custom/FileDropzone";
+import { ReturnRequest } from "@/types";
+import { saveReturnRequest } from "@/lib/utils/returnRequestStorage";
+import { CreateReturnRequest } from "@/lib/api/apiReturns";
+import { toast } from "sonner";
+import SpinnerMini from "../SpinnerMini";
 
 interface RefundRequestDialogProps {
   open: boolean;
@@ -38,11 +44,60 @@ export default function RefundRequestDialog({
   onSubmitSuccess,
 }: RefundRequestDialogProps) {
   const [reason, setReason] = useState("");
+  const [isPending, startTransition] = useTransition();
   const [itemImages, setItemImages] = useState<
     Record<number, { file: File; preview: string }>
   >({});
+  const [itemQuantities, setItemQuantities] = useState<Record<number, number>>(
+    {}
+  );
 
-  const subtotal = items.reduce((sum, item) => sum + Number(item.total), 0);
+  // Initialize quantities when items change
+  useEffect(() => {
+    const initialQuantities: Record<number, number> = {};
+    items.forEach((item) => {
+      if (!itemQuantities[item.product_id]) {
+        initialQuantities[item.product_id] = item.quantity;
+      }
+    });
+    if (Object.keys(initialQuantities).length > 0) {
+      setItemQuantities((prev) => ({ ...prev, ...initialQuantities }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [items]);
+
+  const calculateItemTotal = (item: OrderDetailsItem) => {
+    const returnQty = itemQuantities[item.product_id] || item.quantity;
+    const unitPrice = Number(item.unit_price);
+    return returnQty * unitPrice;
+  };
+
+  const subtotal = items.reduce(
+    (sum, item) => sum + calculateItemTotal(item),
+    0
+  );
+
+  const handleQuantityChange = (productId: number, newQuantity: number) => {
+    const item = items.find((i) => i.product_id === productId);
+    if (!item) return;
+
+    // Ensure quantity is between 1 and the original purchased quantity
+    const clampedQuantity = Math.max(1, Math.min(newQuantity, item.quantity));
+    setItemQuantities((prev) => ({
+      ...prev,
+      [productId]: clampedQuantity,
+    }));
+  };
+
+  const incrementQuantity = (productId: number) => {
+    const currentQty = itemQuantities[productId] || 1;
+    handleQuantityChange(productId, currentQty + 1);
+  };
+
+  const decrementQuantity = (productId: number) => {
+    const currentQty = itemQuantities[productId] || 1;
+    handleQuantityChange(productId, currentQty - 1);
+  };
 
   const handleImageAdd = (
     productId: number,
@@ -80,24 +135,40 @@ export default function RefundRequestDialog({
   };
 
   const handleSubmit = async () => {
-    // TODO: Implement API call to submit refund request
-    console.log("Submitting refund request:", {
-      orderId,
+    // Build the return request according to ReturnRequest type
+    const returnRequest: ReturnRequest = {
+      order_id: orderId.toString(),
+      return_reason: reason,
       items: items.map((item) => ({
-        product_id: item.product_id,
-        quantity: item.quantity,
+        order_item_id: item.id, // Using item.id as order_item_id
+        quantity: itemQuantities[item.product_id] || item.quantity,
         image: itemImages[item.product_id]?.file || null,
       })),
-      reason,
-      itemImages,
-    });
+    };
 
-    // Call onSubmitSuccess callback to clear localStorage
+    const response = await CreateReturnRequest(returnRequest);
+    // console.log("Submitting return request:", {
+    //   ...returnRequest,
+    //   items: returnRequest.items.map((i) => ({
+    //     ...i,
+    //     image: i.image ? "File attached" : "No image",
+    //   })),
+    // });
+
+    if (response?.success) {
+      // Call onSubmitSuccess callback to clear localStorage
+
+      // Close dialog after submission
+
+      toast.success("Refund request submitted successfully.");
+    } else {
+      //   console.error("error :", response);
+      toast.error(response?.message || "Failed to submit refund request.");
+    }
     if (onSubmitSuccess) {
       onSubmitSuccess();
     }
 
-    // Close dialog after submission
     onOpenChange(false);
   };
 
@@ -132,35 +203,93 @@ export default function RefundRequestDialog({
                     <CardContent className="p-4">
                       <div className="flex flex-col justify-between gap-4">
                         {/* Product Info */}
-                        <div className="flex-1 space-y-2">
+                        <div className="flex-1 space-y-3">
                           <h3 className="font-medium text-base">
                             {item.product_name}
                           </h3>
 
-                          <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
-                            {/* Quantity */}
-                            <div className="flex items-center gap-1.5">
-                              <Package className="h-4 w-4" />
-                              <span>Qty: {item.quantity}</span>
-                            </div>
+                          {/* Purchased Quantity Info */}
+                          <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                            <Package className="h-4 w-4" />
+                            <span>Purchased: {item.quantity}</span>
+                          </div>
 
-                            {/* Unit Price */}
-                            <div className="flex items-center gap-1.5">
-                              <DollarSign className="h-4 w-4" />
-                              <span>
-                                {formatCurrency(
-                                  Number(item.unit_price),
-                                  currency
-                                )}
-                              </span>
+                          {/* Return Quantity Selector */}
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium">
+                              Quantity to Return
+                            </label>
+                            <div className="flex items-center gap-2">
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="icon"
+                                className="h-8 w-8"
+                                onClick={() =>
+                                  decrementQuantity(item.product_id)
+                                }
+                                disabled={
+                                  (itemQuantities[item.product_id] ||
+                                    item.quantity) <= 1
+                                }
+                              >
+                                <Minus className="h-4 w-4" />
+                              </Button>
+                              <Input
+                                type="number"
+                                min={1}
+                                max={item.quantity}
+                                value={
+                                  itemQuantities[item.product_id] ||
+                                  item.quantity
+                                }
+                                onChange={(e) =>
+                                  handleQuantityChange(
+                                    item.product_id,
+                                    parseInt(e.target.value) || 1
+                                  )
+                                }
+                                className="w-20 text-center"
+                              />
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="icon"
+                                className="h-8 w-8"
+                                onClick={() =>
+                                  incrementQuantity(item.product_id)
+                                }
+                                disabled={
+                                  (itemQuantities[item.product_id] ||
+                                    item.quantity) >= item.quantity
+                                }
+                              >
+                                <Plus className="h-4 w-4" />
+                              </Button>
                             </div>
                           </div>
 
-                          {/* Total Price */}
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm font-medium">Total:</span>
-                            <span className="text-lg font-bold">
-                              {formatCurrency(Number(item.total), currency)}
+                          {/* Unit Price */}
+                          <div className="text-sm text-muted-foreground">
+                            <span>Unit Price: </span>
+                            <span className="font-medium">
+                              {formatCurrency(
+                                Number(item.unit_price),
+                                currency
+                              )}
+                            </span>
+                          </div>
+
+                          {/* Refund Amount for this item */}
+                          <div className="flex items-center gap-2 pt-2 border-t">
+                            <span className="text-sm font-medium">
+                              Refund Amount:
+                            </span>
+                            <span className="text-lg font-bold text-primary">
+                              {formatCurrency(
+                                calculateItemTotal(item),
+                                currency
+                              )}
                             </span>
                           </div>
                         </div>
@@ -265,10 +394,10 @@ export default function RefundRequestDialog({
           </Button>
           <Button
             variant="default"
-            onClick={handleSubmit}
+            onClick={() => startTransition(handleSubmit)}
             disabled={items.length === 0 || !reason.trim()}
           >
-            Submit Refund Request
+            {isPending ? <SpinnerMini /> : "Submit Refund Request"}
           </Button>
         </DialogFooter>
       </DialogContent>

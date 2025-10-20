@@ -10,7 +10,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useGetCart } from "@/hooks/useGetCart";
-import { formatCurrencyEGP } from "@/lib/utils";
+import { CURRENCY_CODE } from "@/lib/constants";
+import { formatCurrency, formatCurrencyEGP } from "@/lib/utils";
 import { CartData } from "@/types";
 import { ShoppingCart } from "lucide-react";
 import { signOut } from "next-auth/react";
@@ -118,13 +119,14 @@ const HeaderCart = ({ session }: { session?: any }) => {
         <DropdownMenuItem className="text-stone-700 dark:text-stone-300 text-sm font-semibold capitalize px-2 py-1.5 hover:bg-stone-100 dark:hover:bg-slate-700 rounded-md transition">
           <div className="flex items-center gap-2">
             <span>Total</span>
-            {formatCurrencyEGP(
+            {formatCurrency(
               cart?.pharmacies.reduce(
                 (acc, pharmacy) =>
                   acc +
                   pharmacy.items.reduce((acc, item) => acc + item.total, 0),
                 0
-              ) as number
+              ) as number,
+              session?.user.currency_code || CURRENCY_CODE
             )}
           </div>
         </DropdownMenuItem>

@@ -117,6 +117,7 @@ export const profileSchema = z.object({
   email: z.string().email("Email must be a valid email address"),
   profile_image: z.string().url("Profile image must be a valid URL").optional(),
   is_doctor: boolean().optional(),
+  // currency_code: z.string().optional(),
 });
 
 export const userAddressSchema = z.object({

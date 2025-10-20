@@ -167,23 +167,32 @@ export default function PaymentMethodTab({
         }
         className="space-y-3"
       >
-        {paymentMethods.map((pm, idx) => (
-          <label
-            key={pm.id}
-            className="flex items-center gap-4 border border-border p-4 rounded-xl"
-            onClick={() =>
-              setSelectedPayment((prev) => pm.name.en || pm.name.ar)
-            }
-          >
-            <RadioGroupItem
-              value={pm.id.toString()}
-              //  disabled={pm.name.en === "wallet" && walletInfo?.wallet_balance < pharmacyData?.total}
-            />
-            <div className="font-medium text-sm text-foreground">
-              {pm.name.en || pm.name.ar}
-            </div>
-          </label>
-        ))}
+        {paymentMethods.map((pm, idx) => {
+          const disbaleWallet =
+            pm.name.en === "wallet" &&
+            Number(walletInfo?.wallet_balance) < Number(pharmacyData?.total);
+          return (
+            <label
+              key={pm.id}
+              className={`flex items-center gap-4 border border-border p-4 rounded-xl ${
+                disbaleWallet
+                  ? "opacity-50 cursor-not-allowed"
+                  : "cursor-pointer"
+              }`}
+              onClick={() =>
+                setSelectedPayment((prev) => pm.name.en || pm.name.ar)
+              }
+            >
+              <RadioGroupItem
+                value={pm.id.toString()}
+                disabled={disbaleWallet}
+              />
+              <div className="font-medium text-sm text-foreground">
+                {pm.name.en || pm.name.ar}
+              </div>
+            </label>
+          );
+        })}
       </RadioGroup>
 
       {selectedPayment === "Card" && (
