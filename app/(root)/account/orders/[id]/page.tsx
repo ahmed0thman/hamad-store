@@ -254,7 +254,10 @@ export default function OrderDetailsPage() {
                     {(orderDetails?.status.toLowerCase() === "delivered" ||
                       orderDetails?.status.toLowerCase() === "completed" ||
                       orderDetails?.status.toLowerCase() === "returned") && (
-                      <RatingDialog userToken={userToken} item={item} />
+                      <RatingDialog
+                        product_id={item.product_id}
+                        product_name={item.product_name}
+                      />
                     )}
                     {!orderDetails?.is_request_return &&
                       (orderDetails?.status.toLowerCase() === "delivered" ||

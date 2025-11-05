@@ -24,6 +24,7 @@ declare module "next-auth" {
     profileImage: string | null;
     cart?: CartData | null;
     currency_code: string;
+    is_doctor: boolean;
   }
   interface Session {
     accessToken?: string;

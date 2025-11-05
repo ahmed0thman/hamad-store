@@ -26,14 +26,16 @@ const Header = async () => {
       <header className="border-b sticky top-0 start-0 end-0 bg-background z-50">
         <div className="wrapper">
           <div className="!grid grid-cols-4 grid-row-2 sm:!flex flex-between sm:gap-2">
-            <div className="flex items-center gap-2 col-start-2 col-span-3 row-start-1 row-span-1">
+            <div className="flex justify-end items-center gap-2 col-start-2 col-span-3 row-start-1 row-span-1">
               {user ? (
                 <div className="ms-auto sm:ms-0 sm:hidden text-gray-600 text-sm dark:text-gray-300 ">
                   <span className="font-semibold">Welcome,</span>
                   {user.firstName} {user.lastName}.
                 </div>
               ) : null}
-              <HeaderLogo />
+              <div className="">
+                <HeaderLogo />
+              </div>
             </div>
             <HeaderPages />
             <div className="row-start-2 row-span-1 col-span-full">

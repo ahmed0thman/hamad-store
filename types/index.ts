@@ -206,8 +206,8 @@ export type Product = {
 };
 
 export type addRate = {
-  rate: number;
-  rate_text: string;
+  rating: number;
+  comment: string;
 };
 
 export type FavoriteItem = {
@@ -387,6 +387,15 @@ export type PaymentMethod = {
 };
 
 // ----------------
+
+export type Pagination = {
+  current_page: number;
+  last_page: number;
+  per_page: number;
+  total: number;
+  next_page_url: string | null;
+  prev_page_url: string | null;
+};
 
 export type wallet = {
   wallet_balance: string;

@@ -79,7 +79,7 @@ function SidebarContent({
   }
 
   return (
-    <aside className="space-y-3 divide-y divide-y-reverse divide-accent/70 lg:bg-white dark:lg:bg-slate-900 p-4 rounded-md shadow overflow-y-auto  ">
+    <aside className="space-y-3 divide-y divide-y-reverse divide-accent/70 lg:bg-white dark:lg:bg-slate-900 p-4 rounded-md shadow overflow-y-auto lg:sticky lg:top-24  ">
       <div className="border-none">
         <h3 className="text-lg font-semibold mb-2">Price Range</h3>
         <div className="flex gap-2">
@@ -356,6 +356,13 @@ function ProductSidebar({ revalidate }: { revalidate: () => void }) {
     revalidate(); // Call revalidate if provided
   };
 
+  useEffect(
+    function () {
+      revalidate();
+    },
+    [searchParams]
+  );
+
   const handleReset = () => {
     if (minRef.current) minRef.current.value = "";
     if (maxRef.current) maxRef.current.value = "";
@@ -399,7 +406,7 @@ function ProductSidebar({ revalidate }: { revalidate: () => void }) {
         </Sheet>
       </div>
 
-      <div className="hidden lg:col-span-3 xl:col-span-2 lg:block">
+      <div className="hidden relative lg:col-span-3 xl:col-span-2 lg:block">
         <SidebarContent
           minRef={minRef}
           maxRef={maxRef}

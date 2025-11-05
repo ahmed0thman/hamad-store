@@ -1,7 +1,11 @@
 import type { NextConfig } from "next";
-import { SERVER_URL_images } from "./lib/constants";
 
 const nextConfig: NextConfig = {
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "10mb",
+    },
+  },
   images: {
     remotePatterns: [
       {

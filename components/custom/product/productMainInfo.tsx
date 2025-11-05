@@ -25,6 +25,7 @@ import ButtonFavorite from "./buttonFavorite";
 import { revalidatePath } from "next/cache";
 import ButtonAddToCompare from "./buttonAddToCompare";
 import { CURRENCY_CODE } from "@/lib/constants";
+import RatingDialog from "../order/ratingDialog";
 
 const ProductMainInfo = async ({ product }: { product: Product }) => {
   const session = await auth();
@@ -38,10 +39,6 @@ const ProductMainInfo = async ({ product }: { product: Product }) => {
     }
   }
 
-  async function revalidate() {
-    "use server";
-    revalidatePath(`/product/${product.id}`);
-  }
   return (
     <section className="wrapper grid grid-cols-1 sm:grid-cols-5 gap-8 items-start">
       {/* Product Image */}
@@ -91,6 +88,12 @@ const ProductMainInfo = async ({ product }: { product: Product }) => {
           <TextExpander content={product.description} />
 
           <div className="flex flex-wrap gap-3">
+            {session?.user && session.user.is_doctor && (
+              <RatingDialog
+                product_id={product.id}
+                product_name={product.name}
+              />
+            )}
             <ButtonAddToCompare id={product.id}>
               <Button variant="outline" className="flex items-center gap-2">
                 <Scaling className="w-5 h-5" />

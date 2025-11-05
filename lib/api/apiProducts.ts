@@ -1,11 +1,19 @@
 "use server";
 
-import { addRate, Brand, category, Product, ProductItem } from "@/types";
+import {
+  addRate,
+  Brand,
+  category,
+  Pagination,
+  Product,
+  ProductItem,
+} from "@/types";
 import { api } from "../axios";
 import { AxiosError } from "axios";
 import { delay } from "../utils";
 import { success } from "zod";
 import { auth } from "../auth";
+import { getAuthToken } from "./helpers";
 
 // Get Endpoints
 
@@ -67,9 +75,11 @@ export async function getSearchProducts(categoryId: string, keyword: string) {
       response.data.data.products.length > 0
     ) {
       const products: ProductItem[] = response.data.data.products;
+      const pagination: Pagination = response.data.data.pagination;
       return {
         success: true,
         data: products,
+        pagination: pagination,
       };
     }
 
@@ -114,6 +124,7 @@ export async function getFilteredProducts(filterParams: filterParams = {}) {
         category_id: filterParams.categoryId || "",
         brand_id: filterParams.brandId || "",
         in_stock: filterParams.inStock || "",
+        page: filterParams.page || 1,
       },
     });
     // console.log("Api response:", response.data.data);
@@ -143,6 +154,7 @@ export async function getProduct(productId: string) {
   try {
     const response = await api.get(`products/${productId}`);
     const product: Product = response.data.data;
+    console.log("product: ", response.data.data);
     return product;
   } catch (error) {
     console.error("Error fetching product:", error);
@@ -153,20 +165,17 @@ export async function getProduct(productId: string) {
 export async function rateProduct(
   productID: string,
   rating: addRate,
-  userToken: string
+  userToken?: string
 ) {
-  let token: string = userToken;
-  if (!userToken) {
-    const session = await auth();
-    token = session?.user?.token || session?.accessToken || "";
-    if (!session || !session.user || !session.accessToken) {
-      return { success: false, message: "User not authenticated" };
-    }
+  const authResult = await getAuthToken(userToken);
+  if (!authResult.success) {
+    return { success: false, message: authResult.message };
   }
+  const token = authResult.token;
 
   try {
     const response = await api.post(
-      `products/${productID}/ratings`,
+      `products/${productID}/rates`,
       {
         ...rating,
       },
@@ -175,7 +184,7 @@ export async function rateProduct(
       }
     );
 
-    if (response.data.rating) {
+    if (response.data.result === "Success") {
       return { success: true, message: "Product rated successfully" };
     }
 
@@ -183,8 +192,16 @@ export async function rateProduct(
 
     return { success: false, message: "Failed to rate product" };
   } catch (error) {
-    console.error("Error rating product:", error);
-    return { success: false, message: "Error rating product" };
+    if (error instanceof AxiosError && error.response) {
+      console.error("Error rating product:", error?.response?.data || error);
+      return {
+        success: false,
+        message: error.response.data.message || "Failed to rate product",
+      };
+    } else {
+      console.error("Error rating product:", error);
+      return { success: false, message: "An unexpected error occurred" };
+    }
   }
 }
 

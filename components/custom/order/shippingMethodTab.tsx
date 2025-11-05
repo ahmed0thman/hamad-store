@@ -51,8 +51,6 @@ export default function ShippingMethodTab({ onBack }: { onBack: () => void }) {
     shippingAddress,
   } = useOrder();
   const [shippingMethods, setShippingMethods] = useState<ShippingMethod[]>([]);
-  const { data: session, status } = useSession();
-  const [userToken, setUserToken] = useState<string>("");
   const [shippingFees, setShippingFees] = useState<number>(0);
   const [pending, startTransition] = useTransition();
   const [pendingSave, startTransitionSave] = useTransition();
@@ -66,8 +64,11 @@ export default function ShippingMethodTab({ onBack }: { onBack: () => void }) {
 
   async function fetchShippingMethods() {
     if (!pharmacyId) return;
-    // const shippingMethodsData = await getPharmacyShippingMethods(pharmacyId);
-    const shippingMethodsData = await getSiteShippingMethods();
+    // const shippingMethodsData =  await getPharmacyShippingMethods(pharmacyId);
+    const shippingMethodsData =
+      paymentMethod !== "credit"
+        ? await getSiteShippingMethods()
+        : await getPharmacyShippingMethods(pharmacyId);
     if (shippingMethodsData?.success) {
       setShippingMethods(shippingMethodsData?.data as ShippingMethod[]);
       const defaultMethod = shippingMethodsData?.data?.find(
@@ -88,7 +89,7 @@ export default function ShippingMethodTab({ onBack }: { onBack: () => void }) {
   async function handleFetchCardDetails() {
     if (!pharmacyId) return;
     console.log("Fetching card details...");
-    const cartData = await getCartData(userToken);
+    const cartData = await getCartData();
     if (cartData?.success) {
       const cart = cartData.data as CartData;
       const pharmacy = cart.pharmacies.find(
@@ -100,10 +101,8 @@ export default function ShippingMethodTab({ onBack }: { onBack: () => void }) {
   }
 
   useEffect(() => {
-    if (userToken) {
-      startTransition(handleFetchCardDetails);
-    }
-  }, [userToken]);
+    startTransition(handleFetchCardDetails);
+  }, []);
 
   useEffect(() => {
     const pharmacyId = searchParams.get("pharmacyId");
@@ -111,17 +110,6 @@ export default function ShippingMethodTab({ onBack }: { onBack: () => void }) {
       setPharmacyId?.(parseInt(pharmacyId));
     }
   }, []);
-
-  useEffect(
-    function () {
-      if (status === "authenticated" && session?.user.token) {
-        setUserToken(session.user.token);
-      } else {
-        setUserToken("");
-      }
-    },
-    [status]
-  );
 
   useEffect(() => {
     if (pharmacyId) {
@@ -149,7 +137,7 @@ export default function ShippingMethodTab({ onBack }: { onBack: () => void }) {
       shipping_address: Number(shippingAddress),
       payment_method: paymentMethod as string,
     };
-    const response = await saveOrder(orderParams, userToken);
+    const response = await saveOrder(orderParams);
     if (response.success) {
       setShowSuccessDialog(true);
     } else {

@@ -15,14 +15,11 @@ export async function saveOrder(
   orderParams: orderSaveParams,
   userToken?: string
 ) {
-  let token: string = "";
-  if (!userToken) {
-    const session = await auth();
-    token = session?.user?.token || session?.accessToken || "";
-    if (!session || !session.user || !session.accessToken) {
-      return { success: false, message: "User not authenticated" };
-    }
+  const authResult = await getAuthToken(userToken);
+  if (!authResult.success) {
+    return { success: false, message: authResult.message };
   }
+  const token = authResult.token;
 
   try {
     console.log(orderParams);

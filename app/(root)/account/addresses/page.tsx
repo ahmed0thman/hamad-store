@@ -43,8 +43,6 @@ const AddressesPage = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDialogDeleteOpen, setIsDialogDeleteOpen] = useState(false);
   const [addresses, setAddresses] = useState<UserAddress[]>([]);
-  const { data: session, status } = useSession();
-  const [userToken, setUserToken] = useState<string>("");
   const [pendingAddresses, startTransitionAddresses] = useTransition();
   const [pendingAction, startTransitionAction] = useTransition();
   const [mounted, setMounted] = useState(false);
@@ -69,8 +67,12 @@ const AddressesPage = () => {
     },
   });
 
+  useEffect(function () {
+    startTransitionAddresses(fetchAddresses);
+  }, []);
+
   async function fetchAddresses() {
-    const addressesData = await getUserAddresses(userToken);
+    const addressesData = await getUserAddresses();
     if (addressesData?.success) {
       setAddresses(addressesData?.data as UserAddress[]);
       const defaultAddress = (addressesData?.data as UserAddress[])?.find(
@@ -79,23 +81,6 @@ const AddressesPage = () => {
     }
     setMounted(true);
   }
-
-  useEffect(
-    function () {
-      if (status === "authenticated" && session?.user.token) {
-        setUserToken(session.user.token);
-      } else {
-        setUserToken("");
-      }
-    },
-    [status]
-  );
-
-  useEffect(() => {
-    if (userToken) {
-      startTransitionAddresses(fetchAddresses);
-    }
-  }, [userToken]);
 
   useEffect(() => {
     if (!isDialogOpen) {
@@ -118,11 +103,7 @@ const AddressesPage = () => {
 
   const handleAddAddress: SubmitHandler<UserAddress> = async (data) => {
     startTransitionAction(async () => {
-      const response = await addUserAddress(
-        userToken,
-        data,
-        addressToEdit?.id ?? ""
-      );
+      const response = await addUserAddress(data, addressToEdit?.id ?? "");
       if (response?.success) {
         await fetchAddresses();
         handleReset();
@@ -146,7 +127,7 @@ const AddressesPage = () => {
 
   const handleDelete = (id: string) => {
     startTransitionAction(async () => {
-      const response = await deleteUserAddress(userToken, id);
+      const response = await deleteUserAddress(id);
       if (response?.success) {
         await fetchAddresses();
         toast(
@@ -173,7 +154,7 @@ const AddressesPage = () => {
     setIsDialogOpen(true);
   };
 
-  if (pendingAddresses || !addresses || !mounted) {
+  if (pendingAddresses || !mounted) {
     return (
       <div className="animate-pulse">
         <div className="space-y-6 px-4 py-6">

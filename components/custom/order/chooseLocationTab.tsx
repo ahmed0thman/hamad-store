@@ -17,14 +17,12 @@ import Link from "next/link";
 export default function ChooseLocationTab({ onNext }: { onNext: () => void }) {
   const searchParams = useSearchParams();
   const [addresses, setAddresses] = useState<UserAddress[]>([]);
-  const { data: session, status } = useSession();
-  const [userToken, setUserToken] = useState<string>("");
   const [pendingAddresses, startTransitionAddresses] = useTransition();
   const [open, setOpen] = useState(false);
   const { setShippingAddress, shippingAddress, setPharmacyId } = useOrder();
 
   async function fetchAddresses() {
-    const addressesData = await getUserAddresses(userToken);
+    const addressesData = await getUserAddresses();
     if (addressesData?.success) {
       setAddresses(addressesData?.data as UserAddress[]);
       const defaultAddress = (addressesData?.data as UserAddress[])?.find(
@@ -45,22 +43,9 @@ export default function ChooseLocationTab({ onNext }: { onNext: () => void }) {
     }
   }, []);
 
-  useEffect(
-    function () {
-      if (status === "authenticated" && session?.user.token) {
-        setUserToken(session.user.token);
-      } else {
-        setUserToken("");
-      }
-    },
-    [status]
-  );
-
   useEffect(() => {
-    if (userToken) {
-      startTransitionAddresses(fetchAddresses);
-    }
-  }, [userToken]);
+    startTransitionAddresses(fetchAddresses);
+  }, []);
 
   if (pendingAddresses) {
     return <Spinner />;

@@ -23,7 +23,7 @@ export default function StarRating({
   const [hovered, setHovered] = useState<number | null>(null);
   return (
     <div
-      className={`flex items-center gap-0.5 ${color}`}
+      className={`flex items-center sm:gap-0.5 ${color}`}
       onMouseLeave={() => {
         if (!readOnly) setHovered(null);
       }}
@@ -33,11 +33,10 @@ export default function StarRating({
         return (
           <Star
             key={i}
-            size={18}
             fill={filled ? "currentColor" : "none"}
             stroke="currentColor"
             strokeWidth={1}
-            className={`${
+            className={`w-3 h-3 sm:w-4 sm:h-4${
               !readOnly && onChange ? "cursor-pointer" : undefined
             } ${filledOnly && !filled ? "hidden" : ""}`}
             onClick={() => {

@@ -49,7 +49,7 @@ const ProductSwiper = ({
             {products?.map((productItem, index) => (
               <CarouselItem
                 key={`${productItem.id}-${headLine}-${index}`}
-                className="ps-1 sm:basis-1/2 md:basis-1/3 xl:basis-1/4"
+                className="ps-1 basis-2/3 md:basis-1/3 xl:basis-1/4"
               >
                 <div className="p-1 flex-center sm:!block h-full">
                   <ProductCard productItem={productItem} />

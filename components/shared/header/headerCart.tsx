@@ -85,12 +85,7 @@ const HeaderCart = ({ session }: { session?: any }) => {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className=" relative p-0">
           <ShoppingCart className="!w-6 !h-6" />
-          {/* cart count badge */}
-          <span className="absolute -top-1 -right-1 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-red-600 rounded-full">
-            {multiStores
-              ? cart?.pharmacies.length
-              : cart?.pharmacies[0].items.length}
-          </span>
+          
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56 p-3 ">

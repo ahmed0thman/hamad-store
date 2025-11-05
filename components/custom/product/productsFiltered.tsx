@@ -1,5 +1,9 @@
 import { getFilteredProducts } from "@/lib/api/apiProducts";
-import { ProductItem, SearchParams } from "@/types";
+import {
+  Pagination as PaginationType,
+  ProductItem,
+  SearchParams,
+} from "@/types";
 import React from "react";
 import NoData from "../noData";
 import ProductCard from "./productCard";
@@ -12,11 +16,12 @@ const ProductsFiltered = async ({
 }) => {
   const productsRes = await getFilteredProducts({ ...filterParams });
   const products: ProductItem[] = productsRes.products as ProductItem[];
-  const pagination = productsRes.pagination;
+  const pagination: PaginationType = productsRes.pagination;
+  console.log("pagination:", pagination);
   if (!productsRes.success) return <NoData message="Something went wrong" />;
   return (
     <>
-      <div className=" grid grid-cols-1 gap-3 md:gap-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 lg:gap-3 xl:gap-2 justify-center">
+      <div className=" grid grid-cols-2 gap-1 md:gap-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 lg:gap-3 xl:gap-2 justify-center">
         {products.length > 0 ? (
           products.map((productItem) => (
             <div className=" sm:mx-0" key={productItem.id}>

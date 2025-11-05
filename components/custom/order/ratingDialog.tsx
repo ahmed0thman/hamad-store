@@ -1,3 +1,4 @@
+"use client";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -7,7 +8,7 @@ import {
 } from "@/components/ui/dialog";
 import React, { useState, useTransition } from "react";
 import StarRating from "../starRating";
-import { Cart, OrderDetailsItem } from "@/types";
+import { Cart, OrderDetailsItem, Product } from "@/types";
 import { CartItem } from "@/types";
 import { rateProduct } from "@/lib/api/apiProducts";
 import { toast } from "sonner";
@@ -15,11 +16,11 @@ import { CheckCircle, OctagonX } from "lucide-react";
 import SpinnerMini from "../SpinnerMini";
 
 const RatingDialog = ({
-  item,
-  userToken,
+  product_id,
+  product_name,
 }: {
-  item: OrderDetailsItem;
-  userToken: string;
+  product_id: number;
+  product_name: string;
 }) => {
   const [ratings, setRatings] = useState<number>(0);
   const [comments, setComments] = useState<string>("");
@@ -50,11 +51,10 @@ const RatingDialog = ({
       return;
     }
     startTransition(async () => {
-      const response = await rateProduct(
-        item.product_id.toString(),
-        { rate: ratings, rate_text: comments },
-        userToken
-      );
+      const response = await rateProduct(product_id.toString(), {
+        rating: ratings,
+        comment: comments,
+      });
       if (response.success) {
         toast(
           <div className="flex items-center gap-2">
@@ -82,11 +82,11 @@ const RatingDialog = ({
           size="sm"
           className="rounded-full bg-muted"
         >
-          Rate
+          أضف تقييم
         </Button>
       </DialogTrigger>
       <DialogContent className="bg-secondary">
-        <DialogTitle>Rate {item.product_name}</DialogTitle>
+        <DialogTitle>Rate {product_name}</DialogTitle>
         <div className="flex-center">
           <StarRating
             readOnly={false}

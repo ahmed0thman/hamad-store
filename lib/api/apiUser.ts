@@ -44,7 +44,7 @@ export async function registerDoctor(
     certificate_file?: File | string;
   }
 ) {
-  console.log("Doctor registration data:", data);
+  // console.log("Doctor registration data:", data);
   try {
     // Create FormData for file upload
     const formData = new FormData();
@@ -75,6 +75,7 @@ export async function registerDoctor(
         "Content-Type": "multipart/form-data",
       },
     });
+    console.log("doctor resgister response: ", response.data.data);
     return response.data.data;
   } catch (error) {
     if (error instanceof AxiosError) {
@@ -258,12 +259,14 @@ export async function updateUserPassword(
   }
 }
 
-export async function getUserAddresses(userToken: string = "") {
-  if (!userToken) {
-    // console.log("User not authenticated");
-    return { success: false, message: "User not authenticated" };
+export async function getUserAddresses(userToken?: string) {
+  const authResult = await getAuthToken(userToken);
+  if (!authResult.success) {
+    return { success: false, message: authResult.message };
   }
+  userToken = authResult.token;
   try {
+    console.log("fetching addresses");
     const response = await api.get("user-addresses", {
       headers: {
         Authorization: `Bearer ${userToken}`,
@@ -293,19 +296,16 @@ export async function getUserAddresses(userToken: string = "") {
 }
 
 export async function addUserAddress(
-  userToken: string = "",
   addressData: UserAddress,
-  addressToUpdate: string = ""
+  addressToUpdate: string = "",
+  userToken?: string,
 ) {
   console.log("Adding user address:", addressData);
-  if (!userToken) {
-    const session = await auth();
-    userToken = session?.user?.token || session?.accessToken || "";
-    if (!session || !session.user || !session.accessToken) {
-      // console.log("User not authenticated");
-      return { success: false, message: "User not authenticated" };
-    }
+  const authResult = await getAuthToken(userToken);
+  if (!authResult.success) {
+    return { success: false, message: authResult.message };
   }
+  userToken = authResult.token;
   try {
     const response = await api[addressToUpdate ? "put" : "post"](
       addressToUpdate ? `user-addresses/${addressToUpdate}` : "user-addresses",
@@ -342,17 +342,14 @@ export async function addUserAddress(
 }
 
 export async function deleteUserAddress(
-  userToken: string = "",
-  addressId: string
+  addressId: string,
+  userToken?: string
 ) {
-  if (!userToken) {
-    const session = await auth();
-    userToken = session?.user?.token || session?.accessToken || "";
-    if (!session || !session.user || !session.accessToken) {
-      // console.log("User not authenticated");
-      return { success: false, message: "User not authenticated" };
-    }
+  const authResult = await getAuthToken(userToken);
+  if (!authResult.success) {
+    return { success: false, message: authResult.message };
   }
+  userToken = authResult.token;
 
   try {
     const response = await api.delete(`user-addresses/${addressId}`, {
