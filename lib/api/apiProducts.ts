@@ -25,7 +25,7 @@ export async function getAllCategories() {
     return categories;
   } catch (error) {
     if (error instanceof AxiosError) {
-      console.error("Error fetching categories:", error.response);
+      console.error("Error fetching categories:", error);
     }
     return [];
   }
@@ -37,6 +37,7 @@ export async function getBrandsBytitle(title?: string) {
   try {
     console.log("Fetching brands with title:", title);
     const response = await api.get(`home/brands/`);
+    // console.log("response: ", response);
     const brands: Brand[] = response.data.data;
     console.log("Brands fetched successfully:", brands.length);
     return brands;

@@ -110,7 +110,7 @@ const AddToCart = ({
       }
       setMounted(true);
     },
-    [cart, productId, status]
+    [cart, productId, data?.notAuthenticated]
   );
 
   async function handleAddToCart() {

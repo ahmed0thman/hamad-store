@@ -14,6 +14,7 @@ import { rateProduct } from "@/lib/api/apiProducts";
 import { toast } from "sonner";
 import { CheckCircle, OctagonX } from "lucide-react";
 import SpinnerMini from "../SpinnerMini";
+import { revalidate } from "@/lib/api/actions";
 
 const RatingDialog = ({
   product_id,
@@ -56,6 +57,7 @@ const RatingDialog = ({
         comment: comments,
       });
       if (response.success) {
+        revalidate(`/product/${product_id}`);
         toast(
           <div className="flex items-center gap-2">
             <CheckCircle className="h-4 w-4 text-green-500" />

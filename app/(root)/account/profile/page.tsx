@@ -1,32 +1,31 @@
 "use client";
-import { ReactNode, useEffect, useState, useTransition } from "react";
+import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useSession } from "next-auth/react";
 import { UserProfile } from "@/types";
-import { getProfile, updateUserProfile } from "@/lib/api/apiUser";
+import { updateUserProfile } from "@/lib/api/apiUser";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { profileSchema } from "@/lib/validators";
 import { toast } from "sonner";
 import SpinnerMini from "@/components/custom/SpinnerMini";
-import { delay } from "@/lib/utils";
-import { useProfile } from "@/contexts/ProfileContext";
 import { useRouter } from "next/navigation";
 import ChangePassword from "@/components/custom/profile/changePassword";
+import { useGetProfile } from "@/hooks/useGetProfile";
+import { useQueryClient } from "@tanstack/react-query";
 
 const Profile = () => {
-  const { profile, loading, refreshProfile, token } = useProfile();
-  const [pendingProfile, startTransition] = useTransition();
+  const { isLoadoingProfile, profileData } = useGetProfile();
+  const [certificateFile, setCertificateFile] = useState<File | null>(null);
   const router = useRouter();
-
+  const queryClient = useQueryClient();
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-    getValues,
+    setValue,
     reset,
   } = useForm<UserProfile>({
     resolver: zodResolver(profileSchema),
@@ -34,6 +33,7 @@ const Profile = () => {
 
   useEffect(() => {
     // console.log("hhhhh");
+    const profile = profileData?.data as UserProfile | null;
     if (profile) {
       reset({
         first_name: profile.first_name || "",
@@ -43,37 +43,64 @@ const Profile = () => {
         age: profile.age ? Number(profile.age) : undefined,
         gender: profile.gender || "",
         state: profile.state || "",
+        Professional_info: {
+          specialization: profile.Professional_info?.specialization || "",
+          license_number: profile.Professional_info?.license_number || "",
+          bio: profile.Professional_info?.bio || "",
+          certificate_file: profile.Professional_info?.certificate_file || "",
+          promo_code: profile.Professional_info?.promo_code || "",
+        },
       });
     }
-  }, [profile, reset]);
+  }, [profileData, reset, setValue]);
 
-  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    startTransition(updateProfile);
+  const handleCertificateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setCertificateFile(file);
+      // Set the filename for validation purposes
+      setValue("Professional_info.certificate_file", file.name, {
+        shouldValidate: true,
+      });
+    }
   };
 
-  async function updateProfile() {
-    const profileData: UserProfile = {
-      id: profile?.id ?? "", // Provide a fallback or get from session/profile
-      first_name: getValues("first_name"),
-      last_name: getValues("last_name"),
-      phone: getValues("phone"),
-      email: getValues("email"),
-      age: getValues("age"),
-      gender: getValues("gender"),
-      state: getValues("state"),
+  async function updateProfile(data: UserProfile) {
+    const profile = profileData?.data as UserProfile | undefined;
+
+    const updatedProfileData = {
+      id: data.id || profile?.id || "",
+      first_name: data.first_name,
+      last_name: data.last_name,
+      phone: data.phone,
+      email: data.email,
+      age: data.age,
+      gender: data.gender,
+      state: data.state,
       language: profile?.language,
       profile_image: profile?.profile_image,
+      is_doctor: profile?.is_doctor,
+      currency_code: profile?.currency_code,
+      Professional_info: {
+        specialization: data.Professional_info?.specialization || "",
+        license_number: data.Professional_info?.license_number || "",
+        bio: data.Professional_info?.bio || "",
+        promo_code: data.Professional_info?.promo_code || "",
+        certificate_file:
+          certificateFile ||
+          data.Professional_info?.certificate_file ||
+          undefined,
+      },
     };
 
     // Call the API to update the profile
-    const response = await updateUserProfile(token, profileData);
+    const response = await updateUserProfile(updatedProfileData);
     if (response && response.success) {
       toast.success("تم تحديث الملف الشخصي بنجاح", {
         duration: 3000,
         description: "تم حفظ التغييرات بنجاح.",
       });
-      refreshProfile();
+      queryClient.invalidateQueries({ queryKey: ["profile"] });
     } else {
       toast.error("فشل تحديث الملف الشخصي", {
         duration: 3000,
@@ -83,10 +110,14 @@ const Profile = () => {
   }
 
   useEffect(() => {
+    console.log("Errors:", errors);
+  }, [errors]);
+
+  useEffect(() => {
     router.refresh(); // Force refresh to rehydrate session
   }, [router]);
 
-  if (loading) {
+  if (isLoadoingProfile) {
     return (
       <div className="animate-pulse">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 space-y-3">
@@ -115,7 +146,7 @@ const Profile = () => {
 
       <form
         className="grid grid-cols-1 md:grid-cols-2 gap-6"
-        onSubmit={onSubmit}
+        onSubmit={handleSubmit(updateProfile)}
       >
         <div>
           <Label
@@ -237,16 +268,109 @@ const Profile = () => {
             <span className="text-red-500 text-xs">{errors.state.message}</span>
           )}
         </div>
+        {profileData?.data?.Professional_info && (
+          <>
+            <div>
+              <Label
+                htmlFor="specialization"
+                className="mb-1 block text-sm font-medium text-muted-foreground"
+              >
+                التخصص المهني
+              </Label>
+              <Input
+                id="specialization"
+                {...register("Professional_info.specialization")}
+                placeholder="التخصص المهني"
+                type="text"
+              />
+              {errors.Professional_info?.specialization && (
+                <span className="text-red-500 text-xs">
+                  {errors.Professional_info.specialization.message}
+                </span>
+              )}
+            </div>
+
+            <div>
+              <Label
+                htmlFor="license_number"
+                className="mb-1 block text-sm font-medium text-muted-foreground"
+              >
+                رقم الترخيص
+              </Label>
+              <Input
+                id="license_number"
+                {...register("Professional_info.license_number")}
+                type="text"
+                placeholder="رقم الترخيص"
+              />
+              {errors.Professional_info?.license_number && (
+                <span className="text-red-500 text-xs">
+                  {errors.Professional_info.license_number.message}
+                </span>
+              )}
+            </div>
+
+            <div className="md:col-span-2">
+              <Label
+                htmlFor="bio"
+                className="mb-1 block text-sm font-medium text-muted-foreground"
+              >
+                السيرة المهنية
+              </Label>
+              <Input
+                id="bio"
+                {...register("Professional_info.bio")}
+                placeholder="السيرة المهنية"
+              />
+              {errors.Professional_info?.bio && (
+                <span className="text-red-500 text-xs">
+                  {errors.Professional_info.bio.message}
+                </span>
+              )}
+            </div>
+
+            <div>
+              <Label
+                htmlFor="certificate_file"
+                className="mb-1 block text-sm font-medium text-muted-foreground"
+              >
+                ملف الشهادة
+              </Label>
+              <Input
+                id="certificate"
+                type="file"
+                onChange={handleCertificateChange}
+                className="mt-1"
+              />
+              {errors.Professional_info?.certificate_file && (
+                <span className="text-red-500 text-xs">
+                  {errors.Professional_info.certificate_file.message}
+                </span>
+              )}
+            </div>
+
+            <div>
+              <Label
+                htmlFor="promo_code"
+                className="mb-1 block text-sm font-medium text-muted-foreground"
+              >
+                رمز ترويجي
+              </Label>
+              <Input
+                id="promo_code"
+                {...register("Professional_info.promo_code")}
+                readOnly
+              />
+              {errors.Professional_info?.promo_code && (
+                <span className="text-red-500 text-xs">
+                  {errors.Professional_info.promo_code.message}
+                </span>
+              )}
+            </div>
+          </>
+        )}
         <div className="mt-8 flex justify-end md:col-span-2">
-          <Button
-            type="submit"
-            // onClick={(e) => {
-            //   e.preventDefault();
-            //   console.log("Submitting profile data");
-            //   handleSubmit(onSubmit);
-            // }}
-            disabled={isSubmitting}
-          >
+          <Button type="submit" disabled={isSubmitting}>
             {isSubmitting ? <SpinnerMini /> : "حفظ "}
           </Button>
         </div>

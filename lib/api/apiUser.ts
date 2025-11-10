@@ -180,25 +180,49 @@ export async function getProfile(userToken?: string) {
 }
 
 export async function updateUserProfile(
-  userToken: string = "",
-  profileData: UserProfile
+  profileData: Omit<UserProfile, "Professional_info"> & {
+    Professional_info: {
+      specialization: string;
+      license_number: string;
+      bio: string;
+      promo_code: string;
+      certificate_file?: File | string;
+    };
+  },
+  userToken?: string
 ) {
-  if (!userToken) {
-    // console.log("User not authenticated");
-    return { success: false, message: "User not authenticated" };
+  const authResult = await getAuthToken(userToken);
+  if (!authResult.success) {
+    return { success: false, message: authResult.message };
   }
+  userToken = authResult.token;
   try {
-    const response = await api.put(
-      "user-profile",
-      {
-        ...profileData,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${userToken}`,
+    let response;
+    if (profileData.is_doctor) {
+      response = await api.patch(
+        "doctor/update/data",
+        {
+          ...{ ...profileData, ...profileData.Professional_info },
         },
-      }
-    );
+        {
+          headers: {
+            Authorization: `Bearer ${userToken}`,
+          },
+        }
+      );
+    } else {
+      response = await api.put(
+        "user-profile",
+        {
+          ...profileData,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${userToken}`,
+          },
+        }
+      );
+    }
     if (response.data.result === "Success") {
       return {
         success: true,
@@ -298,7 +322,7 @@ export async function getUserAddresses(userToken?: string) {
 export async function addUserAddress(
   addressData: UserAddress,
   addressToUpdate: string = "",
-  userToken?: string,
+  userToken?: string
 ) {
   console.log("Adding user address:", addressData);
   const authResult = await getAuthToken(userToken);
@@ -341,10 +365,7 @@ export async function addUserAddress(
   }
 }
 
-export async function deleteUserAddress(
-  addressId: string,
-  userToken?: string
-) {
+export async function deleteUserAddress(addressId: string, userToken?: string) {
   const authResult = await getAuthToken(userToken);
   if (!authResult.success) {
     return { success: false, message: authResult.message };

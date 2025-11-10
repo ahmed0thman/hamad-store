@@ -1,4 +1,4 @@
-import z, { boolean } from "zod";
+import z, { boolean, optional } from "zod";
 import { formatCurrencyEGP } from "./utils";
 
 export const currency = z.string().refine(
@@ -104,7 +104,7 @@ export const signInSchema = z.object({
 });
 
 export const profileSchema = z.object({
-  id: z.string(),
+  id: z.string().optional(),
   first_name: z.string().min(2, "First name is required"),
   last_name: z.string().optional(),
   phone: z
@@ -117,7 +117,34 @@ export const profileSchema = z.object({
   email: z.string().email("Email must be a valid email address"),
   profile_image: z.string().url("Profile image must be a valid URL").optional(),
   is_doctor: boolean().optional(),
-  // currency_code: z.string().optional(),
+  currency_code: z.string().optional(),
+  Professional_info: z
+    .object({
+      bio: z.string().optional(),
+      specialization: z.string().optional(),
+      license_number: z.string().optional(),
+      certificate_file: z
+        .string()
+        .optional()
+        .refine(
+          (val) => {
+            if (!val?.trim()) return true;
+            // Accept URLs ending with allowed extensions
+            return (
+              typeof val === "string" &&
+              /\.(pdf|doc|docx|jpg|jpeg|png|svg)$/i.test(val)
+            );
+          },
+          {
+            message:
+              "Certificate file must be a valid PDF, DOC, DOCX, JPG, PNG, JPEG, or SVG file URL",
+          }
+        )
+        .optional(),
+      promo_code: z.string().optional(),
+      status: z.string().optional(),
+    })
+    .optional(),
 });
 
 export const userAddressSchema = z.object({

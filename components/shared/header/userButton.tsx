@@ -9,12 +9,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useGetNotifications } from "@/hooks/useGetNotifications";
-import { Notification, User as UserType } from "@/types";
+import { Notification, UserProfile, User as UserType } from "@/types";
 import { Bell, Heart, LogOut, User } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import ButtonLogout from "./buttonLogout";
 import SpinnerMini from "@/components/custom/SpinnerMini";
+import { useGetProfile } from "@/hooks/useGetProfile";
 
 const userMenuItems = [
   {
@@ -38,20 +39,15 @@ const UserButton = ({ user }: { user: UserType | null }) => {
   const [dialogOpen, setDialogOpen] = useState(false);
   let totalNotifications = 0;
   const { notificationsData, isLoadingNotifications } = useGetNotifications();
+  const { isLoadoingProfile, profileData } = useGetProfile();
 
-  // useEffect(() => {
-  //   if (!notificationsData?.success) {
-  //     const count = (notificationsData?.data as Notification[]).filter(
-  //       (n) => !n.read_at
-  //     ).length;
-  //     setTotalNotifications(count);
-  //     console.log("Notifications: ", notificationsData);
-  //   }
-  // }, [isLoadingNotifications, notificationsData?.success]);
-
-  if (isLoadingNotifications) {
+  if (isLoadingNotifications || isLoadoingProfile) {
     return <SpinnerMini />;
   }
+
+  const profile = profileData?.success
+    ? (profileData.data as UserProfile)
+    : null;
 
   if (notificationsData?.success) {
     console.log("Notifications:", notificationsData?.data);
@@ -94,8 +90,8 @@ const UserButton = ({ user }: { user: UserType | null }) => {
                   variant="ghost"
                   className="w-8 h-8 aspect-square rounded-full ms-2 flex items-center justify-center bg-secondary text-primary"
                 >
-                  {user?.firstName?.charAt(0).toUpperCase() ??
-                    user?.lastName?.charAt(0).toUpperCase() ??
+                  {profile?.first_name?.charAt(0).toUpperCase() ??
+                    profile?.last_name?.charAt(0).toUpperCase() ??
                     "U"}
                 </Button>
               </div>
@@ -110,10 +106,10 @@ const UserButton = ({ user }: { user: UserType | null }) => {
                 <div className="flex flex-col space-y-1">
                   <div className="text-sm leading-none">
                     {/* Ahmed Othman */}
-                    {user?.firstName} {user?.lastName}
+                    {profile?.first_name} {profile?.last_name}
                   </div>
                   <div className="text-sm text-muted-foreground leading-none">
-                    {user?.email}
+                    {profile?.email}
                   </div>
                 </div>
               </DropdownMenuLabel>

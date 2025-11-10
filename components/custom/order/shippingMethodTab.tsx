@@ -182,7 +182,10 @@ export default function ShippingMethodTab({ onBack }: { onBack: () => void }) {
     return <Spinner />;
   }
 
+  console.log("profile Data: ", profileData);
+
   const currency = profileData?.data.currency_code || CURRENCY_CODE;
+  const is_doctor = profileData?.data.is_doctor || false;
 
   return (
     <div className="space-y-4 pt-4">
@@ -302,24 +305,28 @@ export default function ShippingMethodTab({ onBack }: { onBack: () => void }) {
                 <span>Payment Method</span>
                 <span className="font-medium capitalize">{paymentMethod}</span>
               </div>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-                use coupon code to earn points
-              </p>
-              <div className="flex items-center gap-2">
-                <Input
-                  placeholder="أدخل الكوبون"
-                  className="flex-grow"
-                  value={couponCode}
-                  onChange={(e) => setCouponCode(e.target.value)}
-                />
-                {/* <Button
+              {!is_doctor && (
+                <>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                    use coupon code to earn points
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <Input
+                      placeholder="أدخل الكوبون"
+                      className="flex-grow"
+                      value={couponCode}
+                      onChange={(e) => setCouponCode(e.target.value)}
+                    />
+                    {/* <Button
                   variant="outline"
                   className="bg-muted"
                   onClick={() => startTransition(handleApplyCoupon)}
                 >
                   تطبيق
                 </Button> */}
-              </div>
+                  </div>
+                </>
+              )}
               <div className="border-t border-border my-3"></div>
               <div className="flex justify-between text-base font-bold">
                 <span>Total</span>
