@@ -69,7 +69,12 @@ const HeaderButtons = ({
       } else {
         console.log("Failed to update language");
       }
+    } else {
+      language = language === "ar" ? "en" : "ar";
+      setDocumentLanguage(language);
+      localStorage?.setItem("Lan", language);
     }
+    window.location.reload();
     // setLanguage(newLang);
     // localStorage?.setItem("Lan", newLang);
     // setDocumentLanguage(newLang);

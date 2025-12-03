@@ -13,6 +13,7 @@ const accountTabs = [
   // { name: "طرق الدفع", href: "/account/payment-methods" },
   { name: "المحفظة", href: "/account/wallet" },
   { name: "مقارنة المنتجات", href: "/account/compare" },
+  { name: "التقارير", href: "/account/reports/promocodes", is_doctor: true },
   // { name: "استشر طبيب", href: "/account/doctor" },
 ];
 
@@ -59,6 +60,9 @@ const AccountNav = () => {
       </div>
       <nav className="space-y-2 text-sm font-medium text-accent-foreground">
         {accountTabs.map((tab, index) => {
+          if (tab.is_doctor && !profile?.is_doctor) {
+            return null;
+          }
           const isActive = pathName.startsWith(tab.href);
           return (
             <Link
