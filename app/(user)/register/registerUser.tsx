@@ -112,22 +112,16 @@ const RegisterUser = () => {
         </div>
 
         <div>
-          <Label htmlFor="governorate" className="block text-sm font-medium">
-            Governorate
+          <Label htmlFor="address" className="block text-sm font-medium">
+            Address
           </Label>
-          <select
-            id="governorate"
+          <Input
+            id="address"
+            type="text"
             {...register("state")}
+            className="mt-1"
             defaultValue={signUpDefaultValues.governorate}
-            className="mt-1 block w-full border py-1 px-3 bg-input/30 rounded-md shadow-sm"
-          >
-            <option value="-1">Select governorate</option>
-            {EGYPT_GOVERNORATES.map((gov) => (
-              <option key={gov} value={gov}>
-                {gov}
-              </option>
-            ))}
-          </select>
+          />
           {errors.state && (
             <p className="text-red-500 text-sm mt-1">{errors.state.message}</p>
           )}

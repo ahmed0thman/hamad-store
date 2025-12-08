@@ -13,20 +13,19 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { getOrderDetails } from "@/lib/api/apiOrders";
+import useGetOrderDetails from "@/hooks/useGetOrderDetails";
 import { formatCurrency, formatCurrencyEGP } from "@/lib/utils";
-import { OrderDetails, OrderDetailsItem } from "@/types";
-import { useSession } from "next-auth/react";
-import Link from "next/link";
-import { useParams } from "next/navigation";
-import { useEffect, useState, useTransition } from "react";
-import { toast } from "sonner";
 import {
+  clearReturnRequest as clearReturnRequestStorage,
   loadReturnRequest,
   saveReturnRequest,
-  clearReturnRequest as clearReturnRequestStorage,
 } from "@/lib/utils/returnRequestStorage";
+import { OrderDetails, OrderDetailsItem } from "@/types";
 import { AlertCircle } from "lucide-react";
+import Link from "next/link";
+import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 const getStatusColor = (status: string) => {
   switch (status.toLowerCase()) {
@@ -55,13 +54,9 @@ export default function OrderDetailsPage() {
   const [remainingDaysToReturn, setRemainingDaysToReturn] = useState<
     string | null
   >(null);
-
-  const { data: session, status } = useSession();
-  const [userToken, setUserToken] = useState<string>("");
-  const [pending, startTransition] = useTransition();
-  const [orderDetails, setOrderDetails] = useState<OrderDetails | null>(null);
   const [itemsToReturn, setItemsToReturn] = useState<OrderDetailsItem[]>([]);
   const [isRefundDialogOpen, setIsRefundDialogOpen] = useState(false);
+  const { orderDetailsData, isLoadingOrderDetails } = useGetOrderDetails();
 
   // Load return requests from localStorage on mount
   useEffect(() => {
@@ -87,31 +82,6 @@ export default function OrderDetailsPage() {
       setRemainingDaysToReturn(value);
     }
   }, []);
-
-  useEffect(
-    function () {
-      if (status === "authenticated" && session?.user.token) {
-        setUserToken(session.user.token);
-      } else {
-        setUserToken("");
-      }
-    },
-    [status]
-  );
-
-  useEffect(() => {
-    if (userToken) {
-      startTransition(fetchOrderDetails);
-    }
-  }, [userToken]);
-
-  async function fetchOrderDetails() {
-    const response = await getOrderDetails(userToken, Number(id));
-    console.log(response);
-    if (response?.success) {
-      setOrderDetails(response.data as OrderDetails);
-    }
-  }
 
   // Clear return request from localStorage (call this after successful submission)
   const clearReturnRequest = () => {
@@ -139,7 +109,7 @@ export default function OrderDetailsPage() {
     );
   };
 
-  if (pending)
+  if (isLoadingOrderDetails)
     return (
       <div className="space-y-6">
         {/* Header Skeleton */}
@@ -185,6 +155,7 @@ export default function OrderDetailsPage() {
       </div>
     );
 
+  const orderDetails = orderDetailsData?.data as OrderDetails;
   return (
     <div className="space-y-6 relative">
       {/* Order Header */}

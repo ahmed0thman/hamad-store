@@ -10,22 +10,27 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { doctorRegisterSchema } from "@/lib/validators";
-import { DoctorRegisterFormData } from "@/types";
+import { DoctorRegisterFormData, specializationT } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React, { useState } from "react";
+import React, { useEffect, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 
 import SpinnerMini from "@/components/custom/SpinnerMini";
-import { registerDoctor } from "@/lib/api/apiUser";
+import { getDoctorsSpecializations, registerDoctor } from "@/lib/api/apiUser";
 import { APP_NAME, signUpDefaultValues } from "@/lib/constants";
 import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import useGetDoctorsSpecializations from "@/hooks/useGetDoctorsSpecializations";
+import Spinner from "@/components/custom/spinner";
 
 // 3|e8wTV7x6fnsJjPbowVI3OmVxM78DqkGSnj68G7BDc3155768
 
 const RegisterDoctor = () => {
   const [formErrors, setFormErrors] = useState<string[]>([]);
+  const [isLoading, startTransition] = useTransition();
+  const [isMounted, setIsMounted] = useState(false);
+  const [specializations, setSpecializations] = useState<specializationT[]>([]);
   const [certificateFile, setCertificateFile] = useState<File | null>(null);
   const {
     register,
@@ -36,6 +41,23 @@ const RegisterDoctor = () => {
   } = useForm<DoctorRegisterFormData>({
     resolver: zodResolver(doctorRegisterSchema),
   });
+
+  useEffect(() => {
+    if (isLoading || isMounted) return;
+    startTransition(async () => {
+      const response = await getDoctorsSpecializations();
+      if (response.success) {
+        setSpecializations(response.data as specializationT[]);
+        setIsMounted(true);
+      }
+    });
+  }, [isLoading, isMounted]);
+
+  if (isLoading) {
+    return <Spinner />;
+  }
+
+  console.log("doctors specializations: ", specializations);
 
   const onSubmit = async (data: DoctorRegisterFormData) => {
     setFormErrors([]);
@@ -150,7 +172,7 @@ const RegisterDoctor = () => {
             id="gender"
             {...register("gender")}
             defaultValue={signUpDefaultValues.gender}
-            className="mt-1 block w-full border py-1 px-3  rounded-md shadow-sm"
+            className="mt-1 block w-full border py-1 px-3  rounded-md shadow-sm bg-input/30"
           >
             <option value="male">Male</option>
             <option value="female">Female</option>
@@ -269,16 +291,22 @@ const RegisterDoctor = () => {
           <Label htmlFor="specialization" className="block text-sm font-medium">
             Specialization
           </Label>
-          <Input
+          <select
             id="specialization"
-            type="text"
-            {...register("specialization")}
-            className="mt-1"
-            defaultValue={signUpDefaultValues.specialization}
-          />
-          {errors.specialization && (
+            {...register("specialization_id")}
+            defaultValue={signUpDefaultValues.specialization_id}
+            className="mt-1 block w-full border py-1 px-3 bg-input/30 rounded-md shadow-sm"
+          >
+            <option value="">Select specialization</option>
+            {specializations.map((spec) => (
+              <option key={spec.id} value={spec.id}>
+                {spec.name}
+              </option>
+            ))}
+          </select>
+          {errors.specialization_id && (
             <p className="text-red-500 text-sm mt-1">
-              {errors.specialization.message}
+              {errors.specialization_id.message}
             </p>
           )}
         </div>

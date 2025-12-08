@@ -1,4 +1,3 @@
-import Banner from "@/components/custom/home/banner";
 import BrandSwiper from "@/components/custom/home/brandsSwiper";
 import FeatureCards from "@/components/custom/home/featureCard";
 import Hero from "@/components/custom/home/hero";
@@ -7,11 +6,10 @@ import {
   getAllCategories,
   getBrandsBytitle,
   getProductsBytitle,
-  getSearchProducts,
 } from "@/lib/api/apiProducts";
 import { auth } from "@/lib/auth";
-import getLocaleStrings from "@/localization";
 import { homeSEO } from "@/lib/seo";
+import getLocaleStrings from "@/localization";
 
 export const metadata = homeSEO;
 

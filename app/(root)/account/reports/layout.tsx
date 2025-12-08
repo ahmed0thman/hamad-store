@@ -1,39 +1,60 @@
-import { auth } from "@/lib/auth";
+"use client";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
-export default async function ReportsLayout({
+export default function ReportsLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const session = await auth();
-  if (!session?.user?.is_doctor) {
-    return (
-      <div className="container mx-auto p-4">
-        <h1 className="text-2xl font-semibold mb-4">Reports</h1>
-        <p className="text-red-500">
-          Access denied. You do not have permission to view this page.
-        </p>
-      </div>
-    );
-  }
+  const pathName = usePathname();
+  console.log("current path", pathName);
+  // const session = await auth();
+  // if (!session?.user?.is_doctor) {
+  //   return (
+  //     <div className="container mx-auto p-4">
+  //       <h1 className="text-2xl font-semibold mb-4">Reports</h1>
+  //       <p className="text-red-500">
+  //         Access denied. You do not have permission to view this page.
+  //       </p>
+  //     </div>
+  //   );
+  // }
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-semibold mb-4">Reports</h1>
 
       <div className="border-b border-border mb-4">
         <div className="flex gap-4">
-          <Link
+          {/* <Link
             href="/account/reports/promocodes"
-            className="px-4 py-2 text-sm font-medium transition-colors hover:text-foreground data-[active=true]:border-b-2 data-[active=true]:border-primary"
+            className={`px-4 py-2 text-sm font-medium transition-colors hover:text-foreground ${
+              pathName.includes("/account/reports/promocodes")
+                ? "border-b-2 border-primary text-foreground"
+                : "text-muted-foreground"
+            }`}
           >
-            Promo Code
-          </Link>
+            كود البروموشن
+          </Link> */}
           <Link
             href="/account/reports/reviews"
-            className="px-4 py-2 text-sm font-medium transition-colors hover:text-foreground data-[active=true]:border-b-2 data-[active=true]:border-primary"
+            className={`px-4 py-2 text-sm font-medium transition-colors hover:text-foreground ${
+              pathName.includes("/account/reports/reviews")
+                ? "border-b-2 border-primary text-foreground"
+                : "text-muted-foreground"
+            }`}
           >
-            Reviews
+            التقارير
+          </Link>
+          <Link
+            href="/account/reports/comments"
+            className={`px-4 py-2 text-sm font-medium transition-colors hover:text-foreground ${
+              pathName.includes("/account/reports/comments")
+                ? "border-b-2 border-primary text-foreground"
+                : "text-muted-foreground"
+            }`}
+          >
+            التعليقات
           </Link>
         </div>
       </div>

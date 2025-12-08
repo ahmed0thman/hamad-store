@@ -16,6 +16,8 @@ import { useState } from "react";
 import ButtonLogout from "./buttonLogout";
 import SpinnerMini from "@/components/custom/SpinnerMini";
 import { useGetProfile } from "@/hooks/useGetProfile";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import { AvatarFallback } from "@radix-ui/react-avatar";
 
 const userMenuItems = [
   {
@@ -82,7 +84,7 @@ const UserButton = ({ user }: { user: UserType | null }) => {
             <DropdownMenuTrigger asChild>
               <div className="flex items-center relative">
                 {totalNotifications > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs px-2 max-w-8  rounded-full flex items-center justify-center">
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs px-2 max-w-8  rounded-full flex items-center justify-center z-10">
                     {totalNotifications > 99 ? "99+" : totalNotifications}
                   </span>
                 )}
@@ -90,9 +92,17 @@ const UserButton = ({ user }: { user: UserType | null }) => {
                   variant="ghost"
                   className="w-8 h-8 aspect-square rounded-full ms-2 flex items-center justify-center bg-secondary text-primary"
                 >
-                  {profile?.first_name?.charAt(0).toUpperCase() ??
-                    profile?.last_name?.charAt(0).toUpperCase() ??
-                    "U"}
+                  <Avatar>
+                    <AvatarImage
+                      src={profile?.profile_image || ""}
+                      alt={`${profile?.first_name} ${profile?.last_name}`}
+                    />
+                    <AvatarFallback>
+                      {profile?.first_name?.charAt(0).toUpperCase() ??
+                        profile?.last_name?.charAt(0).toUpperCase() ??
+                        "U"}
+                    </AvatarFallback>
+                  </Avatar>
                 </Button>
               </div>
             </DropdownMenuTrigger>

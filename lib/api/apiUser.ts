@@ -5,6 +5,7 @@ import {
   RegisterFormData,
   ShippingMethod,
   SignInFormData,
+  specializationT,
   UpdateUserPasswordData,
   UserAddress,
   UserProfile,
@@ -455,14 +456,11 @@ export async function updateUserLanguage(language: string, userToken?: string) {
     return { success: false, message: authResult.message };
   }
   userToken = authResult.token;
-  console.log("current :", language);
-  const newLanguage = language === "ar" ? "en" : "ar";
-  console.log("new lan: ", newLanguage);
   try {
     const response = await api.put(
       "user-profile",
       {
-        language: newLanguage,
+        language: language,
       },
       {
         headers: {
@@ -494,7 +492,201 @@ export async function updateUserLanguage(language: string, userToken?: string) {
   }
 }
 
+export async function getDoctorsSpecializations() {
+  try {
+    const response = await api.get("/doctor/specializations");
+    if (response.data.result === "Success") {
+      return {
+        success: true,
+        data: response.data.data as specializationT[],
+      };
+    }
+    return {
+      success: false,
+      message: response.data.message || "Failed to retrieve specializations",
+    };
+  } catch (error) {
+    console.error("Error fetching doctors specializations:", error);
+    if (error instanceof AxiosError) {
+      return { success: false, message: error.message };
+    }
+    return { success: false, message: "An unknown error occurred" };
+  }
+}
+
 export async function getAuthData() {
   const session = await auth();
   return session;
+}
+
+export async function getDoctorOrdersReport(
+  filters?: {
+    from_date?: string;
+    to_date?: string;
+    pharmacy_id?: string;
+  },
+  paginationQuery?: string,
+  userToken?: string
+) {
+  const authResult = await getAuthToken(userToken);
+  if (!authResult.success) {
+    return { success: false, message: authResult.message };
+  }
+  userToken = authResult.token;
+
+  try {
+    const body: Record<string, string> = {};
+
+    if (filters?.from_date) {
+      body.from_date = filters.from_date;
+    }
+    if (filters?.to_date) {
+      body.to_date = filters.to_date;
+    }
+    if (filters?.pharmacy_id) {
+      body.pharmacy_id = filters.pharmacy_id;
+    }
+
+    const url = `/doctor/orders/reports${
+      paginationQuery ? `?${paginationQuery}` : ""
+    }`;
+    const response = await api.post(url, body, {
+      headers: {
+        Authorization: `Bearer ${userToken}`,
+      },
+    });
+
+    if (response.data.result === "Success") {
+      return {
+        success: true,
+        data: response.data.data,
+        message: response.data.message,
+      };
+    }
+
+    return {
+      success: false,
+      message: response.data.message || "Failed to fetch doctor orders report",
+    };
+  } catch (error) {
+    console.error("Error fetching doctor orders report:", error);
+    if (error instanceof AxiosError) {
+      console.log("axios report error ", error.response);
+      return {
+        success: false,
+        message:
+          error.response?.data?.message ||
+          "Failed to fetch doctor orders report",
+      };
+    }
+    return { success: false, message: "An unknown error occurred" };
+  }
+}
+
+export async function getDoctorCommentsReport(
+  filters?: {
+    from_date?: string;
+    to_date?: string;
+    pharmacy_id?: string;
+  },
+  paginationQuery?: string,
+  userToken?: string
+) {
+  const authResult = await getAuthToken(userToken);
+  if (!authResult.success) {
+    return { success: false, message: authResult.message };
+  }
+  userToken = authResult.token;
+
+  try {
+    const body: Record<string, string> = {};
+
+    if (filters?.from_date) {
+      body.from_date = filters.from_date;
+    }
+    if (filters?.to_date) {
+      body.to_date = filters.to_date;
+    }
+    if (filters?.pharmacy_id) {
+      body.pharmacy_id = filters.pharmacy_id;
+    }
+
+    const url = `/doctor/comments/reports${
+      paginationQuery ? `?${paginationQuery}` : ""
+    }`;
+    const response = await api.post(url, body, {
+      headers: {
+        Authorization: `Bearer ${userToken}`,
+      },
+    });
+
+    if (response.data.result === "Success") {
+      return {
+        success: true,
+        data: response.data.data,
+        message: response.data.message,
+      };
+    }
+
+    return {
+      success: false,
+      message:
+        response.data.message || "Failed to fetch doctor comments report",
+    };
+  } catch (error) {
+    console.error("Error fetching doctor comments report:", error);
+    if (error instanceof AxiosError) {
+      console.log("axios comments report error ", error.response);
+      return {
+        success: false,
+        message:
+          error.response?.data?.message ||
+          "Failed to fetch doctor comments report",
+      };
+    }
+    return { success: false, message: "An unknown error occurred" };
+  }
+}
+
+export async function updateProfileImage(image: File, userToken?: string) {
+  const authResult = await getAuthToken(userToken);
+  if (!authResult.success) {
+    return { success: false, message: authResult.message };
+  }
+  userToken = authResult.token;
+
+  try {
+    const formData = new FormData();
+    formData.append("image", image);
+
+    const response = await api.post("/profile-image", formData, {
+      headers: {
+        Authorization: `Bearer ${userToken}`,
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    if (response.data.result === "Success") {
+      return {
+        success: true,
+        data: response.data.data,
+        message: response.data.message || "Profile image updated successfully",
+      };
+    }
+
+    return {
+      success: false,
+      message: response.data.message || "Failed to update profile image",
+    };
+  } catch (error) {
+    console.error("Error updating profile image:", error);
+    if (error instanceof AxiosError) {
+      return {
+        success: false,
+        message:
+          error.response?.data?.message || "Failed to update profile image",
+      };
+    }
+    return { success: false, message: "An unknown error occurred" };
+  }
 }

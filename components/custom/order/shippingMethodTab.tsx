@@ -131,7 +131,7 @@ export default function ShippingMethodTab({ onBack }: { onBack: () => void }) {
       return;
     }
     const orderParams: orderSaveParams = {
-      code: couponCode || undefined,
+      coupon_code: couponCode || undefined,
       pharmacy_id: pharmacyId,
       shipping_id: Number(shippingMethod),
       shipping_address: Number(shippingAddress),

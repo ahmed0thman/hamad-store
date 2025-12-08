@@ -1,7 +1,8 @@
-import { getWalletDetails } from "@/lib/api/apiWallet";
+import { getWalletDetails, exchangeWalletPoints } from "@/lib/api/apiWallet";
 import { wallet } from "@/types";
 import { ShieldX } from "lucide-react";
 import React from "react";
+import ExchangePointsModal from "@/components/custom/account/ExchangePointsModal";
 
 const Wallet = async () => {
   const walletDetailsResponse = await getWalletDetails();
@@ -18,7 +19,12 @@ const Wallet = async () => {
   return (
     <div className="space-y-8 px-3">
       <div className="space-y-4">
-        <h2 className="text-2xl font-semibold tracking-tight">محفظتك</h2>
+        <div className="flex items-center justify-between">
+          <h2 className="text-2xl font-semibold tracking-tight">محفظتك</h2>
+          <ExchangePointsModal
+            availablePoints={walletDetails.available_points}
+          />
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="p-4 border rounded-lg shadow-sm bg-teal-300/50">

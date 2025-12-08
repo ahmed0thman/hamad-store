@@ -18,14 +18,13 @@ import {
   TableRow,
   TableCell,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
 import Spinner from "@/components/custom/spinner";
-import { useGetDoctorOrdersReport } from "@/hooks/useGetDoctorOrdersReport";
+import { useGetDoctorCommentsReport } from "@/hooks/useGetDoctorCommentsReport";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import Pagination from "@/components/custom/pagination";
 
-export default function ReviewsPage() {
+export default function CommentsPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -39,7 +38,7 @@ export default function ReviewsPage() {
     searchParams.get("pharmacy_id") || ""
   );
 
-  const { data: reportData, isLoading, error } = useGetDoctorOrdersReport();
+  const { data: reportData, isLoading, error } = useGetDoctorCommentsReport();
 
   const handleApplyFilters = () => {
     const params = new URLSearchParams();
@@ -61,10 +60,18 @@ export default function ReviewsPage() {
     setFromDate("");
     setToDate("");
     setSelectedPharmacy("");
-    router.push("/account/reports/reviews");
+    router.push("/account/reports/comments");
   };
 
-  const filteredOrders = useMemo(() => {
+  const pharmacies = useMemo(() => {
+    if (!reportData) return [];
+    const uniquePharmacies = Array.from(
+      new Set(reportData.details.data.map((d) => d.pharmacy))
+    );
+    return uniquePharmacies.map((name) => ({ id: name, name }));
+  }, [reportData]);
+
+  const filteredComments = useMemo(() => {
     if (!reportData) return [];
     return reportData.details.data;
   }, [reportData]);
@@ -92,7 +99,7 @@ export default function ReviewsPage() {
   function formatDate(iso?: string) {
     if (!iso) return "-";
     try {
-      return new Date(iso).toLocaleString();
+      return new Date(iso).toLocaleDateString("ar-EG");
     } catch {
       return iso;
     }
@@ -101,7 +108,7 @@ export default function ReviewsPage() {
   return (
     <div className="flex flex-col gap-4">
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
         <Card>
           <CardHeader>
             <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -116,12 +123,12 @@ export default function ReviewsPage() {
         <Card>
           <CardHeader>
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              كود البروموشن
+              إجمالي التعليقات
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-xl font-bold text-primary">
-              {reportData.promo_code}
+            <div className="text-2xl font-bold text-blue-600">
+              {reportData.total_comments}
             </div>
           </CardContent>
         </Card>
@@ -134,7 +141,7 @@ export default function ReviewsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-600">
-              {reportData.summary.total_points}
+              {reportData.total_points}
             </div>
           </CardContent>
         </Card>
@@ -142,26 +149,16 @@ export default function ReviewsPage() {
         <Card>
           <CardHeader>
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              عدد الطلبات
+              أفضل صيدلية
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-600">
-              {reportData.summary.orders_count}
+            <div className="text-lg font-bold text-primary">
+              {reportData.top_pharmacy.pharmacy}
             </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              استخدام الكود
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-purple-600">
-              {reportData.summary.promocode_use_count}
-            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              {reportData.top_pharmacy.points} نقطة
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -169,7 +166,7 @@ export default function ReviewsPage() {
       {/* Filter bar */}
       <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-2">
         <div className="flex-center gap-2">
-          <label className="">من</label>
+          <label>من</label>
           <Input
             type="date"
             value={fromDate}
@@ -179,7 +176,7 @@ export default function ReviewsPage() {
           />
         </div>
         <div className="flex-center gap-2">
-          <label className="">إلى</label>
+          <label>إلى</label>
           <Input
             type="date"
             value={toDate}
@@ -213,103 +210,40 @@ export default function ReviewsPage() {
         </div>
       </div>
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <Card className="gap-1">
-          <CardHeader>
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              طلبات الطبيب
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-teal-600">
-              {reportData.summary.doctor_orders_count}
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">
-              عدد الطلبات من الطبيب
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="gap-1">
-          <CardHeader>
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              طلبات المرضى
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-orange-600">
-              {reportData.summary.patient_orders_count}
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">
-              عدد طلبات المرضى
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card className="gap-1">
-          <CardHeader>
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              نقاط من المرضى
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-green-600">
-              {reportData.summary.points_from_patients}
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">
-              النقاط المكتسبة من المرضى
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Orders Table */}
+      {/* Comments Table */}
       <Card>
         <CardHeader>
-          <CardTitle>الطلبات</CardTitle>
+          <CardTitle>التعليقات</CardTitle>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>رقم الطلب</TableHead>
-                <TableHead>اسم العميل</TableHead>
+                <TableHead>المنتج</TableHead>
                 <TableHead>الصيدلية</TableHead>
-                <TableHead>نقاط الصيدلية</TableHead>
-                <TableHead>نقاط الموقع</TableHead>
-                <TableHead>إجمالي النقاط</TableHead>
-                <TableHead>الحالة</TableHead>
-                <TableHead>التاريخ</TableHead>
-                <TableHead>المصدر</TableHead>
+                <TableHead>التعليق</TableHead>
+                <TableHead>النقاط</TableHead>
+                <TableHead>تاريخ الإضافة</TableHead>
+                <TableHead>آخر تحديث</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredOrders.map((order) => (
-                <TableRow key={order.id}>
+              {filteredComments.map((comment, index) => (
+                <TableRow key={index}>
                   <TableCell className="font-medium">
-                    {order.order_number}
+                    {comment.product}
                   </TableCell>
-                  <TableCell>{order.customer_name}</TableCell>
-                  <TableCell>{order.pharmacy_name_en}</TableCell>
-                  <TableCell>{order.doctor_pharmacy_points}</TableCell>
-                  <TableCell>{order.doctor_site_points}</TableCell>
-                  <TableCell className="font-bold">
-                    {order.total_points}
+                  <TableCell>{comment.pharmacy}</TableCell>
+                  <TableCell className="max-w-xs truncate">
+                    {comment.comment}
                   </TableCell>
                   <TableCell>
-                    <Badge
-                      variant={
-                        order.status === "completed" ? "default" : "secondary"
-                      }
-                    >
-                      {order.status}
-                    </Badge>
+                    <div className="font-bold text-green-600">
+                      {comment.points}
+                    </div>
                   </TableCell>
-                  <TableCell>{formatDate(order.created_at)}</TableCell>
-                  <TableCell className="text-sm text-muted-foreground">
-                    {order.source}
-                  </TableCell>
+                  <TableCell>{formatDate(comment.earned_at)}</TableCell>
+                  <TableCell>{formatDate(comment.updated_at)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -318,11 +252,11 @@ export default function ReviewsPage() {
       </Card>
 
       {/* Pagination */}
-      {reportData.details.pagination && (
+      {reportData && reportData.details.pagination && (
         <Pagination
           count={reportData.details.pagination.total}
-          // pageSize={1}
-          pageSize={reportData.details.pagination.per_page}
+        //   pageSize={1}
+            pageSize={reportData.details.pagination.per_page}
         />
       )}
     </div>

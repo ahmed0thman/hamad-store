@@ -22,7 +22,7 @@ const HeaderCart = ({ session }: { session?: any }) => {
   let isEmpty = false;
   let multiStores = false;
   const isAuthenticated = session && session.user && session.accessToken;
-  const { data: cartData, isLoading, error } = useGetCart();
+  const { data: cartData, isLoading } = useGetCart();
   if (isAuthenticated) {
     if (cartData?.notAuthenticated) {
       cart = null;
@@ -85,7 +85,14 @@ const HeaderCart = ({ session }: { session?: any }) => {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className=" relative p-0">
           <ShoppingCart className="!w-6 !h-6" />
-          
+          <Badge
+            variant="default"
+            className="absolute bg-red-500 text-white -top-2 -right-0 h-5 min-w-5 flex items-center justify-center p-1 text-xs"
+          >
+            {multiStores
+              ? cart?.pharmacies.length
+              : cart?.pharmacies[0].items.length}
+          </Badge>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56 p-3 ">

@@ -4,8 +4,76 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Mail, Phone } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { contactMessageSchema } from "@/lib/validators";
+import { contactMessageT, siteInformationT } from "@/types";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/components/ui/form";
+import { sendContactMessage } from "@/lib/api/apiPublic";
+import { toast } from "sonner";
+import { useEffect, useState } from "react";
+import { getSiteInformation } from "@/lib/api/apiSiteInfo";
+import Spinner from "@/components/custom/spinner";
 
 const ContactUs = () => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [siteInfo, setSiteInfo] = useState<siteInformationT | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchSiteInfo = async () => {
+      const sitInfoResponse = await getSiteInformation();
+      if (sitInfoResponse.success && sitInfoResponse.data) {
+        setSiteInfo(sitInfoResponse.data[0]);
+      }
+      setIsLoading(false);
+    };
+    fetchSiteInfo();
+  }, []);
+
+  const form = useForm<contactMessageT>({
+    resolver: zodResolver(contactMessageSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      phone: "",
+      message: "",
+    },
+  });
+
+  const onSubmit = async (data: contactMessageT) => {
+    setIsSubmitting(true);
+    try {
+      const response = await sendContactMessage(data);
+      if (response.success) {
+        toast.success(response.message || "تم إرسال رسالتك بنجاح");
+        form.reset();
+      } else {
+        toast.error(response.message || "فشل إرسال الرسالة");
+      }
+    } catch (error) {
+      toast.error("حدث خطأ أثناء إرسال الرسالة");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <section className="wrapper">
+        <div className="py-12 flex justify-center items-center min-h-[400px]">
+          <Spinner />
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="wrapper">
       <div className="py-12 grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -19,9 +87,11 @@ const ContactUs = () => {
             <p className="text-muted-foreground text-sm">
               نحن متواجدون على مدار الساعة طوال أيام الأسبوع.
             </p>
-            <p className="text-muted-foreground text-sm">
-              الهاتف: +8801611112222
-            </p>
+            {siteInfo?.phone && (
+              <p className="text-muted-foreground text-sm">
+                الهاتف: {siteInfo.phone}
+              </p>
+            )}
           </div>
           <hr />
           <div className="flex flex-col items-center text-center space-y-2">
@@ -32,36 +102,100 @@ const ContactUs = () => {
             <p className="text-muted-foreground text-sm">
               املأ استمارتنا وسنتواصل معك خلال 24 ساعة.
             </p>
-            <p className="text-muted-foreground text-sm">
-              البريد الإلكتروني: customer@exclusive.com
-            </p>
-            <p className="text-muted-foreground text-sm">
-              البريد الإلكتروني: support@exclusive.com
-            </p>
+            {siteInfo?.email && (
+              <p className="text-muted-foreground text-sm">
+                البريد الإلكتروني: {siteInfo.email}
+              </p>
+            )}
           </div>
         </div>
 
         {/* Form */}
-        <div className="md:col-span-2 rounded-2xl bg-muted/50 px-6 py-10 flex flex-col space-y-4 shadow-sm">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <Input placeholder="اسمك *" className="bg-white dark:bg-gray-800" />
-            <Input
-              placeholder="بريدك الإلكتروني *"
-              className="bg-white dark:bg-gray-800"
-            />
-            <Input
-              placeholder="هاتفك *"
-              className="bg-white dark:bg-gray-800"
-            />
-          </div>
-          <Textarea
-            placeholder="رسالتك"
-            rows={6}
-            className="flex-grow-1 bg-white dark:bg-gray-800"
-          />
-          <div className="flex justify-end">
-            <Button className="rounded-xl px-6 text-base">إرسال رسالة</Button>
-          </div>
+        <div className="md:col-span-2 rounded-2xl bg-muted/50 px-6 py-10 space-y-4 shadow-sm">
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="space-y-4 flex flex-col h-full"
+            >
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Input
+                          placeholder="اسمك *"
+                          className="bg-white dark:bg-gray-800"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Input
+                          placeholder="بريدك الإلكتروني *"
+                          className="bg-white dark:bg-gray-800"
+                          type="email"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="phone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Input
+                          placeholder="هاتفك *"
+                          className="bg-white dark:bg-gray-800"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <FormField
+                control={form.control}
+                name="message"
+                render={({ field }) => (
+                  <FormItem className="flex-grow">
+                    <FormControl>
+                      <Textarea
+                        placeholder="رسالتك *"
+                        rows={20}
+                        className="flex-grow-1 h-full min-h-[220px] bg-white dark:bg-gray-800"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div className="flex justify-end">
+                <Button
+                  type="submit"
+                  className="rounded-xl px-6 text-base"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? "جارٍ الإرسال..." : "إرسال رسالة"}
+                </Button>
+              </div>
+            </form>
+          </Form>
         </div>
       </div>
     </section>

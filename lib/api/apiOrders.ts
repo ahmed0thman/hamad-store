@@ -23,6 +23,7 @@ export async function saveOrder(
 
   try {
     console.log(orderParams);
+    // throw new Error("Testing error handling");
     const response = await api.post("/orders", orderParams, {
       headers: {
         Authorization: `Bearer ${token || userToken}`,
@@ -98,7 +99,7 @@ export async function getUserOrders(userToken?: string) {
   }
 }
 
-export async function getOrderDetails(userToken: string, orderId: number) {
+export async function getOrderDetails(orderId: number, userToken?: string) {
   let token: string = "";
   if (!userToken) {
     const session = await auth();

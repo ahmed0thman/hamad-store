@@ -2,18 +2,26 @@
 "use client";
 
 import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import {
   Sheet,
   SheetContent,
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { revalidate } from "@/lib/api/actions";
+import { getAllCategories } from "@/lib/api/apiProducts";
+import { signOutUser } from "@/lib/api/apiUser";
+import { category } from "@/types";
 import {
-  CreditCard,
   Globe,
   Heart,
   Home,
   Info,
-  Languages,
   LogIn,
   LogOut,
   Mail,
@@ -22,29 +30,17 @@ import {
   Moon,
   PanelLeft,
   RotateCcw,
-  Settings,
   Sun,
   UserCircle,
   Wallet,
 } from "lucide-react";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-import Image from "next/image";
-import React, { ReactNode, useEffect, useState, useTransition } from "react";
-import profileImg from "/public/images/uploads/profile.png";
-import Link from "next/link";
+import { signOut } from "next-auth/react";
 import { useTheme } from "next-themes";
-import { pharmacyCategories } from "@/lib/sampleData";
-import { getAllCategories } from "@/lib/api/apiProducts";
-import { category } from "@/types";
-import { signOut, useSession } from "next-auth/react";
-import { signOutUser } from "@/lib/api/apiUser";
-import { revalidate } from "@/lib/api/actions";
+import Image from "next/image";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { ReactNode, useEffect, useState, useTransition } from "react";
+import ButtonLang from "./buttonLang";
 
 const headerPages = [
   { title: "Home", path: "/", icon: <Home /> },
@@ -56,11 +52,6 @@ const accountPages = [
   { title: "Personal Info", path: "/account/profile", icon: <UserCircle /> },
   { title: "Addresses", path: "/account/addresses", icon: <MapPin /> },
   { title: "Returns", path: "/account/refund", icon: <RotateCcw /> },
-  {
-    title: "Payment Methods",
-    path: "/account/payment-methods",
-    icon: <CreditCard />,
-  },
   { title: "Wallet", path: "/account/wallet", icon: <Wallet /> },
   { title: "Compare Products", path: "/account/compare", icon: <PanelLeft /> },
   { title: "Favorites", path: "/favorites", icon: <Heart /> },
@@ -74,6 +65,8 @@ const HeaderMenu = ({ session }: { session: any }) => {
   const [isAuth, setIsAuth] = useState<boolean>(
     session?.user?.token || session?.accessToken ? true : false
   );
+
+  const [lang, setLang] = useState<string>("ar");
   const [initials, setInitials] = useState<string>("");
   const pathName = usePathname();
 
@@ -105,6 +98,8 @@ const HeaderMenu = ({ session }: { session: any }) => {
   useEffect(function () {
     startTransition(handleGetCategories);
     setMounted(true);
+    const storedLang = localStorage?.getItem("Lan") || "ar";
+    setLang(storedLang);
   }, []);
 
   function toggleTheme() {
@@ -201,11 +196,13 @@ const HeaderMenu = ({ session }: { session: any }) => {
 
             {/* Menu Actions */}
             <Menu>
-              <MenuItem
-                title={"en"}
-                icon={<Globe />}
-                handleClick={() => console.log("change lang")}
-              />
+              <ButtonLang>
+                <MenuItem
+                  title={lang === "ar" ? "AR" : "EN"}
+                  icon={<Globe />}
+                  handleClick={() => console.log("change lang")}
+                />
+              </ButtonLang>
               <MenuItem
                 title={theme === "light" ? "Light Mode" : "Dark Mode"}
                 icon={theme === "dark" ? <Sun /> : <Moon />}

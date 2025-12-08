@@ -1,42 +1,41 @@
-import { Headset, Package, ShieldCheck, TruckElectric } from "lucide-react";
+import { getSiteFeatures } from "@/lib/api/apiSiteInfo";
+import { siteFeatureT } from "@/types";
+import { CheckCircle2 } from "lucide-react";
 import React from "react";
-
-const features = [
+const features: siteFeatureT[] = [
   {
-    icon: Headset,
+    id: 1,
     title: "دعم العملاء طوال أيام الأسبوع",
-    description: "الوصول الفوري إلى الدعم",
+    sub_title: "الوصول الفوري إلى الدعم",
   },
   {
-    icon: TruckElectric,
+    id: 2,
     title: "شحن مجاني",
-    description: "شحن مجاني على جميع طلباتك",
+    sub_title: "شحن مجاني على جميع طلباتك",
   },
   {
-    icon: ShieldCheck,
+    id: 3,
     title: "دفع آمن 100%",
-    description: "نحن نضمن أن أموالك في أمان",
+    sub_title: "نحن نضمن أن أموالك في أمان",
   },
   {
-    icon: Package,
+    id: 4,
     title: "ضمان استرداد الأموال",
-    description: "ضمان استرداد الأموال لمدة 30 يومًا",
+    sub_title: "ضمان استرداد الأموال لمدة 30 يومًا",
   },
 ];
 
 const FeatureCard = ({
-  icon: Icon,
   title,
   description,
 }: {
-  icon: React.ComponentType;
   title: string;
   description: string;
 }) => {
   return (
     <div className="feature-card">
       <div className="text-primary">
-        <Icon />
+        <CheckCircle2 />
       </div>
       <div className="flex flex-col">
         <p className="feature-title">{title}</p>
@@ -46,18 +45,18 @@ const FeatureCard = ({
   );
 };
 
-const FeatureCards = () => {
+const FeatureCards = async () => {
+  const siteFeaturesResponse = await getSiteFeatures();
+  let stieFeatures = features;
+  if (siteFeaturesResponse.success && siteFeaturesResponse.data) {
+    stieFeatures = siteFeaturesResponse.data;
+  }
   return (
     <section>
       <div className="wrapper">
         <div className="bg-background dark:!bg-slate-800 dark:shadow-slate-600/30 !shadow-lg p-8 !rounded-md translate-y-[-20%] sm:translate-y-[-50%] grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          {features.map(({ icon, title, description }, index) => (
-            <FeatureCard
-              key={index}
-              icon={icon}
-              title={title}
-              description={description}
-            />
+          {stieFeatures.map(({ title, sub_title }, index) => (
+            <FeatureCard key={index} title={title} description={sub_title} />
           ))}
         </div>
       </div>

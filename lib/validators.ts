@@ -21,6 +21,20 @@ export const gender = z.string().refine(
   }
 );
 
+// Global reusable phone number schema
+export const phoneNumberSchema = z
+  .string()
+  .min(5, "Phone number must be at least 5 characters")
+  .max(20, "Phone number must not exceed 20 characters")
+  .regex(
+    /^[\d+\-_() .]+$/,
+    "Invalid phone number. Only digits, +, -, _, (), spaces, and . are allowed."
+  )
+  .refine(
+    (val) => /\d/.test(val),
+    "Phone number must contain at least one digit"
+  );
+
 export const cartItemSchema = z.object({
   productId: z.string().min(1, "Product ID is required"),
   name: z.string().min(1, "Product name is required"),
@@ -63,9 +77,7 @@ export const registerSchema = z
     state: z.string().min(1, "Address is required"),
     gender: gender,
     age: z.string().regex(/^\d+$/, "Age must be a valid number"),
-    phone: z
-      .string()
-      .regex(/^\+?[0-9]{7,15}$/, "Phone must be a valid phone number"),
+    phone: phoneNumberSchema,
     email: z.string().email("Email must be a valid email address"),
     password: z.string().min(8, "Password must be at least 8 characters"),
     password_confirmation: z
@@ -93,7 +105,7 @@ export const doctorRegisterSchema = registerSchema.extend({
         "Certificate file must be a valid PDF, DOC, DOCX, JPG, PNG, JPEG, or SVG file URL",
     }
   ),
-  specialization: z.string().min(1, "Specialization is required"),
+  specialization_id: z.string().min(1, "Specialization is required"),
   is_doctor: z.number().min(0).max(1).default(1).optional(),
 });
 
@@ -107,9 +119,7 @@ export const profileSchema = z.object({
   id: z.string().optional(),
   first_name: z.string().min(2, "First name is required"),
   last_name: z.string().optional(),
-  phone: z
-    .string()
-    .regex(/^\+?[0-9]{7,15}$/, "Phone must be a valid phone number"),
+  phone: phoneNumberSchema,
   language: z.string().optional(),
   gender: gender,
   state: z.string().min(1, "address is required"),
@@ -149,9 +159,7 @@ export const profileSchema = z.object({
 
 export const userAddressSchema = z.object({
   name: z.string().min(1, "Address name is required"),
-  phone: z
-    .string()
-    .regex(/^\+20\d{10}$/, "Phone must be a valid Egyptian number"),
+  phone: phoneNumberSchema,
   building: z.string().min(1, "Building is required"),
   area: z.string().min(1, "Area is required"),
   city: z.string().min(1, "City is required"),
@@ -164,9 +172,7 @@ export const planSubscriptionFormSchema = z
     plan_id: z.number().int().min(1, "Plan ID is required"),
     name: z.string().min(1, "Name is required"),
     email: z.string().email("Email must be a valid email address"),
-    phone: z
-      .string()
-      .regex(/^\+?[0-9]{7,15}$/, "Phone must be a valid phone number"),
+    phone: phoneNumberSchema,
     password: z.string().min(8, "Password must be at least 8 characters"),
     password_confirmation: z
       .string()
@@ -180,9 +186,7 @@ export const planSubscriptionFormSchema = z
     pharmacy_address_en: z
       .string()
       .min(1, "Pharmacy address in English is required"),
-    pharmacy_phone: z
-      .string()
-      .regex(/^\+?[0-9]{7,15}$/, "Pharmacy phone must be a valid phone number"),
+    pharmacy_phone: phoneNumberSchema,
     pharmacy_email: z
       .string()
       .email("Pharmacy email must be a valid email address"),
@@ -214,3 +218,10 @@ export const updateUserPasswordSchema = z
     message: "New passwords must match",
     path: ["new_password_confirmation"],
   });
+
+export const contactMessageSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  phone: phoneNumberSchema,
+  email: z.string().email("Email must be a valid email address"),
+  message: z.string().min(1, "Message is required"),
+});

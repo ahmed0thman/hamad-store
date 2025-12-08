@@ -150,7 +150,10 @@ const Orders = () => {
                   </div>
                   {/* Total below status */}
                   <p className="text-sm text-muted-foreground">
-                    {formatCurrency(Number(order.total), currency)}
+                    {formatCurrency(
+                      Number(order.total_after_shipping),
+                      currency
+                    )}
                   </p>
                 </div>
                 <div className="flex items-center gap-2">

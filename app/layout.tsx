@@ -21,8 +21,8 @@ const SITE_URL = process.env.NEXTAUTH_URL || "https://valideria.com";
 
 export const metadata: Metadata = {
   title: {
-    template: `%s | ${APP_NAME} - الصيدلية الإلكترونية الرائدة`,
-    default: `${APP_NAME} - الصيدلية الإلكترونية الرائدة في الشرق الأوسط`,
+    template: `%s | ${APP_NAME} - منصة الأدوية والمستحضرات الطبية`,
+    default: `${APP_NAME} - منصة الأدوية والمستحضرات الطبية والتجميلية في الشرق الأوسط`,
   },
   description: APP_DESCRIPTION,
   metadataBase: new URL(SITE_URL),
@@ -32,27 +32,35 @@ export const metadata: Metadata = {
     "صيدلية إلكترونية",
     "أدوية أونلاين",
     "مستحضرات تجميل",
+    "منتجات طبية",
     "منتجات صحية",
     "صيدليات متعددة",
     "توصيل أدوية",
+    "عقاقير طبية",
+    "مكملات غذائية",
     "pharmacy online",
     "medicines delivery",
     "healthcare products",
     "cosmetics online",
+    "medical supplies",
     "valideria",
     "الشرق الأوسط",
-    "مصر",
+    "العراق",
     "دواء",
     "علاج",
     "صحة",
+    "تجميل",
   ],
 
   // Authors
-  authors: [{ name: "Valideria Team" }, { name: "Healthcare Specialists" }],
+  authors: [
+    { name: "Valideria Team" },
+    { name: "Healthcare & Medical Specialists" },
+  ],
 
   // Creator
   creator: "Valideria",
-  publisher: "Valideria Healthcare Platform",
+  publisher: "Valideria Medical & Healthcare Platform",
 
   // Robots
   robots: {
@@ -71,7 +79,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     siteName: APP_NAME,
-    title: `${APP_NAME} - الصيدلية الإلكترونية الرائدة في الشرق الأوسط`,
+    title: `${APP_NAME} - منصة الأدوية والمستحضرات الطبية والتجميلية في الشرق الأوسط`,
     description: APP_DESCRIPTION,
     url: SITE_URL,
     locale: "ar_EG",
@@ -81,7 +89,7 @@ export const metadata: Metadata = {
         url: `${SITE_URL}/images/logos/valideria-og.jpg`,
         width: 1200,
         height: 630,
-        alt: `${APP_NAME} - Online Pharmacy Platform`,
+        alt: `${APP_NAME} - Medical & Healthcare Products Platform`,
         type: "image/jpeg",
       },
       {
@@ -99,12 +107,12 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     site: "@valideria",
     creator: "@valideria",
-    title: `${APP_NAME} - الصيدلية الإلكترونية الرائدة`,
+    title: `${APP_NAME} - منصة الأدوية والمستحضرات الطبية`,
     description: APP_DESCRIPTION,
     images: [
       {
         url: `${SITE_URL}/images/logos/valideria-twitter.jpg`,
-        alt: `${APP_NAME} - Online Pharmacy`,
+        alt: `${APP_NAME} - Medical & Healthcare Products`,
       },
     ],
   },
@@ -120,7 +128,7 @@ export const metadata: Metadata = {
 
   // Additional metadata
   category: "Health & Medical",
-  classification: "Healthcare Platform",
+  classification: "Medical & Healthcare Products Platform",
 
   // Manifest
   manifest: "/manifest.json",

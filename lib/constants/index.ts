@@ -35,7 +35,7 @@ export const signUpDefaultValues = {
   password: "12345678",
   password_confirmation: "12345678",
   license_number: "123456",
-  specialization: "Cardiology",
+  specialization_id: 1,
 };
 
 export const EGYPT_GOVERNORATES = [

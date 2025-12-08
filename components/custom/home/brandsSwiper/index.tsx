@@ -1,5 +1,3 @@
-import React from "react";
-import ProductCard from "../../product/productCard";
 import {
   Carousel,
   CarouselContent,
@@ -7,10 +5,9 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import Link from "next/link";
 
-import BrandCard from "./brandCard";
 import { Brand, category } from "@/types";
+import BrandCard from "./brandCard";
 
 const BrandSwiper = ({
   headLine,

@@ -22,7 +22,6 @@ import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { getFavorites } from "@/lib/api/apiFavorites";
 import ButtonFavorite from "./buttonFavorite";
-import { revalidatePath } from "next/cache";
 import ButtonAddToCompare from "./buttonAddToCompare";
 import { CURRENCY_CODE } from "@/lib/constants";
 import RatingDialog from "../order/ratingDialog";
@@ -159,7 +158,7 @@ const ProductMainInfo = async ({ product }: { product: Product }) => {
               </TableCell>
               <TableCell className="font-medium">{product.form}</TableCell>
             </TableRow>
-            <TableRow>
+            {/* <TableRow>
               <TableCell className="flex items-center gap-2 font-semibold bg-muted">
                 <Zap className="w-4 h-4" />
                 القوة
@@ -181,7 +180,7 @@ const ProductMainInfo = async ({ product }: { product: Product }) => {
                 حجم العبوة
               </TableCell>
               <TableCell className="font-medium">{product.pack_size}</TableCell>
-            </TableRow>
+            </TableRow> */}
           </TableBody>
         </Table>
       </div>

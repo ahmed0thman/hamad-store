@@ -22,7 +22,7 @@ export function generateSEO({
   type = "website",
   noIndex = false,
 }: SEOProps): Metadata {
-  const fullTitle = `${title} | ${APP_NAME} - الصيدلية الإلكترونية الرائدة`;
+  const fullTitle = `${title} | ${APP_NAME} - منصة التسوق الصحي المتعددة`;
   const url = `${SITE_URL}${path}`;
   const fullImage = image
     ? `${SITE_URL}${image}`
@@ -30,12 +30,13 @@ export function generateSEO({
 
   // Base keywords for all pages
   const baseKeywords = [
-    "صيدلية إلكترونية",
-    "أدوية أونلاين",
+    "متجر إلكتروني",
+    "تسوق صحي",
     "valideria",
     "صحة",
-    "دواء",
-    "علاج",
+    "منتجات صحية",
+    "متعدد البائعين",
+    "صيدليات متعددة",
   ];
 
   return {
@@ -96,13 +97,14 @@ export function generateSEO({
 export const homeSEO = generateSEO({
   title: "الصفحة الرئيسية",
   description:
-    "اكتشف أفضل الأدوية والمنتجات الصحية من صيدليات موثوقة. توصيل سريع وآمن، أسعار منافسة، واستشارة صيدلانية مجانية.",
+    "تسوق من صيدليات متعددة في مكان واحد. اكتشف أفضل الأدوية والمنتجات الصحية من موردين موثوقين. توصيل سريع وآمن، أسعار منافسة، ومقارنة بين البائعين.",
   keywords: [
-    "صيدلية رئيسية",
-    "أدوية منزلية",
+    "متجر متعدد البائعين",
+    "صيدليات متعددة",
+    "مقارنة أسعار",
     "مكملات غذائية",
     "مستحضرات تجميل",
-    "منتجات أطفال",
+    "منتجات صحية",
     "فيتامينات",
   ],
 });
@@ -110,28 +112,33 @@ export const homeSEO = generateSEO({
 export const productsSEO = generateSEO({
   title: "جميع المنتجات",
   description:
-    "تصفح مجموعة واسعة من الأدوية والمنتجات الصحية من أفضل الصيدليات. فلترة حسب الفئة، السعر، والتقييم.",
+    "تصفح مجموعة واسعة من الأدوية والمنتجات الصحية من صيدليات وموردين متعددين. قارن الأسعار، فلتر حسب الفئة والبائع، واختر الأفضل لك.",
   keywords: [
-    "كتالوج الأدوية",
+    "كتالوج المنتجات",
     "منتجات صحية",
-    "أدوية بوصفة",
-    "أدوية بدون وصفة",
-    "مقارنة الأسعار",
+    "مقارنة أسعار البائعين",
+    "صيدليات متعددة",
+    "موردين موثوقين",
   ],
 });
 
 export const aboutSEO = generateSEO({
   title: "من نحن",
   description:
-    "تعرف على فاليديريا، المنصة الرائدة للصيدليات الإلكترونية في الشرق الأوسط. مهمتنا توفير الرعاية الصحية للجميع.",
-  keywords: ["عن فاليديريا", "رؤية الشركة", "خدمات صحية", "منصة صيدليات"],
+    "تعرف على فاليديريا، منصة التسوق الصحي المتعددة البائعين الرائدة في الشرق الأوسط. نربط المستهلكين بأفضل الصيدليات والموردين في مكان واحد.",
+  keywords: [
+    "عن فاليديريا",
+    "منصة متعددة البائعين",
+    "سوق إلكتروني",
+    "صيدليات متعددة",
+  ],
 });
 
 export const contactSEO = generateSEO({
   title: "اتصل بنا",
   description:
-    "تواصل مع فريق خدمة العملاء في فاليديريا. نحن هنا لمساعدتك في جميع استفساراتك الطبية والصيدلانية.",
-  keywords: ["خدمة العملاء", "دعم فني", "استشارة صيدلانية", "تواصل معنا"],
+    "تواصل مع فريق خدمة العملاء في فاليديريا. نحن هنا لمساعدتك في جميع استفساراتك حول الطلبات، المنتجات، والبائعين.",
+  keywords: ["خدمة العملاء", "دعم فني", "مساعدة التسوق", "تواصل معنا"],
 });
 
 // Dynamic product SEO generator
@@ -146,17 +153,17 @@ export function generateProductSEO(product: {
 }) {
   return generateSEO({
     title: product.name,
-    description: `${product.description} - متوفر الآن في فاليديريا بسعر ${product.price} جنيه. اطلب الآن واحصل على توصيل سريع.`,
+    description: `${product.description} - متوفر من موردين متعددين في فاليديريا. قارن الأسعار واختر الأفضل. توصيل سريع وآمن.`,
     keywords: [
       product.name,
       product.category,
       product.brand,
       "شراء أونلاين",
-      "توصيل سريع",
-      `${product.category} أدوية`,
+      "مقارنة أسعار",
+      `${product.category} منتجات`,
       "فاليديريا",
-      "صيدلية إلكترونية",
-      `دواء ${product.name}`,
+      "متجر متعدد البائعين",
+      `${product.name} سعر`,
       `${product.brand} منتجات`,
     ],
     image: product.image,
@@ -200,16 +207,19 @@ export function generateCategorySEO(category: {
     title: category.name,
     description:
       category.description ||
-      `تسوق من مجموعة ${category.name} الواسعة في فاليديريا. ${
+      `تسوق من مجموعة ${
+        category.name
+      } الواسعة من صيدليات وموردين متعددين في فاليديريا. ${
         category.productCount
           ? `أكثر من ${category.productCount} منتج متاح`
           : ""
-      } مع توصيل سريع وضمان الجودة.`,
+      } مع مقارنة الأسعار وتوصيل سريع.`,
     keywords: [
       category.name,
-      `أدوية ${category.name}`,
       `منتجات ${category.name}`,
+      `${category.name} أسعار`,
       "تسوق أونلاين",
+      "مقارنة بائعين",
     ],
     path: `/products?category=${category.name}`,
   });
@@ -240,7 +250,7 @@ export const accountSEO = {
 
   favorites: generateSEO({
     title: "المفضلة",
-    description: "قائمة المنتجات المفضلة لديك في فاليديريا.",
+    description: "قائمة المنتجات والصيدليات المفضلة لديك في فاليديريا.",
     path: "/favorites",
     noIndex: true,
   }),

@@ -1,6 +1,7 @@
 import {
   cardSchema,
   cartItemSchema,
+  contactMessageSchema,
   doctorRegisterSchema,
   insertCartSchema,
   planSubscriptionFormSchema,
@@ -24,6 +25,8 @@ export type UpdateUserPasswordData = z.infer<typeof updateUserPasswordSchema>;
 export type PlanSubscriptionFormData = z.infer<
   typeof planSubscriptionFormSchema
 >;
+
+export type contactMessageT = z.infer<typeof contactMessageSchema>;
 
 export type plan = {
   id: number;
@@ -283,7 +286,7 @@ export type pagination = {
 
 // orders
 export type orderSaveParams = {
-  code?: string;
+  coupon_code?: string;
   pharmacy_id: number;
   shipping_id: number;
   shipping_address: number;
@@ -395,6 +398,8 @@ export type Pagination = {
   total: number;
   next_page_url: string | null;
   prev_page_url: string | null;
+  from?: number;
+  to?: number;
 };
 
 export type wallet = {
@@ -419,4 +424,109 @@ export type Notification = {
   order_number: string;
   created_at: string;
   read_at: string | null;
+};
+
+export type aboutUsT = {
+  id?: number;
+  active_vendors?: number;
+  active_customers?: number;
+  monthly_sales?: number;
+  annual_sales?: number;
+  title?: string;
+  text?: string;
+  image?: string;
+};
+
+export type siteFeatureT = {
+  id?: number;
+  title?: string;
+  sub_title?: string;
+};
+
+export type siteBannerT = {
+  path?: string;
+  banner_head_text?: string;
+  banner_head_detail_text?: string;
+};
+
+export type siteInformationT = {
+  phone?: string;
+  email?: string;
+  address?: string;
+  app_store_link?: string;
+  google_play_link?: string;
+  facebook_link?: string;
+  twitter_link?: string;
+  instagram_link?: string;
+  Linkein_link?: string;
+  site_year?: string;
+  logo_path?: string;
+};
+
+export type specializationT = {
+  id: number;
+  name: string;
+};
+
+export type DoctorOrderReportDetail = {
+  id: number;
+  order_number: string;
+  created_at: string;
+  doctor_pharmacy_points: number;
+  doctor_site_points: number;
+  total_points: number;
+  promo_code: string;
+  customer_name: string;
+  status: string;
+  pharmacy_name_en: string;
+  pharmacy_name_ar: string | null;
+  source: string;
+};
+
+export type DoctorOrderReportSummary = {
+  total_points: number;
+  orders_count: number;
+  doctor_orders_count: number;
+  patient_orders_count: number;
+  promocode_use_count: number;
+  points_from_patients: string;
+  points_from_self: number;
+};
+
+export type DoctorOrderReport = {
+  doctor_id: number;
+  user_id: number;
+  doctor_name: string;
+  promo_code: string;
+  summary: DoctorOrderReportSummary;
+  details: {
+    data: DoctorOrderReportDetail[];
+    pagination: Pagination;
+  };
+};
+
+export type DoctorCommentReportDetail = {
+  product_id: number;
+  product: string;
+  pharmacy: string;
+  comment: string;
+  points: number;
+  earned_at: string;
+  updated_at: string;
+};
+
+export type TopPharmacy = {
+  pharmacy: string;
+  points: number;
+};
+
+export type DoctorCommentReport = {
+  doctor_name: string;
+  total_comments: number;
+  total_points: number;
+  top_pharmacy: TopPharmacy;
+  details: {
+    data: DoctorCommentReportDetail[];
+    pagination: Pagination;
+  };
 };
