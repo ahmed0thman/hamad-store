@@ -3,8 +3,15 @@ import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
 import { useSession } from "next-auth/react";
-import { UserProfile } from "@/types";
+import { specializationT, UserProfile } from "@/types";
 import { updateUserProfile } from "@/lib/api/apiUser";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -15,10 +22,13 @@ import { useRouter } from "next/navigation";
 import ChangePassword from "@/components/custom/profile/changePassword";
 import { useGetProfile } from "@/hooks/useGetProfile";
 import { useQueryClient } from "@tanstack/react-query";
+import useGetDoctorsSpecializations from "@/hooks/useGetDoctorsSpecializations";
 
 const Profile = () => {
   const { isLoadoingProfile, profileData } = useGetProfile();
   const [certificateFile, setCertificateFile] = useState<File | null>(null);
+  const { specializationsResponse, isLoadingSpecializations } =
+    useGetDoctorsSpecializations();
   const router = useRouter();
   const queryClient = useQueryClient();
   const {
@@ -117,7 +127,7 @@ const Profile = () => {
     router.refresh(); // Force refresh to rehydrate session
   }, [router]);
 
-  if (isLoadoingProfile) {
+  if (isLoadoingProfile || isLoadingSpecializations) {
     return (
       <div className="animate-pulse">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 space-y-3">
@@ -138,6 +148,8 @@ const Profile = () => {
       </div>
     );
   }
+
+  const specializations = specializationsResponse?.data as specializationT[];
   return (
     <div className="">
       <h1 className="text-2xl font-bold text-gray-800 dark:text-white mb-6">
@@ -277,12 +289,25 @@ const Profile = () => {
               >
                 التخصص المهني
               </Label>
-              <Input
-                id="specialization"
-                {...register("Professional_info.specialization")}
-                placeholder="التخصص المهني"
-                type="text"
-              />
+              <Select
+                onValueChange={(value) =>
+                  setValue("Professional_info.specialization", value)
+                }
+                value={
+                  profileData?.data?.Professional_info?.specialization || ""
+                }
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="اختر التخصص" />
+                </SelectTrigger>
+                <SelectContent>
+                  {specializations?.map((spec) => (
+                    <SelectItem key={spec.id} value={spec.name}>
+                      {spec.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               {errors.Professional_info?.specialization && (
                 <span className="text-red-500 text-xs">
                   {errors.Professional_info.specialization.message}
@@ -347,6 +372,22 @@ const Profile = () => {
                   {errors.Professional_info.certificate_file.message}
                 </span>
               )}
+              {/* Preview the fetched certificate file */}
+              {profileData?.data?.Professional_info?.certificate_file &&
+                !certificateFile && (
+                  <a
+                    href={
+                      profileData?.data?.Professional_info?.certificate_file ||
+                      "#"
+                    }
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 underline"
+                  >
+                    عرض الشهادة
+                  </a>
+                )}
+              {/* Preview the newly selected certificate file */}
             </div>
 
             <div>

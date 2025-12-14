@@ -255,8 +255,8 @@ export default function CommentsPage() {
       {reportData && reportData.details.pagination && (
         <Pagination
           count={reportData.details.pagination.total}
-        //   pageSize={1}
-            pageSize={reportData.details.pagination.per_page}
+          //   pageSize={1}
+          pageSize={reportData.details.pagination.per_page}
         />
       )}
     </div>

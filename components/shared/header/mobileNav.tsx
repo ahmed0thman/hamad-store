@@ -6,6 +6,7 @@ import {
   House,
   MessagesSquare,
   Pill,
+  Search,
   ShoppingCart,
   TruckElectric,
 } from "lucide-react";
@@ -18,6 +19,7 @@ const navItems = [
   { href: "/", icon: House, label: "الرئيسية" },
   // { href: "/account/portions", icon: Pill, label: "جرعتي" },
   { href: "/products", icon: Pill, label: "المنتجات" },
+  { href: "/account/orders", icon: Search, label: "بحث", id: "search-nav" },
   { href: "/cart", icon: ShoppingCart, label: "العربة" },
   { href: "/account/orders", icon: TruckElectric, label: "طلباتي" },
   // { href: "/account/chat", icon: MessagesSquare, label: "المحادثات" },
