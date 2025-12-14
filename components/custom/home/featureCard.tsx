@@ -56,7 +56,11 @@ const FeatureCards = async () => {
       <div className="wrapper">
         <div className="bg-background dark:!bg-slate-800 dark:shadow-slate-600/30 !shadow-lg p-8 !rounded-md translate-y-[-20%] sm:translate-y-[-50%] grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {stieFeatures.map(({ title, sub_title }, index) => (
-            <FeatureCard key={index} title={title} description={sub_title} />
+            <FeatureCard
+              key={index}
+              title={title || ""}
+              description={sub_title || ""}
+            />
           ))}
         </div>
       </div>

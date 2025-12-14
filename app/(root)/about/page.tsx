@@ -13,7 +13,7 @@ const About = async () => {
     {
       label: "إجمالي المبيعات السنوية",
       value: aboutData.success
-        ? aboutData.data?.annual_sales.toString()
+        ? aboutData.data?.annual_sales?.toString() || "15+"
         : "15+",
       color: "text-teal-600",
       icon: <Briefcase className="w-8 h-8 text-teal-600" />,
@@ -21,7 +21,7 @@ const About = async () => {
     {
       label: "البائعون النشطون على موقعنا",
       value: aboutData.success
-        ? aboutData.data?.active_vendors.toString()
+        ? aboutData.data?.active_vendors?.toString() || "700+"
         : "700+",
       color: "text-teal-600",
       icon: <Users className="w-8 h-8 text-teal-600" />,
@@ -29,7 +29,7 @@ const About = async () => {
     {
       label: "مبيعات المنتجات الشهرية",
       value: aboutData.success
-        ? aboutData.data?.monthly_sales.toString()
+        ? aboutData.data?.monthly_sales?.toString() || "5000+"
         : "5000+",
       color: "text-teal-600",
       icon: <ShoppingCart className="w-8 h-8 text-teal-600" />,
@@ -37,7 +37,7 @@ const About = async () => {
     {
       label: "الزائرون النشطون على موقعنا",
       value: aboutData.success
-        ? aboutData.data?.active_customers.toString()
+        ? aboutData.data?.active_customers?.toString() || "3000+"
         : "3000+",
       color: "text-teal-600",
       icon: <Globe className="w-8 h-8 text-teal-600" />,
