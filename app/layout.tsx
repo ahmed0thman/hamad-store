@@ -5,6 +5,7 @@ import { APP_DESCRIPTION, APP_NAME } from "@/lib/constants";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/sonner";
 import { SessionProvider } from "next-auth/react";
+import BfcacheHandler from "@/components/shared/BfcacheHandler";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -233,6 +234,7 @@ export default function RootLayout({
             enableSystem={false}
             disableTransitionOnChange
           >
+            <BfcacheHandler />
             {children}
             <Toaster position="top-center" />
           </ThemeProvider>

@@ -4,15 +4,30 @@ import { auth } from "./lib/auth";
 
 export async function middleware(req: NextRequest) {
   const session = await auth();
+
+  // Create response
+  const response = !session?.user
+    ? (() => {
+        const url = req.nextUrl.clone();
+        url.pathname = "/signin";
+        url.searchParams.set("callbackUrl", req.nextUrl.pathname);
+        return NextResponse.redirect(url);
+      })()
+    : NextResponse.next();
+
+  // Enable bfcache by avoiding no-store for authenticated pages
+  // Only set cache headers for public pages, not authenticated ones
   if (!session?.user) {
-    const url = req.nextUrl.clone();
-    url.pathname = "/signin";
-    url.searchParams.set("callbackUrl", req.nextUrl.pathname);
-    return NextResponse.redirect(url);
+    response.headers.set("Cache-Control", "public, max-age=0, must-revalidate");
+  } else {
+    // For authenticated pages, use a more bfcache-friendly approach
+    response.headers.set(
+      "Cache-Control",
+      "private, max-age=0, must-revalidate"
+    );
   }
 
-  // Allow the request to proceed if the user is authenticated
-  return NextResponse.next();
+  return response;
 }
 
 export const config = {

@@ -28,18 +28,24 @@ export const metadata = homeSEO;
 
 export default async function Home() {
   const session = await auth();
-  console.log("token:", session?.accessToken);
-  console.log("user data:", session?.user);
   const locals = await getLocaleStrings();
-  // Get Products
-  const offersProducts = await getProductsBytitle("offers");
-  const uniqueProducts = await getProductsBytitle("features");
-  const topRatesProducts = await getProductsBytitle("top-rates");
-  const topSellingProducts = await getProductsBytitle("top-selling");
-  // Get Categories
-  const homeCategories = await getAllCategories();
-  // Get Brands
-  const brandCategories = await getBrandsBytitle();
+
+  // Parallel data fetching to reduce loading time
+  const [
+    offersProducts,
+    uniqueProducts,
+    topRatesProducts,
+    topSellingProducts,
+    homeCategories,
+    brandCategories,
+  ] = await Promise.all([
+    getProductsBytitle("offers"),
+    getProductsBytitle("features"),
+    getProductsBytitle("top-rates"),
+    getProductsBytitle("top-selling"),
+    getAllCategories(),
+    getBrandsBytitle(),
+  ]);
 
   return (
     <>
