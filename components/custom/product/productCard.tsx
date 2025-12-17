@@ -1,5 +1,4 @@
 import { Heart, Star } from "lucide-react";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { formatCurrency, formatCurrencyEGP } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -43,22 +42,17 @@ const ProductCard = async ({ productItem }: { productItem: ProductItem }) => {
 
       <div className="relative w-full aspect-square !max-h-[150px]">
         <Link href={`/product/${productItem.id}`}>
-          {/* Shadcn Avatar component for product image */}
-          <Avatar className="w-full h-full rounded-md">
-            <AvatarImage
-              src={image || "/images/no-image.jpg"}
-              alt="img"
-              className="object-cover"
-            />
-            <AvatarFallback>
-              <Image
-                src="/images/no-image.jpg"
-                alt="fallback"
-                fill
-                className="w-full h-full object-cover"
-              />
-            </AvatarFallback>
-          </Avatar>
+          <Image
+            src={image || "/images/no-image.jpg"}
+            alt={productItem?.name || "Product image"}
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            className="object-cover rounded-md"
+            loading="lazy"
+            onError={(e) => {
+              e.currentTarget.src = "/images/no-image.jpg";
+            }}
+          />
         </Link>
       </div>
 
