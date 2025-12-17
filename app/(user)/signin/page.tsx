@@ -13,10 +13,9 @@ import CredentialsSignInForm from "./credentialsSignInForm";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import getLocaleStrings from "@/localization";
+import { authSEO } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Sing In",
-};
+export const metadata = authSEO.signin;
 
 const SignInPage = async (props: {
   searchParams: Promise<{ callbackUrl: string }>;

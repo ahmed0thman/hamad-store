@@ -5,11 +5,9 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { faqSEO } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "الأسئلة الشائعة",
-  description: "إجابات على الأسئلة الأكثر شيوعًا حول خدماتنا",
-};
+export const metadata = faqSEO;
 
 export default function FAQPage() {
   return (

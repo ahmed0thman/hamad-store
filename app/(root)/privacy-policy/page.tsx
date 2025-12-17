@@ -1,12 +1,14 @@
 import getLocaleStrings from "@/localization";
 import { getPrivacyPolicy } from "@/lib/api/apiSiteInfo";
 import { Metadata } from "next";
+import { legalSEO } from "@/lib/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocaleStrings();
+  // Use enhanced SEO from lib/seo.ts, fallback to locale if needed
   return {
-    title: locale.privacyPolicy,
-    description: locale.privacyPolicyDescription,
+    ...legalSEO.privacy,
+    title: locale.privacyPolicy || legalSEO.privacy.title,
   };
 }
 

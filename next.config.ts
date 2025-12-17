@@ -4,6 +4,8 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  // Move serverComponentsExternalPackages out of experimental
+  serverExternalPackages: ["axios"],
   experimental: {
     serverActions: {
       bodySizeLimit: "10mb",
@@ -15,9 +17,16 @@ const nextConfig: NextConfig = {
       "date-fns",
       "react-hook-form",
       "@tanstack/react-query",
+      "swiper",
+      "swiper/react",
     ],
-    // Reduce client-side JavaScript
-    serverComponentsExternalPackages: ["axios"],
+  },
+  // Modularize imports for better tree-shaking
+  modularizeImports: {
+    "lucide-react": {
+      transform: "lucide-react/dist/esm/icons/{{kebabCase member}}",
+      skipDefaultConversion: true,
+    },
   },
   // Reduce JavaScript bundle size
   compiler: {
