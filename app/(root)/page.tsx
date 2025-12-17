@@ -1,4 +1,3 @@
-import Hero from "@/components/custom/home/hero";
 import {
   getAllCategories,
   getBrandsBytitle,
@@ -9,6 +8,11 @@ import { homeSEO } from "@/lib/seo";
 import getLocaleStrings from "@/localization";
 import dynamic from "next/dynamic";
 import { Suspense } from "react";
+
+// Lazy load Hero with Swiper to reduce initial JS
+const Hero = dynamic(() => import("@/components/custom/home/hero"), {
+  loading: () => <div className="h-screen max-h-[calc(100vh_-_8rem)] animate-pulse bg-muted" />,
+});
 
 // Lazy load below-the-fold components to reduce initial JavaScript
 const FeatureCards = dynamic(

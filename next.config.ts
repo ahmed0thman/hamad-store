@@ -20,6 +20,11 @@ const nextConfig: NextConfig = {
       "swiper",
       "swiper/react",
     ],
+    // Turbo mode for faster builds
+    turbo: {
+      loaders: {},
+      resolveAlias: {},
+    },
   },
   // Modularize imports for better tree-shaking
   modularizeImports: {
@@ -39,6 +44,9 @@ const nextConfig: NextConfig = {
     // Remove React properties in production
     reactRemoveProperties: process.env.NODE_ENV === "production",
   },
+  // Optimize build output
+  poweredByHeader: false,
+  compress: true,
   // Optimize production builds
   productionBrowserSourceMaps: false,
 
@@ -109,6 +117,11 @@ const nextConfig: NextConfig = {
     minimumCacheTTL: 60,
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    dangerouslyAllowSVG: true,
+    contentDispositionType: "attachment",
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+    // Optimize image loading
+    unoptimized: false,
   },
 };
 

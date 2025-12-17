@@ -20,6 +20,8 @@ export default function ReactQueryProvider({
             refetchOnWindowFocus: false, // Reduce unnecessary refetches
             refetchOnReconnect: false, // Reduce unnecessary refetches
             refetchOnMount: false, // Reduce unnecessary refetches
+            // Reduce network waterfall
+            networkMode: "online",
           },
           mutations: {
             retry: 1,
