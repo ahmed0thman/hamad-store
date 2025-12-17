@@ -14,34 +14,7 @@ import { plan } from "@/types";
 import PlanSubscriptionModal from "@/components/custom/plans/PlanSubscriptionModal";
 import { getPlans } from "@/lib/api/apiPlans";
 import PlansLoading from "./loading";
-
-const planFeatures: Record<string, string[]> = {
-  monthly: [
-    "Full inventory management",
-    "Basic analytics dashboard",
-    "Email support",
-    "Mobile app access",
-    "Up to 1000 products",
-  ],
-  annual: [
-    "Full inventory management",
-    "Advanced analytics & reports",
-    "Priority 24/7 support",
-    "Mobile app access",
-    "Unlimited products",
-    "Custom branding",
-    "API access",
-    "Dedicated account manager",
-  ],
-  quarterly: [
-    "Full inventory management",
-    "Standard analytics dashboard",
-    "Email & chat support",
-    "Mobile app access",
-    "Up to 5000 products",
-    "Custom branding",
-  ],
-};
+import { useTranslation } from "@/hooks/useTranslation";
 
 const PlansPage = () => {
   const [selectedPlan, setSelectedPlan] = useState<plan | null>(null);
@@ -49,6 +22,35 @@ const PlansPage = () => {
   const [plans, setPlans] = useState<plan[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { t } = useTranslation();
+
+  const planFeatures: Record<string, string[]> = {
+    monthly: [
+      t("fullInventoryManagement"),
+      t("basicAnalyticsDashboard"),
+      t("emailSupport"),
+      t("mobileAppAccess"),
+      t("upTo1000Products"),
+    ],
+    annual: [
+      t("fullInventoryManagement"),
+      t("advancedAnalyticsReports"),
+      t("priority247Support"),
+      t("mobileAppAccess"),
+      t("unlimitedProducts"),
+      t("customBranding"),
+      t("apiAccess"),
+      t("dedicatedAccountManager"),
+    ],
+    quarterly: [
+      t("fullInventoryManagement"),
+      t("standardAnalyticsDashboard"),
+      t("emailChatSupport"),
+      t("mobileAppAccess"),
+      t("upTo5000Products"),
+      t("customBranding"),
+    ],
+  };
 
   // Fetch plans from API
   useEffect(() => {
@@ -61,12 +63,12 @@ const PlansPage = () => {
         if (response.success && response.data) {
           setPlans(response.data);
         } else {
-          setError(response.message || "Failed to load plans");
+          setError(response.message || t("failedToLoadPlans"));
           // Keep using mock data as fallback
         }
       } catch (err) {
         console.error("Error loading plans:", err);
-        setError("Failed to load plans. Showing default plans.");
+        setError(t("failedToLoadPlansShowingDefault"));
         // Keep using mock data as fallback
       } finally {
         setIsLoading(false);
@@ -103,11 +105,10 @@ const PlansPage = () => {
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-            Choose Your Plan
+            {t("chooseYourPlan")}
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Select the perfect plan for your pharmacy. All plans include core
-            features with flexible pricing to match your needs.
+            {t("selectPerfectPlanDescription")}
           </p>
 
           {/* Error Message */}
@@ -144,7 +145,7 @@ const PlansPage = () => {
                   {plan.is_default && (
                     <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
                       <Badge className="bg-primary text-primary-foreground px-4 py-1 text-sm font-semibold shadow-lg">
-                        ⭐ Most Popular
+                        ⭐ {t("mostPopular")}
                       </Badge>
                     </div>
                   )}
@@ -182,8 +183,8 @@ const PlansPage = () => {
                         </span>
                       </div>
                       <div className="text-sm text-muted-foreground mt-2">
-                        {monthly} {currency}/month • {plan.duration_in_days}{" "}
-                        days
+                        {monthly} {currency}/{t("perMonth")} •{" "}
+                        {plan.duration_in_days} {t("days")}
                       </div>
                     </div>
                   </CardHeader>
@@ -209,7 +210,7 @@ const PlansPage = () => {
                       size="lg"
                       variant={plan.is_default ? "default" : "outline"}
                     >
-                      Subscribe Now
+                      {t("subscribeNow")}
                     </Button>
                   </CardFooter>
                 </Card>
@@ -220,14 +221,13 @@ const PlansPage = () => {
         {/* Additional Info */}
         <div className="bg-muted/50 rounded-lg p-8 text-center">
           <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
-            Need help choosing a plan?
+            {t("needHelpChoosingPlan")}
           </h3>
           <p className="text-muted-foreground mb-4">
-            Contact our sales team for personalized recommendations and custom
-            enterprise solutions.
+            {t("contactSalesDescription")}
           </p>
           <Button variant="outline" asChild>
-            <a href="/contact-us">Contact Sales</a>
+            <a href="/contact-us">{t("contactSales")}</a>
           </Button>
         </div>
       </div>

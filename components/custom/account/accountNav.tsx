@@ -11,17 +11,18 @@ import { toast } from "sonner";
 import { useGetProfile } from "@/hooks/useGetProfile";
 import { UserProfile } from "@/types";
 import { useQueryClient } from "@tanstack/react-query";
+import { useTranslation } from "@/hooks/useTranslation";
 
 const accountTabs = [
-  { name: "البيانات الشخصية", href: "/account/profile" },
-  { name: "العناوين", href: "/account/addresses" },
-  { name: "الطلبات", href: "/account/orders" },
-  { name: "المرتجعات", href: "/account/refund" },
-  // { name: "طرق الدفع", href: "/account/payment-methods" },
-  { name: "المحفظة", href: "/account/wallet" },
-  { name: "مقارنة المنتجات", href: "/account/compare" },
-  { name: "التقارير", href: "/account/reports/reviews", is_doctor: true },
-  // { name: "استشر طبيب", href: "/account/doctor" },
+  { name: "personalInfo", href: "/account/profile" },
+  { name: "addresses", href: "/account/addresses" },
+  { name: "orders", href: "/account/orders" },
+  { name: "returns", href: "/account/refund" },
+  // { name: "paymentMethods", href: "/account/payment-methods" },
+  { name: "wallet", href: "/account/wallet" },
+  { name: "compareProducts", href: "/account/compare" },
+  { name: "reports", href: "/account/reports/reviews", is_doctor: true },
+  // { name: "consultDoctor", href: "/account/doctor" },
 ];
 
 const AccountNav = () => {
@@ -30,6 +31,7 @@ const AccountNav = () => {
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
 
   const handleImageClick = () => {
     fileInputRef.current?.click();
@@ -43,13 +45,13 @@ const AccountNav = () => {
 
     // Validate file type
     if (!file.type.startsWith("image/")) {
-      toast.error("يرجى اختيار صورة صالحة");
+      toast.error(t("pleaseSelectValidImage"));
       return;
     }
 
     // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
-      toast.error("حجم الصورة يجب أن يكون أقل من 5 ميجابايت");
+      toast.error(t("imageSizeMustBeLess"));
       return;
     }
 
@@ -57,14 +59,14 @@ const AccountNav = () => {
     try {
       const response = await updateProfileImage(file);
       if (response.success) {
-        toast.success("تم تحديث صورة الملف الشخصي بنجاح");
+        toast.success(t("profileImageUpdatedSuccessfully"));
         // Invalidate profile query to refetch updated data
         queryClient.invalidateQueries({ queryKey: ["profile"] });
       } else {
-        toast.error(response.message || "فشل تحديث صورة الملف الشخصي");
+        toast.error(response.message || t("failedToUpdateProfileImage"));
       }
     } catch (error) {
-      toast.error("حدث خطأ أثناء تحديث الصورة");
+      toast.error(t("errorOccurredWhileUpdatingImage"));
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) {
@@ -117,7 +119,8 @@ const AccountNav = () => {
             onClick={handleImageClick}
             disabled={isUploading}
             className="absolute bottom-0 right-0 bg-white rounded-full p-1 shadow-md hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            title="تغيير صورة الملف الشخصي"
+            title={t("changeProfilePicture")}
+            aria-label={t("changeProfilePicture")}
           >
             <CameraIcon className="text-teal-500 w-5 h-5" />
           </button>
@@ -147,7 +150,7 @@ const AccountNav = () => {
                 isActive ? "bg-teal-600 text-white" : "hover:bg-muted"
               }`}
             >
-              {tab.name}
+              {t(tab.name as keyof typeof t)}
             </Link>
           );
         })}

@@ -24,6 +24,7 @@ import {
 import { toast } from "sonner";
 import { useGetNotifications } from "@/hooks/useGetNotifications";
 import { useQueryClient } from "@tanstack/react-query";
+import { useTranslation } from "@/hooks/useTranslation";
 
 type NotificationType =
   | "order_placed"
@@ -62,34 +63,34 @@ const getNotificationIcon = (type: NotificationType) => {
   }
 };
 
-const getNotificationBadge = (type: NotificationType) => {
+const getNotificationBadge = (type: NotificationType, t: (key: string) => string) => {
   switch (type) {
     case "order_placed":
-      return <Badge variant="secondary">جديد</Badge>;
+      return <Badge variant="secondary">{t("newBadge")}</Badge>;
     case "order_confirmed":
-      return <Badge variant="default">مؤكد</Badge>;
+      return <Badge variant="default">{t("confirmedBadge")}</Badge>;
     case "order_shipped":
-      return <Badge variant="secondary">مُرسل</Badge>;
+      return <Badge variant="secondary">{t("shippedBadge")}</Badge>;
     case "order_delivered":
       return (
         <Badge variant="default" className="bg-green-600">
-          مُسلم
+          {t("deliveredBadge")}
         </Badge>
       );
     case "order_canceled":
-      return <Badge variant="destructive">ملغي</Badge>;
+      return <Badge variant="destructive">{t("canceledBadge")}</Badge>;
     case "return_request_placed":
-      return <Badge variant="outline">طلب إرجاع</Badge>;
+      return <Badge variant="outline">{t("returnRequestBadge")}</Badge>;
     case "return_request_accepted":
       return (
         <Badge variant="default" className="bg-green-600">
-          مقبول
+          {t("acceptedBadge")}
         </Badge>
       );
     case "return_request_rejected":
-      return <Badge variant="destructive">مرفوض</Badge>;
+      return <Badge variant="destructive">{t("rejectedBadge")}</Badge>;
     default:
-      return <Badge variant="secondary">إشعار</Badge>;
+      return <Badge variant="secondary">{t("notificationBadge")}</Badge>;
   }
 };
 // end util functions
@@ -97,9 +98,10 @@ const getNotificationBadge = (type: NotificationType) => {
 const Notifications = () => {
   const queryClient = useQueryClient();
   const { notificationsData, isLoadingNotifications } = useGetNotifications();
+  const { t } = useTranslation();
 
   if (!notificationsData?.success) {
-    return <div className="text-red-500">Failed to load notifications</div>;
+    return <div className="text-red-500">{t("failedToLoadNotifications")}</div>;
   }
 
   const notifications = notificationsData.data.notifications as Notification[];
@@ -112,12 +114,12 @@ const Notifications = () => {
     );
 
     if (diffInHours < 1) {
-      return "الآن";
+      return t("now");
     } else if (diffInHours < 24) {
-      return `منذ ${diffInHours} ساعة`;
+      return `${t("since")} ${diffInHours} ${t("hoursAgo")}`;
     } else {
       const diffInDays = Math.floor(diffInHours / 24);
-      return `منذ ${diffInDays} يوم`;
+      return `${t("since")} ${diffInDays} ${t("daysAgo")}`;
     }
   };
 
@@ -125,9 +127,9 @@ const Notifications = () => {
     const response = await markNotificationAsRead(notificationId);
     if (response.success) {
       queryClient.invalidateQueries({ queryKey: ["notifications"] });
-      toast.success("تم تعيين الإشعار كمقروء");
+      toast.success(t("notificationMarkedAsRead"));
     } else {
-      toast.error(response.message || "فشل في تعيين الإشعار كمقروء");
+      toast.error(response.message || t("failedToMarkNotificationAsRead"));
     }
   };
 
@@ -135,9 +137,9 @@ const Notifications = () => {
     const response = await markAllNotificationsAsRead();
     if (response.success) {
       queryClient.invalidateQueries({ queryKey: ["notifications"] });
-      toast.success("تم تعيين جميع الإشعارات كمقروءة");
+      toast.success(t("allNotificationsMarkedAsRead"));
     } else {
-      toast.error(response.message || "فشل في تعيين جميع الإشعارات كمقروءة");
+      toast.error(response.message || t("failedToMarkAllNotificationsAsRead"));
     }
   };
 
@@ -151,10 +153,10 @@ const Notifications = () => {
               <Bell className="h-8 w-8 text-primary" />
               <div>
                 <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-                  الإشعارات
+                  {t("notifications")}
                 </h1>
                 <p className="text-sm text-muted-foreground">
-                  جاري تحميل الإشعارات...
+                  {t("loadingNotifications")}
                 </p>
               </div>
             </div>
@@ -195,10 +197,10 @@ const Notifications = () => {
               <Bell className="h-8 w-8 text-primary" />
               <div>
                 <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-                  الإشعارات
+                  {t("notifications")}
                 </h1>
                 <p className="text-sm text-muted-foreground">
-                  جميع الإشعارات مقروءة
+                  {t("allNotificationsRead")}
                 </p>
               </div>
             </div>
@@ -209,9 +211,9 @@ const Notifications = () => {
             <Card>
               <CardContent className="flex flex-col items-center justify-center py-12">
                 <Bell className="h-16 w-16 text-muted-foreground mb-4" />
-                <h3 className="text-lg font-semibold mb-2">لا توجد إشعارات</h3>
+                <h3 className="text-lg font-semibold mb-2">{t("noNotifications")}</h3>
                 <p className="text-muted-foreground text-center">
-                  ستظهر هنا جميع إشعاراتك المتعلقة بالطلبات والإرجاعات
+                  {t("allOrderAndReturnNotifications")}
                 </p>
               </CardContent>
             </Card>
@@ -232,12 +234,12 @@ const Notifications = () => {
             <Bell className="h-8 w-8 text-primary" />
             <div>
               <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-                الإشعارات
+                {t("notifications")}
               </h1>
               <p className="text-sm text-muted-foreground">
                 {unreadCount > 0
-                  ? `${unreadCount} إشعار غير مقروء`
-                  : "جميع الإشعارات مقروءة"}
+                  ? `${unreadCount} ${t("unreadNotifications")}`
+                  : t("allNotificationsRead")}
               </p>
             </div>
           </div>
@@ -245,7 +247,7 @@ const Notifications = () => {
           {unreadCount > 0 && (
             <Button onClick={markAllAsRead} variant="outline" size="sm">
               <CheckCircle className="h-4 w-4 mr-2" />
-              تعيين الكل كمقروء
+              {t("markAllAsRead")}
             </Button>
           )}
         </div>
@@ -256,9 +258,9 @@ const Notifications = () => {
             <Card>
               <CardContent className="flex flex-col items-center justify-center py-12">
                 <Bell className="h-16 w-16 text-muted-foreground mb-4" />
-                <h3 className="text-lg font-semibold mb-2">لا توجد إشعارات</h3>
+                <h3 className="text-lg font-semibold mb-2">{t("noNotifications")}</h3>
                 <p className="text-muted-foreground text-center">
-                  ستظهر هنا جميع إشعاراتك المتعلقة بالطلبات والإرجاعات
+                  {t("allOrderAndReturnNotifications")}
                 </p>
               </CardContent>
             </Card>
@@ -318,7 +320,7 @@ const Notifications = () => {
                             size="sm"
                             className="text-xs"
                           >
-                            تعيين كمقروء
+                            {t("markAsRead")}
                           </Button>
                         </div>
                       )}
@@ -337,7 +339,7 @@ const Notifications = () => {
           <div className="mt-8 text-center">
             <p className="text-sm text-muted-foreground flex items-center justify-center gap-1">
               <AlertCircle className="h-4 w-4" />
-              سيتم الاحتفاظ بالإشعارات لمدة 30 يوماً
+              {t("notificationsKeptFor30Days")}
             </p>
           </div>
         )}

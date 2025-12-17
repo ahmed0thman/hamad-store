@@ -12,6 +12,7 @@ import Link from "next/link";
 import CredentialsSignInForm from "./credentialsSignInForm";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
+import getLocaleStrings from "@/localization";
 
 export const metadata: Metadata = {
   title: "Sing In",
@@ -22,6 +23,7 @@ const SignInPage = async (props: {
 }) => {
   const session = await auth();
   const { callbackUrl } = await props.searchParams;
+  const locale = await getLocaleStrings();
 
   if (session?.user) return redirect(callbackUrl || "/");
   return (
@@ -37,9 +39,9 @@ const SignInPage = async (props: {
               priority
             />
           </Link>
-          <CardTitle className="text-center">Sign In</CardTitle>
+          <CardTitle className="text-center">{locale.signInTitle}</CardTitle>
           <CardDescription className="text-center">
-            Sign in to your account
+            {locale.signInDescription}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">

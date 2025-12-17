@@ -38,6 +38,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import SpinnerMini from "@/components/custom/SpinnerMini";
 import { set } from "zod";
+import { useTranslation } from "@/hooks/useTranslation";
 
 const AddressesPage = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -47,6 +48,7 @@ const AddressesPage = () => {
   const [pendingAction, startTransitionAction] = useTransition();
   const [mounted, setMounted] = useState(false);
   const [addressToEdit, setAddressToEdit] = useState<UserAddress | null>(null);
+  const { t } = useTranslation();
 
   const {
     register,
@@ -110,14 +112,14 @@ const AddressesPage = () => {
         toast(
           <div className="flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 text-green-500" />
-            <span>تم حفظ العنوان بنجاح</span>
+            <span>{t("addressSavedSuccessfully")}</span>
           </div>
         );
       } else {
         toast(
           <div className="flex items-center gap-2">
             <OctagonX className="w-4 h-4 text-red-500" />
-            <span>{"فشل في حفظ العنوان"}</span>
+            <span>{t("failedToSaveAddress")}</span>
           </div>
         );
       }
@@ -133,7 +135,7 @@ const AddressesPage = () => {
         toast(
           <div className="flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 text-green-500" />
-            <span>تم حذف العنوان بنجاح</span>
+            <span>{t("addressDeletedSuccessfully")}</span>
           </div>
         );
       }
@@ -168,7 +170,9 @@ const AddressesPage = () => {
   if (!addresses || addresses.length === 0) {
     return (
       <div className="space-y-6 px-4 py-6">
-        <p className="text-sm text-muted-foreground">لا توجد عناوين متاحة</p>
+        <p className="text-sm text-muted-foreground">
+          {t("noAddressesAvailable")}
+        </p>
         <div className="pt-4">
           <Dialog
             open={isDialogOpen}
@@ -185,12 +189,12 @@ const AddressesPage = () => {
                 className="flex-center ms-auto w-fit"
               >
                 <Plus className="w-4 h-4 mr-2" />
-                إضافة عنوان جديد
+                {t("addNewAddress")}
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-lg">
               <DialogHeader>
-                <DialogTitle>إضافة عنوان جديد</DialogTitle>
+                <DialogTitle>{t("addNewAddress")}</DialogTitle>
               </DialogHeader>
               <form onSubmit={handleSubmit(handleAddAddress)}>
                 <div className="grid gap-4 py-4">
@@ -290,7 +294,7 @@ const AddressesPage = () => {
               </p>
               {addr.is_default ? (
                 <span className="inline-block mt-1 text-sm font-medium bg-teal-100/80 text-teal-900 px-2 py-0.5 rounded">
-                  العنوان الافتراضي
+                  {t("defaultAddress")}
                 </span>
               ) : null}
             </div>
@@ -310,23 +314,23 @@ const AddressesPage = () => {
                 </DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
-                    <DialogTitle>حذف العنوان</DialogTitle>
+                    <DialogTitle>{t("deleteAddress")}</DialogTitle>
                   </DialogHeader>
                   <p className="text-sm text-muted-foreground">
-                    هل أنت متأكد أنك تريد حذف هذا العنوان؟
+                    {t("deleteAddressConfirmation")}
                   </p>
                   <DialogFooter>
                     <Button
                       variant="outline"
                       onClick={() => setIsDialogDeleteOpen(false)}
                     >
-                      إلغاء
+                      {t("cancel")}
                     </Button>
                     <Button
                       variant="destructive"
                       onClick={() => handleDelete(addr.id ?? "")}
                     >
-                      حذف
+                      {t("delete")}
                     </Button>
                   </DialogFooter>
                 </DialogContent>
@@ -353,18 +357,18 @@ const AddressesPage = () => {
               className="flex-center ms-auto w-fit"
             >
               <Plus className="w-4 h-4 mr-2" />
-              إضافة عنوان جديد
+              {t("addNewAddress")}
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-lg">
             <DialogHeader>
-              <DialogTitle>إضافة عنوان جديد</DialogTitle>
+              <DialogTitle>{t("addNewAddress")}</DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit(handleAddAddress)}>
               <div className="grid gap-4 py-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="name">الاسم</Label>
+                    <Label htmlFor="name">{t("name")}</Label>
                     <Input {...register("name")} type="text" />
                     {errors.name && (
                       <p className="text-red-500 text-sm">
@@ -373,7 +377,7 @@ const AddressesPage = () => {
                     )}
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="phone">رقم الهاتف</Label>
+                    <Label htmlFor="phone">{t("phoneNumber")}</Label>
                     <Input {...register("phone")} type="tel" />
                     {errors.phone && (
                       <p className="text-red-500 text-sm">
@@ -382,7 +386,7 @@ const AddressesPage = () => {
                     )}
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="building"> المبنى</Label>
+                    <Label htmlFor="building">{t("building")}</Label>
                     <Input {...register("building")} type="text" />
                     {errors.building && (
                       <p className="text-red-500 text-sm">
@@ -391,7 +395,7 @@ const AddressesPage = () => {
                     )}
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="city">المدينة</Label>
+                    <Label htmlFor="city">{t("city")}</Label>
                     <Input {...register("city")} type="text" />
                     {errors.city && (
                       <p className="text-red-500 text-sm">
@@ -400,7 +404,7 @@ const AddressesPage = () => {
                     )}
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="area">المنطقة</Label>
+                    <Label htmlFor="area">{t("area")}</Label>
                     <Input {...register("area")} type="text" />
                     {errors.area && (
                       <p className="text-red-500 text-sm">
@@ -417,7 +421,7 @@ const AddressesPage = () => {
                     id="isDefault"
                     // checked={getValues("is_default") === 1}
                   />
-                  <Label htmlFor="isDefault">اجعل العنوان افتراضي</Label>
+                  <Label htmlFor="isDefault">{t("makeDefaultAddress")}</Label>
                 </div>
               </div>
               <DialogFooter>
@@ -426,10 +430,10 @@ const AddressesPage = () => {
                   variant="outline"
                   onClick={handleDialogClose}
                 >
-                  إلغاء
+                  {t("cancel")}
                 </Button>
                 <Button type="submit" disabled={isSubmitting}>
-                  حفظ
+                  {t("save")}
                   {isSubmitting && <SpinnerMini />}
                 </Button>
               </DialogFooter>

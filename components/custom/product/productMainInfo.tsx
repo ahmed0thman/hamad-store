@@ -1,32 +1,23 @@
 import { Button } from "@/components/ui/button";
-import { Table, TableBody, TableRow, TableCell } from "@/components/ui/table";
-import { formatCurrency, formatCurrencyEGP } from "@/lib/utils";
-import {
-  Heart,
-  Scaling,
-  Layers,
-  FileText,
-  Tag,
-  Box,
-  Zap,
-  Calendar,
-  PackageCheck,
-  Store,
-} from "lucide-react";
+import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
+import { getFavorites } from "@/lib/api/apiFavorites";
+import { auth } from "@/lib/auth";
+import { CURRENCY_CODE } from "@/lib/constants";
+import { formatCurrency } from "@/lib/utils";
+import { FavoriteItem, Product } from "@/types";
+import { Box, FileText, Layers, Scaling, Store, Tag } from "lucide-react";
+import Link from "next/link";
+import ButtonShare from "../buttonShare";
+import RatingDialog from "../order/ratingDialog";
 import TextExpander from "../textExpander";
+import ButtonAddToCompare from "./buttonAddToCompare";
+import ButtonFavorite from "./buttonFavorite";
 import ProductAddCart from "./productAddCart";
 import ProductImages from "./productImage";
-import ButtonShare from "../buttonShare";
-import { FavoriteItem, Product } from "@/types";
-import Link from "next/link";
-import { auth } from "@/lib/auth";
-import { getFavorites } from "@/lib/api/apiFavorites";
-import ButtonFavorite from "./buttonFavorite";
-import ButtonAddToCompare from "./buttonAddToCompare";
-import { CURRENCY_CODE } from "@/lib/constants";
-import RatingDialog from "../order/ratingDialog";
+import getLocaleStrings from "@/localization";
 
 const ProductMainInfo = async ({ product }: { product: Product }) => {
+  const locale = await getLocaleStrings();
   const session = await auth();
   // let favorites: FavoriteItem[] | null = null;
   let inFavorites = false;
@@ -61,16 +52,16 @@ const ProductMainInfo = async ({ product }: { product: Product }) => {
           <div className="flex gap-2 items-center ">
             {product.offer ? (
               <>
-                <span className="line-through text-gray-500">
+                <span className="line-through text-gray-600 dark:text-gray-400">
                   {formatCurrency(
                     product.offer.price_before,
-                    session?.user.currency_code || CURRENCY_CODE
+                    product.currency_symbol || CURRENCY_CODE
                   )}
                 </span>
                 <span className="text-primary font-semibold text-2xl">
                   {formatCurrency(
                     product.offer.price_after,
-                    session?.user.currency_code || CURRENCY_CODE
+                    product.currency_symbol || CURRENCY_CODE
                   )}
                 </span>
               </>
@@ -78,7 +69,7 @@ const ProductMainInfo = async ({ product }: { product: Product }) => {
               <span className="text-primary font-semibold text-2xl">
                 {formatCurrency(
                   product.price,
-                  session?.user.currency_code || CURRENCY_CODE
+                  product.currency_symbol || CURRENCY_CODE
                 )}
               </span>
             )}
@@ -96,7 +87,7 @@ const ProductMainInfo = async ({ product }: { product: Product }) => {
             <ButtonAddToCompare id={product.id}>
               <Button variant="outline" className="flex items-center gap-2">
                 <Scaling className="w-5 h-5" />
-                أضف للمقارنة
+                {locale.addToCompare}
               </Button>
             </ButtonAddToCompare>
 
@@ -115,14 +106,16 @@ const ProductMainInfo = async ({ product }: { product: Product }) => {
         </div>
       </div>
       <div className="col-span-full">
-        <h3 className="text-xl font-semibold mt-6 mb-2">تفاصيل المنتج</h3>
+        <h3 className="text-xl font-semibold mt-6 mb-2">
+          {locale.productDetails}
+        </h3>
         {/* Product detailed info table */}
         <Table className="w-full border bg-muted/20">
           <TableBody className="divide-y text-base">
             <TableRow>
               <TableCell className="flex items-center gap-2 font-semibold bg-muted">
                 <FileText className="w-4 h-4" />
-                الاسم العلمي
+                {locale.genericName}
               </TableCell>
               <TableCell className="font-medium">
                 {product.generic_name}
@@ -131,7 +124,7 @@ const ProductMainInfo = async ({ product }: { product: Product }) => {
             <TableRow>
               <TableCell className="flex items-center gap-2 font-semibold bg-muted">
                 <Layers className="w-4 h-4" />
-                الفئة
+                {locale.category}
               </TableCell>
               <TableCell className="font-medium">
                 {product.categoryName}
@@ -140,21 +133,21 @@ const ProductMainInfo = async ({ product }: { product: Product }) => {
             <TableRow>
               <TableCell className="flex items-center gap-2 font-semibold bg-muted">
                 <Tag className="w-4 h-4" />
-                العلامة التجارية
+                {locale.brand}
               </TableCell>
               <TableCell className="font-medium">{product.brandName}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell className="flex items-center gap-2 font-semibold bg-muted">
                 <Tag className="w-4 h-4" />
-                النوع
+                {locale.productType}
               </TableCell>
               <TableCell className="font-medium">{product.type}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell className="flex items-center gap-2 font-semibold bg-muted">
                 <Box className="w-4 h-4" />
-                الشكل
+                {locale.form}
               </TableCell>
               <TableCell className="font-medium">{product.form}</TableCell>
             </TableRow>

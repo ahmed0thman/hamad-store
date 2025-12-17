@@ -12,8 +12,10 @@ import { Badge } from "@/components/ui/badge";
 import ButtonAddToCompare from "./buttonAddToCompare";
 import Image from "next/image";
 import { CURRENCY_CODE } from "@/lib/constants";
+import getLocaleStrings from "@/localization";
 
 const ProductCard = async ({ productItem }: { productItem: ProductItem }) => {
+  const locale = await getLocaleStrings();
   const session = await auth();
   // let favorites: FavoriteItem[] | null = null;
   let inFavorites = false;
@@ -60,19 +62,19 @@ const ProductCard = async ({ productItem }: { productItem: ProductItem }) => {
         </Link>
       </div>
 
-      <div className="space-y-3 mt-5 flex flex-col flex-grow">
+      <div className="sm:space-y-3 mt-5 flex flex-col flex-grow">
         <h3 className="sm:text-lg font-semibold text-foreground">
           {/* <span className="text-xs block text-muted-foreground underline font-medium">
             {productItem.pharmacy_id}
           </span> */}
-          {productItem.name}
+          {productItem?.name}
         </h3>
 
-        <div className="flex gap-1 sm:gap-4 justify-between">
-          <div className="flex  flex-col items-start gap-0">
+        <div className="flex flex-col sm:flex-row gap-1 sm:gap-4 justify-between">
+          <div className="flex items-end  sm:flex-col sm:items-start gap-2">
             {productItem.offer_discount ? (
               <>
-                <span className="line-through text-gray-500 text-xs">
+                <span className="line-through text-gray-600 dark:text-gray-400 text-xs">
                   {formatCurrency(
                     productItem.price as number,
                     productItem.currency_symbol
@@ -89,13 +91,13 @@ const ProductCard = async ({ productItem }: { productItem: ProductItem }) => {
               <span className="text-foreground font-bold sm:text-xl">
                 {formatCurrency(
                   productItem.price as number,
-                  session?.user.currency_code || CURRENCY_CODE
+                  productItem.currency_symbol || CURRENCY_CODE
                 )}
               </span>
             )}
           </div>
 
-          <div className="flex items-end flex-col gap-2">
+          <div className="flex sm:items-end flex-col sm:gap-2">
             <div className="flex items-center text-yellow-400 gap-1">
               <StarRating
                 value={productItem.average_rating.user}
@@ -111,41 +113,42 @@ const ProductCard = async ({ productItem }: { productItem: ProductItem }) => {
 
             <div className="flex items-center text-green-500 gap-1">
               <StarRating
-                value={productItem.average_rating.pharmacist}
+                value={productItem.average_rating.doctor}
                 outOf={5}
                 readOnly
                 color="text-green-500"
                 // filledOnly
               />
               <span className="font-medium">
-                ({productItem.average_rating.count_pharmacist_rate})
+                ({productItem.average_rating.count_doctor_rate})
               </span>
             </div>
           </div>
         </div>
         {productItem.quantity > 0 ? (
           <span className="text-green-500 text-xs sm:text-sm font-medium  mt-auto">
-            متوفر في المخزون
+            {locale.availableInStock}
             {/* ({productItem.quantity}) */}
           </span>
         ) : (
           <Badge variant="destructive" className="w-fit py-1 px-3  mt-auto">
-            غير متوفر
+            {locale.notAvailable}
           </Badge>
         )}
-        <div className="flex flex-row  gap-1">
+        <div className="hidden sm:flex flex-row  gap-1">
           <Button
             asChild
             className=" rounded-full text-stone-100 font-medium text-xs sm:text-base flex-grow-0 !py-1 sm:!py-2"
           >
             <Link href={`/product/${productItem.id}`}>
-              {productItem.quantity > 0 ? "اشتري الآن" : "التفاصيل"}
+              {/* {productItem.quantity > 0 ? locale.buyNowButton : locale.details} */}
+              {locale.details}
             </Link>
           </Button>
 
           <ButtonAddToCompare id={productItem.id}>
             <Button className="rounded-full text-stone-100 font-medium text-xs sm:text-base flex-grow-0 ">
-              مقارنة
+              {locale.compare}
             </Button>
           </ButtonAddToCompare>
         </div>

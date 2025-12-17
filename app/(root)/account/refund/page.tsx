@@ -12,10 +12,11 @@ import {
   XCircle,
 } from "lucide-react";
 import Link from "next/link";
+import getLocaleStrings from "@/localization";
 
 export default async function RefundPage() {
   const response = await getReturnedRequests();
-
+  const locale = await getLocaleStrings();
   if (!response?.success) {
     return (
       <section className="py-8">
@@ -25,7 +26,7 @@ export default async function RefundPage() {
               <CardContent className="flex flex-col items-center justify-center py-12">
                 <AlertCircle className="h-16 w-16 text-destructive mb-4" />
                 <h3 className="text-lg font-semibold mb-2">
-                  Error Loading Refund Requests
+                  {locale.errorLoadingRefundRequests}
                 </h3>
                 <p className="text-muted-foreground text-center">
                   {response?.message}
@@ -39,6 +40,28 @@ export default async function RefundPage() {
   }
 
   const returnedRequests = response.data as ReturnedRequest[];
+
+  const getStatusTranslation = (status: string) => {
+    const statusKey = status.toLowerCase().replace(/\s+/g, "_");
+    switch (statusKey) {
+      case "pending":
+        return locale.pending;
+      case "platform_received":
+        return locale.platformReceived;
+      case "pharmacy_pending":
+        return locale.pharmacyPending;
+      case "pharmacy_received":
+        return locale.pharmacyReceived;
+      case "approved":
+        return locale.approved;
+      case "rejected":
+        return locale.rejected;
+      case "refunded":
+        return locale.refunded;
+      default:
+        return status;
+    }
+  };
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase().replace(/\s+/g, "_")) {
@@ -87,10 +110,10 @@ export default async function RefundPage() {
           {/* Header */}
           <div className="mb-6">
             <h1 className="text-3xl font-bold text-foreground mb-2">
-              Refund Requests
+              {locale.refundRequests}
             </h1>
             <p className="text-muted-foreground">
-              Track and manage your refund requests
+              {locale.trackAndManageRefundRequests}
             </p>
           </div>
 
@@ -100,13 +123,13 @@ export default async function RefundPage() {
               <CardContent className="flex flex-col items-center justify-center py-16">
                 <PackageOpen className="h-20 w-20 text-muted-foreground mb-4" />
                 <h3 className="text-xl font-semibold mb-2">
-                  No Refund Requests
+                  {locale.noRefundRequests}
                 </h3>
                 <p className="text-muted-foreground text-center mb-6">
-                  You haven&apos;t submitted any refund requests yet
+                  {locale.noRefundRequestsSubmitted}
                 </p>
                 <Button asChild variant="default">
-                  <Link href="/account/orders">View Orders</Link>
+                  <Link href="/account/orders">{locale.viewOrders}</Link>
                 </Button>
               </CardContent>
             </Card>
@@ -125,19 +148,19 @@ export default async function RefundPage() {
                         <div className="flex-1 min-w-[200px]">
                           <div className="flex items-center gap-2 mb-2">
                             <h3 className="text-lg font-semibold text-foreground">
-                              Request #{request.id}
+                              {locale.request} #{request.id}
                             </h3>
                             <Badge className={getStatusColor(request.status)}>
                               <span className="flex items-center gap-1">
                                 {getStatusIcon(request.status)}
                                 <span className="capitalize">
-                                  {request.status}
+                                  {getStatusTranslation(request.status)}
                                 </span>
                               </span>
                             </Badge>
                           </div>
                           <p className="text-sm text-muted-foreground">
-                            Order #{request.order_number}
+                            {locale.order} #{request.order_number}
                           </p>
                         </div>
 
@@ -154,7 +177,7 @@ export default async function RefundPage() {
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-3 border-t border-b border-border">
                         <div>
                           <p className="text-xs text-muted-foreground mb-1">
-                            Total Amount
+                            {locale.totalAmount}
                           </p>
                           <p className="text-base font-semibold text-foreground">
                             {formatCurrency(
@@ -166,7 +189,7 @@ export default async function RefundPage() {
                         {request.is_refunded && (
                           <div>
                             <p className="text-xs text-muted-foreground mb-1">
-                              Refund Amount
+                              {locale.refundAmount}
                             </p>
                             <p className="text-base font-semibold text-primary">
                               {formatCurrency(
@@ -181,8 +204,10 @@ export default async function RefundPage() {
                       {/* Refund Method */}
                       {request.refund_to_wallet && (
                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <span className="font-medium">Refund Method:</span>
-                          <Badge variant="outline">Wallet</Badge>
+                          <span className="font-medium">
+                            {locale.refundMethod}:
+                          </span>
+                          <Badge variant="outline">{locale.wallet}</Badge>
                         </div>
                       )}
 
@@ -190,7 +215,7 @@ export default async function RefundPage() {
                       {request.return_reason && (
                         <div className="bg-muted/50 rounded-lg p-3">
                           <p className="text-xs text-muted-foreground mb-1">
-                            Reason
+                            {locale.reason}
                           </p>
                           <p className="text-sm text-foreground line-clamp-2">
                             {request.return_reason}
@@ -207,7 +232,7 @@ export default async function RefundPage() {
                           className="rounded-full hover:bg-secondary/70 transition-colors duration-200"
                         >
                           <Link href={`/account/refund/${request.id}`}>
-                            View Details
+                            {locale.viewDetails}
                           </Link>
                         </Button>
                       </div>

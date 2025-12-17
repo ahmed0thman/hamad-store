@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "@/hooks/useTranslation";
 import { revalidate } from "@/lib/api/actions";
 import { addToFavorites, removeFromFavorites } from "@/lib/api/apiFavorites";
 import { Heart } from "lucide-react";
@@ -31,12 +32,13 @@ const ButtonFavorite = ({
     data: null,
     notAuthenticated: false,
   });
+  const { t } = useTranslation();
 
   useEffect(
     function () {
       if (resAdd.success) {
         setAddedToFavorites(true);
-        toast.success("Added to favorites");
+        toast.success(t("addedToFavorites"));
         if (pathName === "/favorites") {
           revalidate("/favorites");
         } else if (pathName.startsWith("/product/")) {
@@ -51,7 +53,7 @@ const ButtonFavorite = ({
     function () {
       if (resRemove.success) {
         setAddedToFavorites(false);
-        toast.success("Removed from favorites");
+        toast.success(t("removedFromFavorites"));
         revalidate("/favorites");
       }
     },
@@ -61,9 +63,9 @@ const ButtonFavorite = ({
   useEffect(
     function () {
       if (resAdd.notAuthenticated || resRemove.notAuthenticated) {
-        toast.error("You need to log in to manage favorites", {
+        toast.error(t("needLoginToManageFavorites"), {
           action: {
-            label: "Login",
+            label: t("login"),
             onClick: () => {
               router.push(`/signin?callbackUrl=${pathName}`);
             },
@@ -80,6 +82,7 @@ const ButtonFavorite = ({
         variant="ghost"
         size="icon"
         className="!text-red-500  hover:bg-red-100 dark:hover:bg-red-900"
+        aria-label={addedToFavorites ? t("removeFromFavorites") : t("addToFavorites")}
       >
         <Heart fill={addedToFavorites ? "red" : "none"} className="!w-6 !h-6" />
       </Button>

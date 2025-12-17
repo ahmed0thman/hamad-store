@@ -7,20 +7,19 @@ import { useOrder } from "@/contexts/OrderContext";
 import { getUserAddresses } from "@/lib/api/apiUser";
 import { UserAddress } from "@/types";
 import { ArrowRight } from "lucide-react";
-import { useSession } from "next-auth/react";
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 import Spinner from "../spinner";
 import ButtonStepNav from "./buttonStepNav";
-import Link from "next/link";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export default function ChooseLocationTab({ onNext }: { onNext: () => void }) {
   const searchParams = useSearchParams();
   const [addresses, setAddresses] = useState<UserAddress[]>([]);
   const [pendingAddresses, startTransitionAddresses] = useTransition();
-  const [open, setOpen] = useState(false);
   const { setShippingAddress, shippingAddress, setPharmacyId } = useOrder();
-
+  const { t } = useTranslation();
   async function fetchAddresses() {
     const addressesData = await getUserAddresses();
     if (addressesData?.success) {
@@ -53,7 +52,9 @@ export default function ChooseLocationTab({ onNext }: { onNext: () => void }) {
 
   return (
     <div className="space-y-4 pt-4">
-      <h3 className="text-lg font-bold text-foreground">Choose Location</h3>
+      <h3 className="text-lg font-bold text-foreground">
+        {t("chooseLocation")}
+      </h3>
       <RadioGroup
         value={shippingAddress || ""}
         onValueChange={(value) => {
@@ -93,7 +94,7 @@ export default function ChooseLocationTab({ onNext }: { onNext: () => void }) {
               </div>
               {addr.is_default ? (
                 <Badge variant="outline" className="text-xs ms-auto">
-                  default
+                  {t("default")}
                 </Badge>
               ) : null}
             </label>
@@ -143,12 +144,12 @@ export default function ChooseLocationTab({ onNext }: { onNext: () => void }) {
               <Button onClick={handleAddAddress}>Add</Button> 
             </DialogFooter>
           </DialogContent>
-        </Dialog> */}
+        </Button> */}
         <Button asChild variant="secondary">
-          <Link href="/account/addresses">Add New Address</Link>
+          <Link href="/account/addresses">{t("addNewAddress")}</Link>
         </Button>
         <ButtonStepNav handleClick={onNext}>
-          Next
+          {t("next")}
           <ArrowRight className="auto-dir" />
         </ButtonStepNav>
       </div>

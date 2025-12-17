@@ -102,7 +102,7 @@ interface filterParams {
   price_min?: string;
   price_max?: string;
   user_rating_min?: string;
-  pharmacist_rating_min?: string;
+  doctor_rating_min?: string;
   keyword?: string;
   categoryId?: string;
   brandId?: string;
@@ -120,7 +120,7 @@ export async function getFilteredProducts(filterParams: filterParams = {}) {
         price_min: filterParams.price_min || "",
         price_max: filterParams.price_max || "",
         user_rating_min: filterParams.user_rating_min || "",
-        pharmacist_rating_min: filterParams.pharmacist_rating_min || "",
+        doctor_rating_min: filterParams.doctor_rating_min || "",
         keyword: filterParams.keyword || "",
         category_id: filterParams.categoryId || "",
         brand_id: filterParams.brandId || "",

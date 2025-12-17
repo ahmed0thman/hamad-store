@@ -3,9 +3,12 @@ import { Button } from "@/components/ui/button";
 import { headerPages } from "@/lib/sampleData";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const HaederPages = () => {
   const pathName = usePathname();
+  const { language } = useLanguage();
+
   return (
     <div className="items-center hidden lg:flex">
       {headerPages.map((ele) => (
@@ -20,7 +23,7 @@ const HaederPages = () => {
           }  text-base hover:no-underline`}
         >
           <Link className="" href={ele.path}>
-            {ele.title}
+            {ele.title[language]}
           </Link>
         </Button>
       ))}

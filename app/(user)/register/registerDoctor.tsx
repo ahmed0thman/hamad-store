@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "@/hooks/useTranslation";
 import {
   Card,
   CardDescription,
@@ -27,6 +28,7 @@ import Spinner from "@/components/custom/spinner";
 // 3|e8wTV7x6fnsJjPbowVI3OmVxM78DqkGSnj68G7BDc3155768
 
 const RegisterDoctor = () => {
+  const { t } = useTranslation();
   const [formErrors, setFormErrors] = useState<string[]>([]);
   const [isLoading, startTransition] = useTransition();
   const [isMounted, setIsMounted] = useState(false);
@@ -102,9 +104,9 @@ const RegisterDoctor = () => {
             priority
           />
         </Link>
-        <CardTitle className="text-center">Sign Up</CardTitle>
+        <CardTitle className="text-center">{t("signUpTitle")}</CardTitle>
         <CardDescription className="text-center">
-          Create your account, enter your information below.
+          {t("signUpDescription")}
         </CardDescription>
       </CardHeader>
       <form
@@ -114,7 +116,7 @@ const RegisterDoctor = () => {
         <input type="hidden" name="is_doctor" value="1" />
         <div>
           <Label htmlFor="first_name" className="block text-sm font-medium">
-            First Name
+            {t("firstName")}
           </Label>
           <Input
             id="first_name"
@@ -132,7 +134,7 @@ const RegisterDoctor = () => {
 
         <div>
           <Label htmlFor="last_name" className="block text-sm font-medium">
-            Last Name
+            {t("lastName")}
           </Label>
           <Input
             id="last_name"
@@ -150,7 +152,7 @@ const RegisterDoctor = () => {
 
         <div>
           <Label htmlFor="governorate" className="block text-sm font-medium">
-            Address
+            {t("address")}
           </Label>
           <Input
             id="governorate"
@@ -166,7 +168,7 @@ const RegisterDoctor = () => {
 
         <div>
           <Label htmlFor="gender" className="block text-sm font-medium">
-            Gender
+            {t("gender")}
           </Label>
           <select
             id="gender"
@@ -174,8 +176,8 @@ const RegisterDoctor = () => {
             defaultValue={signUpDefaultValues.gender}
             className="mt-1 block w-full border py-1 px-3  rounded-md shadow-sm bg-input/30"
           >
-            <option value="male">Male</option>
-            <option value="female">Female</option>
+            <option value="male">{t("male")}</option>
+            <option value="female">{t("female")}</option>
           </select>
           {errors.gender && (
             <p className="text-red-500 text-sm mt-1">{errors.gender.message}</p>
@@ -184,7 +186,7 @@ const RegisterDoctor = () => {
 
         <div>
           <Label htmlFor="age" className="block text-sm font-medium">
-            Age
+            {t("age")}
           </Label>
           <Input
             id="age"
@@ -200,7 +202,7 @@ const RegisterDoctor = () => {
 
         <div>
           <Label htmlFor="phone" className="block text-sm font-medium">
-            Phone
+            {t("phone")}
           </Label>
           <Input
             id="phone"
@@ -216,7 +218,7 @@ const RegisterDoctor = () => {
 
         <div>
           <Label htmlFor="email" className="block text-sm font-medium">
-            Email
+            {t("email")}
           </Label>
           <Input
             id="email"
@@ -232,7 +234,7 @@ const RegisterDoctor = () => {
 
         <div>
           <Label htmlFor="password" className="block text-sm font-medium">
-            Password
+            {t("password")}
           </Label>
           <Input
             id="password"
@@ -253,7 +255,7 @@ const RegisterDoctor = () => {
             htmlFor="password_confirmation"
             className="block text-sm font-medium"
           >
-            Confirm Password
+            {t("confirmPassword")}
           </Label>
           <Input
             id="password_confirmation"
@@ -271,7 +273,7 @@ const RegisterDoctor = () => {
 
         <div>
           <Label htmlFor="license_number" className="block text-sm font-medium">
-            License Number
+            {t("licenseNumber")}
           </Label>
           <Input
             id="license_number"
@@ -289,7 +291,7 @@ const RegisterDoctor = () => {
 
         <div>
           <Label htmlFor="specialization" className="block text-sm font-medium">
-            Specialization
+            {t("specialization")}
           </Label>
           <select
             id="specialization"
@@ -297,7 +299,7 @@ const RegisterDoctor = () => {
             defaultValue={signUpDefaultValues.specialization_id}
             className="mt-1 block w-full border py-1 px-3 bg-input/30 rounded-md shadow-sm"
           >
-            <option value="">Select specialization</option>
+            <option value="">{t("selectSpecialization")}</option>
             {specializations.map((spec) => (
               <option key={spec.id} value={spec.id}>
                 {spec.name}
@@ -313,7 +315,7 @@ const RegisterDoctor = () => {
 
         <div>
           <Label htmlFor="certificate" className="block text-sm font-medium">
-            Certificate
+            {t("certificate")}
           </Label>
           <Input
             id="certificate"
@@ -344,13 +346,13 @@ const RegisterDoctor = () => {
             type="submit"
             className="w-fit mx-auto"
           >
-            {isSubmitting ? <SpinnerMini /> : "Register"}
+            {isSubmitting ? <SpinnerMini /> : t("register")}
           </Button>
         </div>
         <div className="col-span-full text-center text-sm text-muted-foreground">
-          Already have an account?
+          {t("alreadyHaveAccount")}
           <Link href="/signin" target="_self" className="link">
-            Sign In
+            {t("signin")}
           </Link>
         </div>
       </form>

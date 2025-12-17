@@ -47,6 +47,16 @@
     @apply max-w-7xl lg:mx-auto px-3 py-1 sm:py-2 md:py-4 md:px-10 w-full;
   }
 
+  /* Prevent layout shifts */
+  header {
+    /* contain: layout style; */
+    min-height: fit-content;
+  }
+
+  .contain-layout {
+    contain: layout;
+  }
+
   .flex-start {
     @apply flex justify-start items-center;
   }

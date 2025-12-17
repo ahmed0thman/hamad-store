@@ -1,3 +1,5 @@
+import ClientProviders from "@/providers/ClientProviders";
+import ButtonLang from "@/components/shared/header/buttonLang";
 import React from "react";
 
 export default function AuthLayout({
@@ -6,8 +8,13 @@ export default function AuthLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      {children}
-    </div>
+    <ClientProviders>
+      <div className="min-h-screen flex items-center justify-center bg-background relative">
+        <div className="absolute top-4 end-4">
+          <ButtonLang />
+        </div>
+        {children}
+      </div>
+    </ClientProviders>
   );
 }

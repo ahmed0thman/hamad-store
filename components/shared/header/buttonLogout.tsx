@@ -11,6 +11,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { useTranslation } from "@/hooks/useTranslation";
 import { signOutUser } from "@/lib/api/apiUser";
 import { User as UserType } from "@/types";
 import { LogOut } from "lucide-react";
@@ -27,7 +28,7 @@ const ButtonLogout = ({
   user: UserType | null;
 }) => {
   const [pending, startTransition] = useTransition();
-
+  const { t } = useTranslation();
   const handleLogout = () => {
     signOut({ redirectTo: "/" });
     startTransition(async () => {
@@ -39,22 +40,22 @@ const ButtonLogout = ({
       <DialogTrigger className="hidden" asChild>
         <Button variant="ghost" onClick={() => setDialogOpen(true)}>
           <LogOut className="text-destructive" />
-          Sign Out
+          {t("signOut")}
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Confirm Logout</DialogTitle>
+          <DialogTitle>{t("confirmLogout")}</DialogTitle>
           <DialogDescription>
-            Are you sure you want to log out?
+            {t("confirmLogoutMessage")}
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
           <DialogClose asChild>
-            <Button variant="outline">Cancel</Button>
+            <Button variant="outline">{t("cancel")}</Button>
           </DialogClose>
           <Button variant="destructive" onClick={handleLogout}>
-            {pending ? <SpinnerMini /> : "Yes, Logout"}
+            {pending ? <SpinnerMini /> : t("yesLogout")}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -18,6 +18,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import SpinnerMini from "../SpinnerMini";
 import { revalidate } from "@/lib/api/actions";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface ExchangePointsModalProps {
   availablePoints: number;
@@ -27,17 +28,17 @@ const ExchangePointsModal = ({ availablePoints }: ExchangePointsModalProps) => {
   const [open, setOpen] = useState(false);
   const [points, setPoints] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-
+  const { t } = useTranslation();
   const handleExchange = async () => {
     const pointsToExchange = Number(points);
 
     if (!points || pointsToExchange <= 0) {
-      toast.error("الرجاء إدخال عدد صحيح من النقاط");
+      toast.error(t("pleaseEnterValidNumberOfPoints"));
       return;
     }
 
     if (pointsToExchange > availablePoints) {
-      toast.error("ليس لديك نقاط كافية");
+      toast.error(t("notEnoughPoints"));
       return;
     }
 
@@ -45,15 +46,15 @@ const ExchangePointsModal = ({ availablePoints }: ExchangePointsModalProps) => {
     try {
       const response = await exchangeWalletPoints(pointsToExchange);
       if (response.success) {
-        toast.success("تم تحويل النقاط بنجاح!");
+        toast.success(t("pointsConvertedSuccessfully"));
         setOpen(false);
         setPoints("");
         revalidate("/account/wallet");
       } else {
-        toast.error(response.message || "فشل تحويل النقاط");
+        toast.error(response.message || t("failedToConvertPoints"));
       }
     } catch (error) {
-      toast.error("حدث خطأ أثناء تحويل النقاط");
+      toast.error(t("errorConvertingPoints"));
     } finally {
       setIsSubmitting(false);
     }
@@ -64,24 +65,24 @@ const ExchangePointsModal = ({ availablePoints }: ExchangePointsModalProps) => {
       <DialogTrigger asChild>
         <Button className="gap-2">
           <ArrowRightLeft className="w-4 h-4" />
-          تحويل النقاط
+          {t("exchangePoints")}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>تحويل النقاط إلى المحفظة</DialogTitle>
+          <DialogTitle>{t("convertPointsToWallet")}</DialogTitle>
           <DialogDescription>
-            قم بتحويل نقاطك المتاحة إلى رصيد المحفظة. النقاط المتاحة:{" "}
+            {t("convertAvailablePointsToWalletBalance")}{" "}
             <span className="font-bold">{availablePoints}</span>
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid gap-2">
-            <Label htmlFor="points">النقاط المراد تحويلها</Label>
+            <Label htmlFor="points">{t("pointsToConvert")}</Label>
             <Input
               id="points"
               type="number"
-              placeholder="أدخل عدد النقاط"
+              placeholder={t("enterNumberOfPoints")}
               value={points}
               onChange={(e) => setPoints(e.target.value)}
               min="1"
@@ -105,10 +106,10 @@ const ExchangePointsModal = ({ availablePoints }: ExchangePointsModalProps) => {
             onClick={() => setOpen(false)}
             disabled={isSubmitting}
           >
-            إلغاء
+            {t("cancel")}
           </Button>
           <Button onClick={handleExchange} disabled={isSubmitting}>
-            {isSubmitting ? <SpinnerMini /> : "تحويل"}
+            {isSubmitting ? <SpinnerMini /> : t("convert")}
           </Button>
         </DialogFooter>
       </DialogContent>

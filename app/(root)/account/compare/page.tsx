@@ -24,11 +24,13 @@ import { ProductItemCompare } from "@/types";
 import { formatCurrencyEGP } from "@/lib/utils";
 import AddToCart from "@/components/custom/product/addToCart";
 import TextExpander from "@/components/custom/textExpander";
+import { useTranslation } from "@/hooks/useTranslation";
+import Link from "next/link";
 
 const ProductComparison = () => {
   const { compareItems } = useCompare();
   const [compareList, setCompareList] = useState<ProductItemCompare[]>([]);
-
+  const { t } = useTranslation();
   const handleFetchItems = useCallback(async () => {
     const itemsResponse = await getCompareList(compareItems);
     if (itemsResponse.success) {
@@ -45,12 +47,12 @@ const ProductComparison = () => {
   return (
     <main className="wrapper text-sm sm:text-base">
       <h1 className="text-2xl sm:text-3xl font-bold text-center mb-6">
-        مقارنة المنتجات
+        {t("productComparison")}
       </h1>
       {/* Removed global search grid; moved input into each column */}
       {compareList.length === 0 ? (
         <div className="text-center text-muted-foreground">
-          لا توجد منتجات للمقارنة. يرجى إضافة منتجات إلى قائمة المقارنة.
+          {t("noProductsToCompare")}
         </div>
       ) : (
         <div className="grid grid-cols-2 divide-x divide-muted max-w-6xl mx-auto">
@@ -80,7 +82,7 @@ const ProductComparison = () => {
                   {product.name}
                 </h2>
                 <p className="text-sm text-muted-foreground text-center">
-                  الاسم العلمي: {product.generic_name}
+                  {t("scientificName")}: {product.generic_name}
                 </p>
                 <div className="text-sm text-muted-foreground text-center">
                   <TextExpander content={product.description} />
@@ -95,57 +97,59 @@ const ProductComparison = () => {
                 <li className="flex gap-2 items-start">
                   <Building2 className="text-teal-600 mt-1" size={16} />
                   <span>
-                    <strong>الصيدلية:</strong> {product.pharmacy.name}
+                    <strong>{t("vendor")}:</strong> {product.pharmacy.name}
                   </span>
                 </li>
                 <li className="flex gap-2 items-start">
                   <Landmark className="text-teal-600 mt-1" size={16} />
                   <span>
-                    <strong>الفئة:</strong> {product.categoryName}
+                    <strong>{t("category")}:</strong> {product.categoryName}
                   </span>
                 </li>
                 <li className="flex gap-2 items-start">
                   <Info className="text-teal-600 mt-1" size={16} />
                   <span>
-                    <strong>العلامة التجارية:</strong> {product.brandName}
+                    <strong>{t("brand")}:</strong> {product.brandName}
                   </span>
                 </li>
                 <li className="flex gap-2 items-start">
                   <Pill className="text-teal-600 mt-1" size={16} />
                   <span>
-                    <strong>الشكل:</strong> {product.form}
+                    <strong>{t("form")}:</strong> {product.form}
                   </span>
                 </li>
                 <li className="flex gap-2 items-start">
                   <PackageCheck className="text-teal-600 mt-1" size={16} />
                   <span>
-                    <strong>التركيز:</strong> {product.strength}
+                    <strong>{t("strength")}:</strong> {product.strength}
                   </span>
                 </li>
                 <li className="flex gap-2 items-start">
                   <CircleCheckBig className="text-teal-600 mt-1" size={16} />
                   <span>
-                    <strong>السعر:</strong> {formatCurrencyEGP(product.price)}
+                    <strong>{t("price")}:</strong>{" "}
+                    {formatCurrencyEGP(product.price)}
                   </span>
                 </li>
                 <li className="flex gap-2 items-start">
                   <CircleCheckBig className="text-teal-600 mt-1" size={16} />
                   <span>
-                    <strong>الكمية المتاحة:</strong> {product.quantity}
+                    <strong>{t("availableQuantity")}:</strong>{" "}
+                    {product.quantity}
                   </span>
                 </li>
                 {product.pack_size && (
                   <li className="flex gap-2 items-start">
                     <PackageCheck className="text-teal-600 mt-1" size={16} />
                     <span>
-                      <strong>حجم العبوة:</strong> {product.pack_size}
+                      <strong>{t("packSize")}:</strong> {product.pack_size}
                     </span>
                   </li>
                 )}
                 <li className="flex gap-2 items-start">
                   <Calendar className="text-teal-600 mt-1" size={16} />
                   <span>
-                    <strong>تاريخ الإنتاج:</strong>{" "}
+                    <strong>{t("productionDate")}:</strong>{" "}
                     {new Date(product.production_date).toLocaleDateString(
                       "ar-EG"
                     )}
@@ -154,7 +158,7 @@ const ProductComparison = () => {
                 <li className="flex gap-2 items-start">
                   <AlertTriangle className="text-yellow-600 mt-1" size={16} />
                   <span>
-                    <strong>تاريخ الانتهاء:</strong>{" "}
+                    <strong>{t("expiryDate")}:</strong>{" "}
                     {new Date(product.expiry_date).toLocaleDateString("ar-EG")}
                   </span>
                 </li>
@@ -163,17 +167,18 @@ const ProductComparison = () => {
                 <li className="flex gap-2 items-start">
                   <Star className="text-yellow-500 mt-1" size={16} />
                   <span>
-                    <strong>تقييم المستخدمين:</strong>{" "}
+                    <strong>{t("userRating")}:</strong>{" "}
                     {product.average_rating.user}/5 (
-                    {product.average_rating.count_user_rate} تقييم)
+                    {product.average_rating.count_user_rate} {t("reviews")})
                   </span>
                 </li>
                 <li className="flex gap-2 items-start">
                   <Star className="text-blue-500 mt-1" size={16} />
                   <span>
-                    <strong>تقييم الصيادلة:</strong>{" "}
+                    <strong>{t("pharmacistRating")}:</strong>{" "}
                     {product.average_rating.pharmacist}/5 (
-                    {product.average_rating.count_pharmacist_rate} تقييم)
+                    {product.average_rating.count_pharmacist_rate}{" "}
+                    {t("reviews")})
                   </span>
                 </li>
               </ul>
@@ -182,7 +187,7 @@ const ProductComparison = () => {
               {product.offer && (
                 <div className="flex justify-center">
                   <Badge variant="destructive">
-                    خصم {product.offer.discount_percentage}% -{" "}
+                    {t("discount")} {product.offer.discount_percentage}% -{" "}
                     {formatCurrencyEGP(product.offer.price_after)}
                   </Badge>
                 </div>
@@ -196,6 +201,11 @@ const ProductComparison = () => {
                 {formatCurrencyEGP(product.offer?.price_after || product.price)}
                 )
               </Button> */}
+
+              {/* button show product page */}
+              <Button asChild>
+                <Link href={`/products/${product.id}`}>{t("viewDetails")}</Link>
+              </Button>
             </div>
           ))}
         </div>

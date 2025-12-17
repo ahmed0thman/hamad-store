@@ -1,34 +1,25 @@
 "use client";
 
-import { useState } from "react";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
 import ChooseLocationTab from "@/components/custom/order/chooseLocationTab";
-import ShippingMethodTab from "@/components/custom/order/shippingMethodTab";
 import PaymentMethodTab from "@/components/custom/order/paymentMethodTab";
+import ShippingMethodTab from "@/components/custom/order/shippingMethodTab";
 import { OrderPovider } from "@/contexts/OrderContext";
+import { useTranslation } from "@/hooks/useTranslation";
+import { cn } from "@/lib/utils";
+import { useState } from "react";
 
 export default function OrderPlacementPage() {
   const [step, setStep] = useState(1);
-  const [selectedPayment, setSelectedPayment] = useState("Card");
-  const [selectedCard, setSelectedCard] = useState("Visa");
-
-  const paymentMethods = ["Card", "Zain Pay", "Cash on Delivery"];
-  const savedCards = [
-    { name: "Visa", info: "Ending in 4242", logo: "/visa.svg" },
-    { name: "Mastercard", info: "Ending in 1234", logo: "/mastercard.svg" },
-  ];
+  const { t } = useTranslation();
 
   return (
     <OrderPovider>
       <div className="wrapper !py-12 px-4 text-gray-900 dark:text-gray-100">
         <div className="flex border-b w-fit">
           {[
-            { id: 1, label: "Choose Location" },
-            { id: 2, label: "Payment Method" },
-            { id: 3, label: "Shipping Method" },
+            { id: 1, label: t("chooseLocation") },
+            { id: 2, label: t("paymentMethod") },
+            { id: 3, label: t("shippingMethod") },
           ].map((tab) => (
             <div
               key={tab.id}

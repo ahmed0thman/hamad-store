@@ -20,11 +20,13 @@ import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import { getSiteInformation } from "@/lib/api/apiSiteInfo";
 import Spinner from "@/components/custom/spinner";
+import { useTranslation } from "@/hooks/useTranslation";
 
 const ContactUs = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [siteInfo, setSiteInfo] = useState<siteInformationT | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const { t } = useTranslation();
 
   useEffect(() => {
     const fetchSiteInfo = async () => {
@@ -52,13 +54,13 @@ const ContactUs = () => {
     try {
       const response = await sendContactMessage(data);
       if (response.success) {
-        toast.success(response.message || "تم إرسال رسالتك بنجاح");
+        toast.success(response.message || t("messageSentSuccess"));
         form.reset();
       } else {
-        toast.error(response.message || "فشل إرسال الرسالة");
+        toast.error(response.message || t("messageFailedToSend"));
       }
     } catch (error) {
-      toast.error("حدث خطأ أثناء إرسال الرسالة");
+      toast.error(t("errorSendingMessage"));
     } finally {
       setIsSubmitting(false);
     }
@@ -83,13 +85,13 @@ const ContactUs = () => {
             <div className="bg-primary/10 p-3 rounded-full text-primary">
               <Phone className="w-6 h-6" />
             </div>
-            <h2 className="text-lg font-semibold">اتصل بنا</h2>
+            <h2 className="text-lg font-semibold">{t("callUs")}</h2>
             <p className="text-muted-foreground text-sm">
-              نحن متواجدون على مدار الساعة طوال أيام الأسبوع.
+              {t("availableAllWeek")}
             </p>
             {siteInfo?.phone && (
               <p className="text-muted-foreground text-sm">
-                الهاتف: {siteInfo.phone}
+                {t("phone")}: {siteInfo.phone}
               </p>
             )}
           </div>
@@ -98,13 +100,13 @@ const ContactUs = () => {
             <div className="bg-primary/10 p-3 rounded-full text-primary">
               <Mail className="w-6 h-6" />
             </div>
-            <h2 className="text-lg font-semibold">اكتب لنا</h2>
+            <h2 className="text-lg font-semibold">{t("writeToUs")}</h2>
             <p className="text-muted-foreground text-sm">
-              املأ استمارتنا وسنتواصل معك خلال 24 ساعة.
+              {t("fillFormAndGetReply")}
             </p>
             {siteInfo?.email && (
               <p className="text-muted-foreground text-sm">
-                البريد الإلكتروني: {siteInfo.email}
+                {t("email")}: {siteInfo.email}
               </p>
             )}
           </div>
@@ -125,7 +127,7 @@ const ContactUs = () => {
                     <FormItem>
                       <FormControl>
                         <Input
-                          placeholder="اسمك *"
+                          placeholder={t("yourName")}
                           className="bg-white dark:bg-gray-800"
                           {...field}
                         />
@@ -141,7 +143,7 @@ const ContactUs = () => {
                     <FormItem>
                       <FormControl>
                         <Input
-                          placeholder="بريدك الإلكتروني *"
+                          placeholder={t("yourEmail")}
                           className="bg-white dark:bg-gray-800"
                           type="email"
                           {...field}
@@ -158,7 +160,7 @@ const ContactUs = () => {
                     <FormItem>
                       <FormControl>
                         <Input
-                          placeholder="هاتفك *"
+                          placeholder={t("yourPhone")}
                           className="bg-white dark:bg-gray-800"
                           {...field}
                         />
@@ -175,7 +177,7 @@ const ContactUs = () => {
                   <FormItem className="flex-grow">
                     <FormControl>
                       <Textarea
-                        placeholder="رسالتك *"
+                        placeholder={t("yourMessage")}
                         rows={20}
                         className="flex-grow-1 h-full min-h-[220px] bg-white dark:bg-gray-800"
                         {...field}
@@ -191,7 +193,7 @@ const ContactUs = () => {
                   className="rounded-xl px-6 text-base"
                   disabled={isSubmitting}
                 >
-                  {isSubmitting ? "جارٍ الإرسال..." : "إرسال رسالة"}
+                  {isSubmitting ? t("sending") : t("sendMessage")}
                 </Button>
               </div>
             </form>

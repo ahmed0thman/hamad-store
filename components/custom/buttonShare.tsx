@@ -9,8 +9,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Copy, Facebook, Share2, Twitter } from "lucide-react";
 import { toast } from "sonner";
+import { useTranslation } from "@/hooks/useTranslation";
 
 const ButtonShare = () => {
+  const { t } = useTranslation();
+
   return (
     <>
       <DropdownMenu>
@@ -19,6 +22,7 @@ const ButtonShare = () => {
             variant="ghost"
             size="icon"
             className="hover:bg-slate-100 text-primary dark:hover:bg-slate-800"
+            aria-label={t("shareProduct")}
           >
             <Share2 className="!w-7 !h-7" />
           </Button>

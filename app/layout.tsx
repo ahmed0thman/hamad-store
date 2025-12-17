@@ -10,46 +10,97 @@ const poppins = Poppins({
   subsets: ["latin"],
   weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
   variable: "--font-poppins",
+  display: "swap",
+  preload: true,
+  adjustFontFallback: true,
 });
 const cairo = Cairo({
   subsets: ["latin", "arabic"],
   weight: ["200", "300", "400", "500", "700", "800", "900"],
   variable: "--font-cairo",
+  display: "swap",
+  preload: true,
+  adjustFontFallback: true,
 });
 
 const SITE_URL = process.env.NEXTAUTH_URL || "https://valideria.com";
 
 export const metadata: Metadata = {
   title: {
-    template: `%s | ${APP_NAME} - منصة الأدوية والمستحضرات الطبية`,
-    default: `${APP_NAME} - منصة الأدوية والمستحضرات الطبية والتجميلية في الشرق الأوسط`,
+    template: `%s | ${APP_NAME} - Valideria - فاليديريا - Multi-Vendor Medical & Cosmetics Store`,
+    default: `${APP_NAME} - Valideria - فاليديريا | Multi-Vendor Medical & Cosmetics Store - منصة متعددة البائعين للمنتجات الطبية ومستحضرات التجميل في الشرق الأوسط`,
   },
   description: APP_DESCRIPTION,
   metadataBase: new URL(SITE_URL),
 
   // Keywords for SEO
   keywords: [
+    // Brand names and variations
+    "Valideria",
+    "valideria",
+    "VALIDERIA",
+    "فاليديريا",
+    "فاليدريا",
+    "فاليديريا العراق",
+    "valideria iraq",
+    "valideria middle east",
+    // Arabic medical & cosmetics keywords
+    "مستلزمات طبية",
+    "مستحضرات تجميل",
     "صيدلية إلكترونية",
     "أدوية أونلاين",
-    "مستحضرات تجميل",
     "منتجات طبية",
     "منتجات صحية",
-    "صيدليات متعددة",
+    "متجر متعدد البائعين",
+    "منصة طبية",
     "توصيل أدوية",
     "عقاقير طبية",
     "مكملات غذائية",
-    "pharmacy online",
-    "medicines delivery",
-    "healthcare products",
-    "cosmetics online",
-    "medical supplies",
-    "valideria",
+    "العناية بالبشرة",
+    "العناية الشخصية",
+    "منتجات تجميل",
+    "عطور",
+    "مكياج",
+    "فيتامينات",
+    "معدات طبية",
+    "صحة وجمال",
+    "بائعين موثوقين",
+    "منتجات أصلية",
+    "توصيل سريع",
     "الشرق الأوسط",
     "العراق",
     "دواء",
     "علاج",
     "صحة",
     "تجميل",
+    // English medical & cosmetics keywords
+    "multi-vendor medical store",
+    "online pharmacy",
+    "medical supplies",
+    "cosmetics online",
+    "beauty products",
+    "healthcare products",
+    "medicines delivery",
+    "medical equipment",
+    "health and beauty",
+    "skincare products",
+    "makeup",
+    "perfumes",
+    "vitamins and supplements",
+    "personal care",
+    "trusted vendors",
+    "authentic products",
+    "fast delivery",
+    "middle east",
+    "iraq",
+    "prescription drugs",
+    "OTC products",
+    "wellness products",
+    "baby care",
+    "fitness supplements",
+    "dental care",
+    "medical devices",
+    "home healthcare",
   ],
 
   // Authors
@@ -78,12 +129,12 @@ export const metadata: Metadata = {
   // Open Graph
   openGraph: {
     type: "website",
-    siteName: APP_NAME,
-    title: `${APP_NAME} - منصة الأدوية والمستحضرات الطبية والتجميلية في الشرق الأوسط`,
+    siteName: `${APP_NAME} - Valideria - فاليديريا`,
+    title: `${APP_NAME} - Valideria - فاليديريا | Multi-Vendor Medical & Cosmetics Store - منصة متعددة البائعين للمنتجات الطبية ومستحضرات التجميل`,
     description: APP_DESCRIPTION,
     url: SITE_URL,
     locale: "ar_EG",
-    alternateLocale: ["en_US"],
+    alternateLocale: ["en_US", "ar_SA", "ar_IQ"],
     images: [
       {
         url: `${SITE_URL}/images/logos/valideria-og.jpg`,
@@ -107,7 +158,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     site: "@valideria",
     creator: "@valideria",
-    title: `${APP_NAME} - منصة الأدوية والمستحضرات الطبية`,
+    title: `${APP_NAME} - Valideria - فاليديريا | Multi-Vendor Medical & Cosmetics Store`,
     description: APP_DESCRIPTION,
     images: [
       {
@@ -127,8 +178,8 @@ export const metadata: Metadata = {
   },
 
   // Additional metadata
-  category: "Health & Medical",
-  classification: "Medical & Healthcare Products Platform",
+  category: "Health, Medical & Beauty",
+  classification: "Multi-Vendor Medical & Cosmetics Marketplace",
 
   // Manifest
   manifest: "/manifest.json",
@@ -165,6 +216,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ar" dir="rtl" suppressHydrationWarning>
+      <head>
+        <link rel="preconnect" href="https://backend.valideria.com" />
+        <link rel="dns-prefetch" href="https://backend.valideria.com" />
+      </head>
       <body className={` ${poppins.className} ${cairo.className} antialiased`}>
         <SessionProvider>
           <ThemeProvider

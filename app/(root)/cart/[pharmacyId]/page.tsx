@@ -3,29 +3,23 @@ import AddToCart from "@/components/custom/product/addToCart";
 import Spinner from "@/components/custom/spinner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { addCouponToCart, getCartData } from "@/lib/api/apiCart";
-import { getAuthData } from "@/lib/api/apiUser";
-import { formatCurrency, formatCurrencyEGP } from "@/lib/utils";
+import { useGetCart } from "@/hooks/useGetCart";
+import { useGetProfile } from "@/hooks/useGetProfile";
+import { useGetWallet } from "@/hooks/useGetWallet";
+import { useTranslation } from "@/hooks/useTranslation";
+import { CURRENCY_CODE } from "@/lib/constants";
+import { formatCurrency } from "@/lib/utils";
 import { CartData, CartPharmacy, wallet } from "@/types";
-import { Session } from "next-auth";
-import { CircleCheckBig, OctagonX } from "lucide-react";
-import { signOut, useSession } from "next-auth/react";
+import { signOut } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState, useTransition } from "react";
-import { toast } from "sonner";
-import { getWalletDetails } from "@/lib/api/apiWallet";
-import { useGetCart } from "@/hooks/useGetCart";
-import { useGetWallet } from "@/hooks/useGetWallet";
-import { useGetProfile } from "@/hooks/useGetProfile";
-import { CURRENCY_CODE } from "@/lib/constants";
+import { useEffect, useState } from "react";
 
 const PharamacyCart = () => {
   const params = useParams();
   const { pharmacyId } = params;
-
+  const { t } = useTranslation();
   const router = useRouter();
   const [cartPharmacy, setCartPharmacy] = useState<CartPharmacy | null>(null);
   // const [currency, setCurrency] = useState("");
@@ -63,7 +57,7 @@ const PharamacyCart = () => {
 
   if (isLoading || isLoadingWallet || isLoadoingProfile) return <Spinner />;
 
-  const currency = profileData?.data.currency_code || CURRENCY_CODE;
+  const currency = cartPharmacy?.currency_code || CURRENCY_CODE;
 
   return (
     <section className="wrapper">
@@ -90,7 +84,7 @@ const PharamacyCart = () => {
                         {item.name}
                       </h2>
                       <p className="text-sm text-gray-600 dark:text-gray-400">
-                        السعر للوحدة:{" "}
+                        {t("pricePerUnit")}:{" "}
                         {formatCurrency(item.final_price, currency)}
                       </p>
                     </div>
@@ -110,11 +104,11 @@ const PharamacyCart = () => {
           <Card className="bg-teal-50 dark:bg-slate-800 shadow-lg">
             <CardContent className="p-6">
               <h3 className="text-xl font-bold text-center text-teal-900 dark:text-teal-400 mb-6">
-                ملخص الطلب
+                {t("orderSummary")}
               </h3>
               <div className="space-y-4 text-gray-700 dark:text-gray-300">
                 <div className="flex justify-between">
-                  <span>المجموع الفرعي</span>
+                  <span>{t("subtotal")}</span>
                   <span>
                     {formatCurrency(
                       cartPharmacy?.items.reduce(
@@ -127,7 +121,7 @@ const PharamacyCart = () => {
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span>الضريبة المقدرة</span>
+                  <span>{t("estimatedTax")}</span>
                   <span>
                     {formatCurrency(
                       cartPharmacy?.items.reduce(
@@ -143,7 +137,7 @@ const PharamacyCart = () => {
                   <span>{formatCurrencyEGP(29)}</span>
                 </div> */}
                 <div className="flex justify-between font-bold text-teal-900 dark:text-teal-400 text-lg border-t border-teal-200 dark:border-teal-700 pt-4">
-                  <span>المجموع</span>
+                  <span>{t("totalAmount")}</span>
                   <span>
                     {formatCurrency(cartPharmacy?.total as number, currency)}
                   </span>
@@ -153,7 +147,7 @@ const PharamacyCart = () => {
               <div className="mt-6 border-t border-teal-200 dark:border-teal-700 pt-6">
                 <div className="flex justify-between items-center mb-4">
                   <span className="text-lg font-semibold text-teal-800 dark:text-teal-400">
-                    رصيد المحفظة
+                    {t("walletBalance")}
                   </span>
                   <span className="text-xl font-bold text-teal-600 dark:text-teal-400">
                     {walletInfo?.wallet_balance
@@ -164,7 +158,7 @@ const PharamacyCart = () => {
                 </div>
 
                 <div className="flex justify-between font-bold text-teal-900 dark:text-teal-400 text-lg border-t border-teal-200 dark:border-teal-700 pt-4 mt-6">
-                  <span>المجموع</span>
+                  <span>{t("totalAmount")}</span>
                   <span className="flex items-center">
                     {formatCurrency(cartPharmacy?.total as number, currency)}
                   </span>
@@ -175,7 +169,7 @@ const PharamacyCart = () => {
                 className="w-full mt-6 bg-teal-600 hover:bg-teal-700 text-lg"
               >
                 <Link href={`/place-order?pharmacyId=${pharmacyId}`}>
-                  إتمام الشراء
+                  {t("checkout")}
                 </Link>
               </Button>
             </CardContent>

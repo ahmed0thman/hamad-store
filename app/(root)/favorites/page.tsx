@@ -8,8 +8,10 @@ import { auth } from "@/lib/auth";
 import { FavoriteItem, ProductItem } from "@/types";
 import { Link } from "lucide-react";
 import React from "react";
+import getLocaleStrings from "@/localization";
 
 const Favorites = async () => {
+  const locale = await getLocaleStrings();
   const session = await auth();
 
   if (!session || !session.user || !session.accessToken)
@@ -17,10 +19,10 @@ const Favorites = async () => {
       <section className="wrapper">
         <div className="text-center text-gray-600 dark:text-gray-300">
           <h2 className="text-2xl font-semibold">
-            Please log in to view your favorites.
+            {locale.pleaseLoginToViewFavorites}
           </h2>
           <Button className="mt-4" asChild>
-            <Link href="/signin">Log in</Link>
+            <Link href="/signin">{locale.logIn}</Link>
           </Button>
         </div>
       </section>
@@ -28,7 +30,7 @@ const Favorites = async () => {
   const favoritesRes = await getFavorites();
   const productsRes = await getFilteredProducts();
   if (!favoritesRes.success || !productsRes.success) {
-    return <NoData message="Your favorites list is empty." />;
+    return <NoData message={locale.yourFavoritesListIsEmpty} />;
   }
 
   const favorites: FavoriteItem[] = favoritesRes.data as FavoriteItem[];
@@ -43,10 +45,13 @@ const Favorites = async () => {
       favorites.some((favorite) => favorite.id === product.id)
   );
   // console.log(favoriteProducts.length);
-  if (!productsRes.success) return <NoData message="Something went wrong" />;
+  if (!productsRes.success)
+    return <NoData message={locale.somethingWentWrong} />;
   return (
     <section className="wrapper">
-      <h2 className="text-2xl font-semibold mb-6">Your Favorites</h2>
+      <h2 className="text-2xl font-semibold mb-6">
+        {locale.yourFavoritesList}
+      </h2>
       <div className="grid grid-cols-1 gap-3 md:gap-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 lg:gap-3 xl:gap-2 justify-center">
         {favoriteProducts.length > 0 ? (
           favoriteProducts.map((productItem) => (
@@ -56,7 +61,7 @@ const Favorites = async () => {
           ))
         ) : (
           <div className="col-span-full">
-            <NoData message="No favorite products found" />
+            <NoData message={locale.noFavoriteProductsFound} />
           </div>
         )}
       </div>

@@ -1,7 +1,5 @@
-import BrandSwiper from "@/components/custom/home/brandsSwiper";
 import FeatureCards from "@/components/custom/home/featureCard";
 import Hero from "@/components/custom/home/hero";
-import ProductSwiper from "@/components/custom/product/productSwiper";
 import {
   getAllCategories,
   getBrandsBytitle,
@@ -10,6 +8,21 @@ import {
 import { auth } from "@/lib/auth";
 import { homeSEO } from "@/lib/seo";
 import getLocaleStrings from "@/localization";
+import dynamic from "next/dynamic";
+
+// Lazy load below-the-fold components
+const BrandSwiper = dynamic(
+  () => import("@/components/custom/home/brandsSwiper"),
+  {
+    loading: () => <div className="h-96 animate-pulse bg-muted" />,
+  }
+);
+const ProductSwiper = dynamic(
+  () => import("@/components/custom/product/productSwiper"),
+  {
+    loading: () => <div className="h-96 animate-pulse bg-muted" />,
+  }
+);
 
 export const metadata = homeSEO;
 
@@ -41,41 +54,41 @@ export default async function Home() {
       )}
       <BrandSwiper
         items={homeCategories}
-        headLine="Browse all"
-        highlight="Categories"
-        subHeadign="Choose from a wide range of medicines, health products, and personal care products – everything you need in one place."
+        headLine={locals.browseAll}
+        highlight={locals.categories}
+        subHeadign={locals.categoriesSubheading}
       />
       {uniqueProducts && uniqueProducts.length > 0 && (
         <ProductSwiper
           products={uniqueProducts}
-          headLine="Unique Products"
+          headLine={locals.uniqueProducts}
           showAll
         />
       )}
       <BrandSwiper
         items={brandCategories}
-        headLine="Browse all"
-        highlight="Brands"
-        subHeadign="Choose from a wide range of medicines, health products, and personal care products – everything you need in one place."
+        headLine={locals.browseAll}
+        highlight={locals.brands}
+        subHeadign={locals.brandsSubheading}
       />
       {topRatesProducts && topRatesProducts.length > 0 && (
         <ProductSwiper
           products={topRatesProducts}
-          headLine="Top Rated Products"
+          headLine={locals.topRatedProducts}
           showAll
         />
       )}
       {/* <Banner /> */}
       <BrandSwiper
         items={brandCategories}
-        headLine="Top"
-        highlight="Rated Brands"
+        headLine={locals.top}
+        highlight={locals.ratedBrands}
         subHeadign=""
       />
       {topSellingProducts && topSellingProducts.length > 0 && (
         <ProductSwiper
           products={topSellingProducts}
-          headLine="Top Selling Products"
+          headLine={locals.topSellingProducts}
           showAll
         />
       )}

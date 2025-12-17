@@ -7,8 +7,10 @@ import { auth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import { getCartData } from "@/lib/api/apiCart";
 import { CURRENCY_CODE } from "@/lib/constants";
+import getLocaleStrings from "@/localization";
 
 const ProductAddCart = async ({ product }: { product: Product }) => {
+  const locale = await getLocaleStrings();
   const session = await auth();
   const cartData = await getCartData();
   let cart: CartData | null | undefined;
@@ -26,21 +28,18 @@ const ProductAddCart = async ({ product }: { product: Product }) => {
     <Card className="p-0">
       <CardContent className="p-4">
         <div className="mb-2 flex justify-between">
-          <div>Price</div>
+          <div>{locale.price}</div>
           <div>
-            {formatCurrency(
-              price,
-              session?.user.currency_code || CURRENCY_CODE
-            )}
+            {formatCurrency(price, product.currency_symbol || CURRENCY_CODE)}
           </div>
         </div>
         <div className="mb-2 flex justify-between">
-          <div>Status</div>
+          <div>{locale.status}</div>
           <div>
             {stock > 0 ? (
-              <Badge variant="outline">In Stock </Badge>
+              <Badge variant="outline">{locale.inStock}</Badge>
             ) : (
-              <Badge variant="destructive">Out Of Stock</Badge>
+              <Badge variant="destructive">{locale.outOfStock}</Badge>
             )}
           </div>
         </div>

@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface PaginationProps {
   count: number;
@@ -18,6 +19,7 @@ export default function Pagination({
 }: PaginationProps) {
   const searchParams = useSearchParams();
   const params = new URLSearchParams(searchParams.toString());
+  const { t } = useTranslation();
 
   useEffect(() => {
     params.set("pageSize", pageSize.toString());
@@ -64,6 +66,7 @@ export default function Pagination({
           size="icon"
           onClick={() => setPage(1)}
           disabled={currentPage === 1}
+          aria-label={t("firstPage")}
         >
           {"<<"}
         </Button>
@@ -73,6 +76,7 @@ export default function Pagination({
           size="icon"
           onClick={prevPage}
           disabled={currentPage === 1}
+          aria-label={t("previousPage")}
         >
           <ChevronLeft className="w-4 h-4 auto-dir" />
         </Button>
@@ -83,6 +87,8 @@ export default function Pagination({
             variant={page === currentPage ? "default" : "outline"}
             size="icon"
             onClick={() => setPage(page)}
+            aria-label={`${t("goToPage")} ${page}`}
+            aria-current={page === currentPage ? "page" : undefined}
           >
             {page}
           </Button>
@@ -93,6 +99,7 @@ export default function Pagination({
           size="icon"
           onClick={nextPage}
           disabled={currentPage === pageCount}
+          aria-label={t("nextPage")}
         >
           <ChevronRight className="w-4 h-4 auto-dir" />
         </Button>
@@ -102,6 +109,7 @@ export default function Pagination({
           size="icon"
           onClick={() => setPage(pageCount)}
           disabled={currentPage === pageCount}
+          aria-label={t("lastPage")}
         >
           {">>"}
         </Button>

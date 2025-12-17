@@ -37,6 +37,7 @@ import AddNewCardDialog from "./addNewCardDialog";
 import { getCartData } from "@/lib/api/apiCart";
 import { useGetCart } from "@/hooks/useGetCart";
 import { useGetWallet } from "@/hooks/useGetWallet";
+import { useTranslation } from "@/hooks/useTranslation";
 // const paymentMethods = [
 //   // "Card",
 //   // "Zain Pay",
@@ -90,9 +91,7 @@ export default function PaymentMethodTab({
   onNext: () => void;
 }) {
   const searchParams = useSearchParams();
-  const { data: session, status } = useSession();
-  const [userToken, setUserToken] = useState<string>("");
-
+  const { t } = useTranslation();
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
   const {
     pharmacyId,
@@ -105,8 +104,8 @@ export default function PaymentMethodTab({
   const [pharmacyData, setPharmacyData] = useState<CartPharmacy | null>(null);
   const [walletInfo, setWalletInfo] = useState<wallet | null>(null);
 
-  const { data: cartData, isLoading: isLoadingCart } = useGetCart();
-  const { walletDetails, isLoadingWallet } = useGetWallet();
+  const { data: cartData } = useGetCart();
+  const { walletDetails } = useGetWallet();
 
   async function handleGetPaymentMethods() {
     const response = await getPaymentMethods();
@@ -155,7 +154,7 @@ export default function PaymentMethodTab({
 
   return (
     <div className="space-y-4 pt-4">
-      <h3 className="text-lg font-bold">Payment Method</h3>
+      <h3 className="text-lg font-bold">{t("paymentMethod")}</h3>
       <RadioGroup
         value={paymentMethodValue}
         onValueChange={(value) =>
@@ -197,7 +196,7 @@ export default function PaymentMethodTab({
 
       {selectedPayment === "Card" && (
         <div className="space-y-3">
-          <h4 className="text-base font-semibold pt-2">Saved Cards</h4>
+          <h4 className="text-base font-semibold pt-2">{t("savedCards")}</h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {savedCards.map((card) => {
               const isSelected = selectedCard === card.name;
@@ -220,7 +219,7 @@ export default function PaymentMethodTab({
                   {card.icon}
                   {isExpired && (
                     <span className=" bg-red-100 text-red-700 px-2 py-0.5 rounded-full text-xs font-semibold border border-red-300 dark:bg-red-900 dark:text-red-100 dark:border-red-400">
-                      Expired
+                      {t("expired")}
                     </span>
                   )}
                   <div className="flex flex-col flex-1 text-left">
@@ -251,7 +250,7 @@ export default function PaymentMethodTab({
       {selectedPayment === "Zain Pay" && (
         <div className="space-y-4 pt-2">
           <div className="text-sm text-muted-foreground">
-            Please transfer the payment to the following number:
+            {t("transferPaymentToNumber")}
           </div>
           <div className="font-medium text-lg text-foreground bg-muted p-3 rounded-md w-fit">
             0912345678
@@ -299,7 +298,7 @@ export default function PaymentMethodTab({
                 <>
                   <Upload />
                   <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Drag & drop or click to upload transaction image
+                    {t("dragDropUploadTransaction")}
                   </p>
                 </>
               )}
@@ -352,11 +351,11 @@ export default function PaymentMethodTab({
       <div className="flex justify-end items-center gap-3 pt-4">
         <ButtonStepNav handleClick={onBack}>
           <ArrowLeft className="auto-dir" />
-          Back
+          {t("back")}
         </ButtonStepNav>
 
         <ButtonStepNav handleClick={onNext}>
-          Next
+          {t("next")}
           <ArrowRight className="auto-dir" />
         </ButtonStepNav>
       </div>

@@ -11,13 +11,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { getAllCategories, getSearchProducts } from "@/lib/api/apiProducts";
+import { getSearchProducts } from "@/lib/api/apiProducts";
 import { category, ProductItem } from "@/types";
-import { Search } from "lucide-react";
+import { Search, X } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useRef, useState, useTransition } from "react";
-import { set } from "zod";
+import { useEffect, useState, useTransition } from "react";
+import { useTranslation } from "@/hooks/useTranslation";
 
 const HeaderSearch = ({ categories }: { categories: category[] }) => {
   const [isPending, searchTransitionStart] = useTransition();
@@ -26,7 +26,9 @@ const HeaderSearch = ({ categories }: { categories: category[] }) => {
   const [showModalSearch, setShowModalSearch] = useState(false);
   const [products, setProducts] = useState<ProductItem[]>([]);
   const [isItemSelected, setIsItemSelected] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
   const router = useRouter();
+  const { t } = useTranslation();
 
   async function handleSearch(categoryId: string, keyword: string) {
     const result = await getSearchProducts(categoryId, keyword);
@@ -58,7 +60,21 @@ const HeaderSearch = ({ categories }: { categories: category[] }) => {
 
   return (
     <div className="relative">
-      <div className="!border-primary border rounded-md bg-secondary h-9 md:h-10 flex-center overflow-hidden">
+      <button
+        className="text-gray-800 dark:text-gray-400 fixed z-10 top-[14px] start-12 sm:hidden"
+        onClick={() => setShowSearch(!showSearch)}
+      >
+        {showSearch ? (
+          <X className="w-5 h-5" />
+        ) : (
+          <Search className="w-5 h-5" />
+        )}
+      </button>
+      <div
+        className={`!border-primary border rounded-md bg-secondary h-9 md:h-10 sm:!flex flex-center overflow-hidden ${
+          showSearch ? "" : "!hidden "
+        }`}
+      >
         <div className="flex-center py-2 flex-grow-1">
           <Select
             onValueChange={(value) => {
@@ -68,14 +84,14 @@ const HeaderSearch = ({ categories }: { categories: category[] }) => {
           >
             <SelectTrigger className="!text-froreground !bg-transparent w-36 border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 ">
               <SelectValue
-                placeholder="All Categories"
+                placeholder={t("allCategories")}
                 className="text-gray-500"
               />
             </SelectTrigger>
             <SelectContent className="max-h-72 overflow-y-auto">
               <SelectGroup>
-                <SelectLabel>Categories</SelectLabel>
-                <SelectItem value="all">All Categories</SelectItem>
+                <SelectLabel>{t("categories")}</SelectLabel>
+                <SelectItem value="all">{t("allCategories")}</SelectItem>
                 {categories.map((category) => (
                   <SelectItem
                     key={category.id.toString()}
@@ -91,7 +107,7 @@ const HeaderSearch = ({ categories }: { categories: category[] }) => {
           <Input
             type="text"
             className="h-full !bg-transparent shadow-none border-0 border-s !border-stone-300 dark:!border-stone-700 rounded-none focus-visible:ring-0 focus-visible:ring-offset-0 leading-0 !text-base text-gray-700 dark:text-gray-300"
-            placeholder="Search for products..."
+            placeholder={t("searchForProducts")}
             onChange={(e) => {
               setKeyword(e.target.value.trim());
             }}
@@ -154,7 +170,7 @@ const HeaderSearch = ({ categories }: { categories: category[] }) => {
                   </div>
                 ) : (
                   <div className="p-4 text-gray-500 bg-background">
-                    No results found
+                    {t("noResultsFound")}
                   </div>
                 )}
               </>

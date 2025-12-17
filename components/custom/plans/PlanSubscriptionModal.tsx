@@ -34,6 +34,7 @@ import { Badge } from "@/components/ui/badge";
 import { Building2, CreditCard, User } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { subscribeToPlan } from "@/lib/api/apiPlans";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface PlanSubscriptionModalProps {
   plan: plan;
@@ -47,6 +48,7 @@ const PlanSubscriptionModal = ({
   onClose,
 }: PlanSubscriptionModalProps) => {
   const [apiErrors, setApiErrors] = useState<Record<string, string[]>>({});
+  const { t } = useTranslation();
 
   const form = useForm<PlanSubscriptionFormData>({
     resolver: zodResolver(planSubscriptionFormSchema),
@@ -63,7 +65,7 @@ const PlanSubscriptionModal = ({
       pharmacy_address_en: "",
       pharmacy_phone: "",
       pharmacy_email: "",
-      payment_method: "card",
+      payment_method: "cash",
     },
   });
 
@@ -83,7 +85,7 @@ const PlanSubscriptionModal = ({
         pharmacy_address_en: "",
         pharmacy_phone: "",
         pharmacy_email: "",
-        payment_method: "card",
+        payment_method: "cash",
       });
       setApiErrors({}); // Clear API errors when modal opens
     }
@@ -95,7 +97,7 @@ const PlanSubscriptionModal = ({
       const response = await subscribeToPlan(data);
       console.log(response);
       if (response.success) {
-        toast.success("Subscription successful! Welcome aboard! 🎉");
+        toast.success(t("subscriptionSuccessful"));
         form.reset();
         onClose();
       } else {
@@ -103,7 +105,7 @@ const PlanSubscriptionModal = ({
       }
     } catch (error) {
       console.error("Subscription error:", error);
-      toast.error("Failed to subscribe. Please try again.");
+      toast.error(t("failedToSubscribe"));
     }
   };
 
@@ -112,12 +114,10 @@ const PlanSubscriptionModal = ({
       <DialogContent className=" !w-11/12 !max-w-5xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold">
-            Subscribe to{" "}
-            {plan.type.charAt(0).toUpperCase() + plan.type.slice(1)} Plan
+            {t("subscribeTo")}{" "}
+            {plan.type.charAt(0).toUpperCase() + plan.type.slice(1)} {t("plan")}
           </DialogTitle>
-          <DialogDescription>
-            Fill in your details to complete your subscription
-          </DialogDescription>
+          <DialogDescription>{t("fillDetailsToSubscribe")}</DialogDescription>
         </DialogHeader>
 
         {/* Plan Summary */}
@@ -125,7 +125,7 @@ const PlanSubscriptionModal = ({
           <div className="flex items-center justify-between">
             <div>
               <h4 className="font-semibold text-lg capitalize">
-                {plan.type} Plan
+                {plan.type} {t("plan")}
               </h4>
               <p className="text-sm text-muted-foreground">
                 {plan.description}
@@ -136,7 +136,7 @@ const PlanSubscriptionModal = ({
                 {plan.price} {plan.currency}
               </div>
               <Badge variant="secondary" className="mt-1">
-                {plan.duration_in_days} days
+                {plan.duration_in_days} {t("days")}
               </Badge>
             </div>
           </div>
@@ -148,7 +148,7 @@ const PlanSubscriptionModal = ({
             <div>
               <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                 <User className="h-5 w-5 text-primary" />
-                Personal Information
+                {t("personalInformation")}
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
@@ -156,7 +156,7 @@ const PlanSubscriptionModal = ({
                   name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Full Name *</FormLabel>
+                      <FormLabel>{t("fullName")} *</FormLabel>
                       <FormControl>
                         <Input placeholder="John Doe" {...field} />
                       </FormControl>
@@ -170,7 +170,7 @@ const PlanSubscriptionModal = ({
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email *</FormLabel>
+                      <FormLabel>{t("email")} *</FormLabel>
                       <FormControl>
                         <Input
                           type="email"
@@ -188,7 +188,7 @@ const PlanSubscriptionModal = ({
                   name="phone"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Phone *</FormLabel>
+                      <FormLabel>{t("phone")} *</FormLabel>
                       <FormControl>
                         <Input
                           type="tel"
@@ -206,11 +206,11 @@ const PlanSubscriptionModal = ({
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Password *</FormLabel>
+                      <FormLabel>{t("password")} *</FormLabel>
                       <FormControl>
                         <Input
                           type="password"
-                          placeholder="Min. 8 characters"
+                          placeholder={t("minCharacters")}
                           {...field}
                         />
                       </FormControl>
@@ -224,11 +224,11 @@ const PlanSubscriptionModal = ({
                   name="password_confirmation"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Confirm Password</FormLabel>
+                      <FormLabel>{t("confirmPassword")}</FormLabel>
                       <FormControl>
                         <Input
                           type="password"
-                          placeholder="Re-enter your password"
+                          placeholder={t("reEnterPassword")}
                           {...field}
                         />
                       </FormControl>
@@ -245,7 +245,7 @@ const PlanSubscriptionModal = ({
             <div>
               <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                 <Building2 className="h-5 w-5 text-primary" />
-                Pharmacy Information
+                {t("pharmacyInformation")}
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
@@ -253,7 +253,7 @@ const PlanSubscriptionModal = ({
                   name="pharmacy_name_ar"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Pharmacy Name (Arabic) *</FormLabel>
+                      <FormLabel>{t("pharmacyNameArabic")} *</FormLabel>
                       <FormControl>
                         <Input
                           placeholder="صيدلية النور"
@@ -271,7 +271,7 @@ const PlanSubscriptionModal = ({
                   name="pharmacy_name_en"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Pharmacy Name (English) *</FormLabel>
+                      <FormLabel>{t("pharmacyNameEnglish")} *</FormLabel>
                       <FormControl>
                         <Input placeholder="Al-Noor Pharmacy" {...field} />
                       </FormControl>
@@ -285,7 +285,7 @@ const PlanSubscriptionModal = ({
                   name="pharmacy_address_ar"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Address (Arabic) *</FormLabel>
+                      <FormLabel>{t("addressArabic")} *</FormLabel>
                       <FormControl>
                         <Input
                           placeholder="القاهرة - مدينة نصر"
@@ -303,7 +303,7 @@ const PlanSubscriptionModal = ({
                   name="pharmacy_address_en"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Address (English) *</FormLabel>
+                      <FormLabel>{t("addressEnglish")} *</FormLabel>
                       <FormControl>
                         <Input placeholder="Cairo - Nasr City" {...field} />
                       </FormControl>
@@ -317,7 +317,7 @@ const PlanSubscriptionModal = ({
                   name="pharmacy_phone"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Pharmacy Phone *</FormLabel>
+                      <FormLabel>{t("pharmacyPhone")} *</FormLabel>
                       <FormControl>
                         <Input
                           type="tel"
@@ -335,7 +335,7 @@ const PlanSubscriptionModal = ({
                   name="pharmacy_email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Pharmacy Email *</FormLabel>
+                      <FormLabel>{t("pharmacyEmail")} *</FormLabel>
                       <FormControl>
                         <Input
                           type="email"
@@ -356,7 +356,7 @@ const PlanSubscriptionModal = ({
             <div>
               <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                 <CreditCard className="h-5 w-5 text-primary" />
-                Payment Method
+                {t("paymentMethod")}
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
@@ -364,22 +364,28 @@ const PlanSubscriptionModal = ({
                   name="payment_method"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Payment Method *</FormLabel>
+                      <FormLabel>{t("paymentMethod")} *</FormLabel>
                       <Select
                         onValueChange={field.onChange}
                         defaultValue={field.value}
                       >
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Select payment method" />
+                            <SelectValue
+                              placeholder={t("selectPaymentMethod")}
+                            />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="card">
-                            Credit/Debit Card
+                          {/* <SelectItem value="card">
+                            {t("creditDebitCard")}
+                          </SelectItem> */}
+                          <SelectItem value="cash">
+                            {t("cashOnDelivery")}
                           </SelectItem>
-                          <SelectItem value="cash">Cash on Delivery</SelectItem>
-                          <SelectItem value="wallet">Digital Wallet</SelectItem>
+                          <SelectItem value="wallet">
+                            {t("digitalWallet")}
+                          </SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -418,12 +424,12 @@ const PlanSubscriptionModal = ({
                 onClick={onClose}
                 disabled={form.formState.isSubmitting}
               >
-                Cancel
+                {t("cancel")}
               </Button>
               <Button type="submit" disabled={form.formState.isSubmitting}>
                 {form.formState.isSubmitting
-                  ? "Processing..."
-                  : "Subscribe Now"}
+                  ? t("processing")
+                  : t("subscribeNow")}
               </Button>
             </div>
           </form>

@@ -23,6 +23,7 @@ import { saveReturnRequest } from "@/lib/utils/returnRequestStorage";
 import { CreateReturnRequest } from "@/lib/api/apiReturns";
 import { toast } from "sonner";
 import SpinnerMini from "../SpinnerMini";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface RefundRequestDialogProps {
   open: boolean;
@@ -45,6 +46,7 @@ export default function RefundRequestDialog({
 }: RefundRequestDialogProps) {
   const [reason, setReason] = useState("");
   const [isPending, startTransition] = useTransition();
+  const { t } = useTranslation();
   const [itemImages, setItemImages] = useState<
     Record<number, { file: File; preview: string }>
   >({});
@@ -160,10 +162,10 @@ export default function RefundRequestDialog({
 
       // Close dialog after submission
 
-      toast.success("Refund request submitted successfully.");
+      toast.success(t("refundRequestSubmittedSuccessfully"));
     } else {
       //   console.error("error :", response);
-      toast.error(response?.message || "Failed to submit refund request.");
+      toast.error(response?.message || t("failedToSubmitRefundRequest"));
     }
     if (onSubmitSuccess) {
       onSubmitSuccess();
@@ -176,23 +178,25 @@ export default function RefundRequestDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className=" !w-10/12 !max-w-7xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-2xl">Refund Request</DialogTitle>
-          <DialogDescription>Order #{orderId}</DialogDescription>
+          <DialogTitle className="text-2xl">{t("refundRequest")}</DialogTitle>
+          <DialogDescription>
+            {t("order")} #{orderId}
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6 py-4">
           {/* Items Cards */}
           <div>
-            <h2 className="text-lg font-medium mb-3">Items to Refund</h2>
+            <h2 className="text-lg font-medium mb-3">{t("itemsToRefund")}</h2>
             {items.length === 0 ? (
               <Card>
                 <CardContent className="flex flex-col items-center justify-center py-12">
                   <Package className="h-16 w-16 text-muted-foreground mb-4" />
                   <h3 className="text-lg font-semibold mb-2">
-                    No items selected
+                    {t("noItemsSelected")}
                   </h3>
                   <p className="text-muted-foreground text-center text-sm">
-                    Add items from your order to request a refund
+                    {t("addItemsToRequestRefund")}
                   </p>
                 </CardContent>
               </Card>
@@ -211,13 +215,15 @@ export default function RefundRequestDialog({
                           {/* Purchased Quantity Info */}
                           <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
                             <Package className="h-4 w-4" />
-                            <span>Purchased: {item.quantity}</span>
+                            <span>
+                              {t("purchased")} {item.quantity}
+                            </span>
                           </div>
 
                           {/* Return Quantity Selector */}
                           <div className="space-y-2">
                             <label className="text-sm font-medium">
-                              Quantity to Return
+                              {t("quantityToReturn")}
                             </label>
                             <div className="flex items-center gap-2">
                               <Button
@@ -271,7 +277,7 @@ export default function RefundRequestDialog({
 
                           {/* Unit Price */}
                           <div className="text-sm text-muted-foreground">
-                            <span>Unit Price: </span>
+                            <span>{t("unitPrice")} </span>
                             <span className="font-medium">
                               {formatCurrency(
                                 Number(item.unit_price),
@@ -283,7 +289,7 @@ export default function RefundRequestDialog({
                           {/* Refund Amount for this item */}
                           <div className="flex items-center gap-2 pt-2 border-t">
                             <span className="text-sm font-medium">
-                              Refund Amount:
+                              {t("refundAmount")}
                             </span>
                             <span className="text-lg font-bold text-primary">
                               {formatCurrency(
@@ -297,7 +303,7 @@ export default function RefundRequestDialog({
                         {/* Image Upload Section */}
                         <div className="space-y-2">
                           <label className="text-sm font-medium">
-                            Proof Image (Optional)
+                            {t("proofImageOptional")}
                           </label>
                           {itemImages[item.product_id] ? (
                             <div className="relative border rounded-lg p-2">
@@ -333,7 +339,7 @@ export default function RefundRequestDialog({
                               ) => handleImageAdd(item.product_id, files)}
                               accept="image/*,.jpg,.jpeg,.png,.gif,.webp"
                               maxSizeMB={5}
-                              label="Upload image"
+                              label={t("uploadImage")}
                               multiple={false}
                               Icon={Upload}
                               className="!h-24"
@@ -349,7 +355,7 @@ export default function RefundRequestDialog({
                           className="rounded-full bg-muted hover:bg-destructive/10 hover:text-destructive block flex-center ms-auto sm:self-center"
                         >
                           <X className="h-4 w-4 mr-2" />
-                          Remove
+                          {t("remove")}
                         </Button>
                       </div>
                     </CardContent>
@@ -361,9 +367,9 @@ export default function RefundRequestDialog({
 
           {/* Refund Reason */}
           <div>
-            <h2 className="text-lg font-medium mb-3">Refund Reason</h2>
+            <h2 className="text-lg font-medium mb-3">{t("refundReason")}</h2>
             <Textarea
-              placeholder={`Why are you requesting a refund for ${items
+              placeholder={`${t("whyRequestingRefund")} ${items
                 .map((i) => i.product_name)
                 .join(", ")}?`}
               value={reason}
@@ -374,14 +380,14 @@ export default function RefundRequestDialog({
 
           {/* Refund Summary */}
           <div>
-            <h2 className="text-lg font-medium mb-3">Refund Summary</h2>
+            <h2 className="text-lg font-medium mb-3">{t("refundSummary")}</h2>
             <div className="space-y-2 bg-muted p-4 rounded-lg">
               <div className="flex justify-between">
-                <span>Subtotal</span>
+                <span>{t("subtotal")}</span>
                 <span>{formatCurrency(subtotal, currency)}</span>
               </div>
               <div className="flex justify-between font-semibold">
-                <span>Estimated Refund</span>
+                <span>{t("estimatedRefund")}</span>
                 <span>{formatCurrency(subtotal, currency)}</span>
               </div>
             </div>
@@ -390,14 +396,14 @@ export default function RefundRequestDialog({
 
         <DialogFooter>
           <Button variant="ghost" onClick={() => onOpenChange(false)}>
-            Cancel
+            {t("cancel")}
           </Button>
           <Button
             variant="default"
             onClick={() => startTransition(handleSubmit)}
             disabled={items.length === 0 || !reason.trim()}
           >
-            {isPending ? <SpinnerMini /> : "Submit Refund Request"}
+            {isPending ? <SpinnerMini /> : t("submitRefundRequest")}
           </Button>
         </DialogFooter>
       </DialogContent>

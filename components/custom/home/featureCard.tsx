@@ -1,4 +1,5 @@
 import { getSiteFeatures } from "@/lib/api/apiSiteInfo";
+import { getLocale } from "@/localization";
 import { siteFeatureT } from "@/types";
 import { CheckCircle2 } from "lucide-react";
 import React from "react";
@@ -46,7 +47,8 @@ const FeatureCard = ({
 };
 
 const FeatureCards = async () => {
-  const siteFeaturesResponse = await getSiteFeatures();
+  const lang = await getLocale();
+  const siteFeaturesResponse = await getSiteFeatures(lang);
   let stieFeatures = features;
   if (siteFeaturesResponse.success && siteFeaturesResponse.data) {
     stieFeatures = siteFeaturesResponse.data;

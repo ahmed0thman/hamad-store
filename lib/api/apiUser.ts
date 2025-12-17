@@ -80,7 +80,7 @@ export async function registerDoctor(
     return response.data.data;
   } catch (error) {
     if (error instanceof AxiosError) {
-      console.log("error during doctor registration:", error.response);
+      console.log("error during doctor registration:", error.response?.data);
       if (error.response?.data?.message) {
         return {
           status: "error",

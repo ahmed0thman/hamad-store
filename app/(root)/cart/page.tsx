@@ -9,8 +9,10 @@ import { ShoppingCartIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import getLocaleStrings from "@/localization";
 
 export default async function Cart() {
+  const locale = await getLocaleStrings();
   const session = await auth();
   const cartData = await getCartData();
   let cart: CartData | null = null;
@@ -40,10 +42,10 @@ export default async function Cart() {
       <div className=" mb-8">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
           <ShoppingCartIcon className="inline-block me-2" />
-          سلة التسوق
+          {locale.shoppingCart}
         </h1>
         <p className="text-gray-600 dark:text-gray-400">
-          &quot;إدارة سلة التسوق الخاصة بك عبر المتاجر المختلفة&quot;
+          &quot;{locale.manageCartAcrossStores}&quot;
         </p>
       </div>
       <div className="  grid grid-cols-1 lg:grid-cols-2 gap-8 ">
@@ -71,14 +73,15 @@ export default async function Cart() {
                       />
                       <div className="flex-1 flex flex-wrap gap-4 justify-between">
                         <h2 className="text-lg font-bold text-teal-900 dark:text-teal-400 mb-1">
-                          {pharmacy.pharmacy_id} pharamcy
+                          {pharmacy.pharmacy_id} {locale.pharmacy}
                         </h2>
                         <div className="flex items-center gap-4">
                           <Badge className="bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-300 px-3 py-1 rounded-full text-sm font-medium">
-                            عدد المنتجات: {pharmacy.items.length}
+                            {locale.productsCount}: {pharmacy.items.length}
                           </Badge>
                           <span className="text-base font-semibold text-gray-800 dark:text-gray-100">
-                            الإجمالي: {formatCurrencyEGP(pharmacy.total)}
+                            {locale.totalAmount}:{" "}
+                            {formatCurrencyEGP(pharmacy.total)}
                           </span>
                         </div>
                       </div>

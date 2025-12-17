@@ -12,8 +12,8 @@ export const pharmacyCategories = [
 ];
 
 export const headerPages = [
-  { title: "Home", path: "/" },
-  { title: "About", path: "/about" },
-  { title: "Contact Us", path: "/contact-us" },
-  { title: "plans", path: "/plans" },
+  { title: { en: "Home", ar: "الرئيسية" }, path: "/" },
+  { title: { en: "About", ar: "عن المنصة" }, path: "/about" },
+  { title: { en: "Contact Us", ar: "اتصل بنا" }, path: "/contact-us" },
+  { title: { en: "Plans", ar: "الباقات" }, path: "/plans" },
 ];

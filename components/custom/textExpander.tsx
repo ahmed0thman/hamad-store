@@ -1,8 +1,10 @@
 "use client";
 import React, { useState } from "react";
+import { useTranslation } from "@/hooks/useTranslation";
 
 const TextExpander = ({ content }: { content: string }) => {
   const [showMore, setShowMore] = useState(false);
+  const { t } = useTranslation();
   const fullText = content.trim();
   const displayedText = showMore ? fullText : fullText.slice(0, 180) + "...";
   return (
@@ -12,7 +14,7 @@ const TextExpander = ({ content }: { content: string }) => {
     >
       {displayedText}
       <span className="text-primary text-sm mt-2">
-        {showMore ? "عرض أقل" : "عرض المزيد"}
+        {showMore ? t("showLess") : t("showMore")}
       </span>
     </p>
   );

@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import { CheckCircle, OctagonX } from "lucide-react";
 import SpinnerMini from "../SpinnerMini";
 import { revalidate } from "@/lib/api/actions";
+import { useTranslation } from "@/hooks/useTranslation";
 
 const RatingDialog = ({
   product_id,
@@ -28,6 +29,7 @@ const RatingDialog = ({
   const [pending, startTransition] = useTransition();
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [open, setOpen] = useState(false);
+  const { t } = useTranslation();
   const handleClose = () => {
     setRatings(0);
     setComments("");
@@ -40,14 +42,14 @@ const RatingDialog = ({
     if (ratings <= 0) {
       setErrors((prev) => ({
         ...prev,
-        ratings: "Please select a rating",
+        ratings: t("pleaseSelectRating"),
       }));
       return;
     }
     if (comments.trim() === "") {
       setErrors((prev) => ({
         ...prev,
-        comments: "Please add a comment",
+        comments: t("pleaseAddComment"),
       }));
       return;
     }
@@ -61,7 +63,7 @@ const RatingDialog = ({
         toast(
           <div className="flex items-center gap-2">
             <CheckCircle className="h-4 w-4 text-green-500" />
-            <span>Thank you for your feedback!</span>
+            <span>{t("thankYouForFeedback")}</span>
           </div>
         );
         handleClose();
@@ -69,7 +71,7 @@ const RatingDialog = ({
         toast(
           <div className="flex items-center gap-2">
             <OctagonX className="h-4 w-4 text-red-500" />
-            <span>Failed to submit feedback. Please try again.</span>
+            <span>{t("failedToSubmitFeedback")}</span>
           </div>
         );
       }
@@ -84,11 +86,13 @@ const RatingDialog = ({
           size="sm"
           className="rounded-full bg-muted"
         >
-          أضف تقييم
+          {t("addRating")}
         </Button>
       </DialogTrigger>
       <DialogContent className="bg-secondary">
-        <DialogTitle>Rate {product_name}</DialogTitle>
+        <DialogTitle>
+          {t("rate")} {product_name}
+        </DialogTitle>
         <div className="flex-center">
           <StarRating
             readOnly={false}
@@ -100,7 +104,7 @@ const RatingDialog = ({
           <p className="text-red-500 text-sm mt-2">{errors.ratings}</p>
         )}
         <textarea
-          placeholder="Add a comment"
+          placeholder={t("addComment")}
           className="w-full mt-4 p-2 border rounded"
           value={comments}
           onChange={(e) => setComments(e.target.value)}
@@ -110,7 +114,7 @@ const RatingDialog = ({
         )}
 
         <Button className="mt-4" onClick={handleRateSubmit}>
-          {pending ? <SpinnerMini /> : "Submit Rating"}
+          {pending ? <SpinnerMini /> : t("submitRating")}
         </Button>
       </DialogContent>
     </Dialog>

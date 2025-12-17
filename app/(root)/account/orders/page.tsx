@@ -25,12 +25,14 @@ import Link from "next/link";
 import { toast } from "sonner";
 import { useGetProfile } from "@/hooks/useGetProfile";
 import { CURRENCY_CODE } from "@/lib/constants";
+import { useTranslation } from "@/hooks/useTranslation";
 
 const Orders = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const queryClient = useQueryClient();
   const { ordersData, isLoadingOrders, errorOrders } = useGetOrders();
   const { profileData, isLoadoingProfile } = useGetProfile();
+  const { t } = useTranslation();
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
@@ -59,10 +61,10 @@ const Orders = () => {
       mutationFn: handleCancelOrder,
       onSuccess: (response) => {
         if (response && response.success) {
-          toast.success("Order canceled successfully");
+          toast.success(t("orderCancelledSuccessfully"));
           queryClient.invalidateQueries({ queryKey: ["orders"] });
         } else {
-          toast.error("Failed to cancel order");
+          toast.error(t("failedToCancelOrder"));
         }
       },
     });
@@ -111,7 +113,7 @@ const Orders = () => {
           {/* Header */}
           <div className="flex flex-wrap justify-between gap-3 p-4">
             <h1 className="text-foreground text-3xl font-bold leading-tight min-w-72">
-              My Orders
+              {t("myOrders")}
             </h1>
           </div>
 
@@ -120,7 +122,7 @@ const Orders = () => {
             <div className="relative">
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
               <Input
-                placeholder="Search by product name or order ID"
+                placeholder={t("searchByProductOrOrderId")}
                 className="pl-12 h-12"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -145,7 +147,7 @@ const Orders = () => {
                   {/* Status below order code */}
                   <div className="flex items-center gap-2">
                     <Badge className={getStatusColor(order.status)}>
-                      {order.status}
+                      {t(order.status.toLowerCase() as keyof typeof t)}
                     </Badge>
                   </div>
                   {/* Total below status */}
@@ -167,7 +169,7 @@ const Orders = () => {
                     <Link
                       href={`/account/orders/${order.id}?remaining_days_to_return=${order.remaining_days_to_return}`}
                     >
-                      View Details
+                      {t("viewDetails")}
                     </Link>
                   </Button>
                   {order.status.toLowerCase() === "pending" && (
@@ -179,29 +181,30 @@ const Orders = () => {
                           className="rounded-full w-fit hover:bg-red-600/50 transition-colors duration-200"
                           disabled={isCancellingOrder}
                         >
-                          {isCancellingOrder ? "Cancelling..." : "Cancel Order"}
+                          {isCancellingOrder
+                            ? t("cancelling")
+                            : t("cancelOrder")}
                         </Button>
                       </DialogTrigger>
                       <DialogContent>
                         <DialogHeader>
                           <DialogTitle>
-                            Are you sure you want to cancel this order?
+                            {t("cancelOrderConfirmTitle")}
                           </DialogTitle>
                           <DialogDescription>
-                            This action cannot be undone. Please confirm your
-                            decision.
+                            {t("cancelOrderConfirmDescription")}
                           </DialogDescription>
                         </DialogHeader>
                         <DialogFooter>
                           <DialogClose asChild>
-                            <Button variant="outline">No</Button>
+                            <Button variant="outline">{t("no")}</Button>
                           </DialogClose>
                           <Button
                             onClick={() =>
                               cancelOrderMutation(order.id.toString())
                             }
                           >
-                            Yes
+                            {t("yes")}
                           </Button>
                         </DialogFooter>
                       </DialogContent>

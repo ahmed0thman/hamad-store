@@ -21,6 +21,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { useTranslation } from "@/hooks/useTranslation";
 
 function SidebarContent({
   minRef,
@@ -58,6 +59,7 @@ function SidebarContent({
   const [filteredBrands, setFilteredBrands] = useState<Brand[]>([]);
   const [categories, setCategories] = useState<category[]>([]);
   const [brands, setBrands] = useState<Brand[]>([]);
+  const { t } = useTranslation();
 
   useEffect(function () {
     startTransition(fetchFilters);
@@ -81,24 +83,24 @@ function SidebarContent({
   return (
     <aside className="space-y-3 divide-y divide-y-reverse divide-accent/70 lg:bg-white dark:lg:bg-slate-900 p-4 rounded-md shadow overflow-y-auto lg:sticky lg:top-24  ">
       <div className="border-none">
-        <h3 className="text-lg font-semibold mb-2">Price Range</h3>
+        <h3 className="text-lg font-semibold mb-2">{t("priceRange")}</h3>
         <div className="flex gap-2">
           <div className="basis-1/2">
-            <label className="block text-sm">From</label>
+            <label className="block text-sm">{t("from")}</label>
             <Input
               ref={minRef}
               type="number"
-              placeholder="Min"
+              placeholder={t("min")}
               min={0}
               className="mb-2"
             />
           </div>
           <div className="basis-1/2">
-            <label className="block text-sm">To</label>
+            <label className="block text-sm">{t("to")}</label>
             <Input
               ref={maxRef}
               type="number"
-              placeholder="Max"
+              placeholder={t("max")}
               min={0}
               className="mb-2"
             />
@@ -107,7 +109,7 @@ function SidebarContent({
       </div>
 
       <div>
-        <h3 className="text-lg font-semibold">Customer Rating</h3>
+        <h3 className="text-lg font-semibold">{t("customerRating")}</h3>
         <div className="flex flex-wrap">
           <Input
             id="customer-rating-slider"
@@ -135,7 +137,7 @@ function SidebarContent({
       </div>
 
       <div>
-        <h3 className="text-lg font-semibold">Doctor Rating</h3>
+        <h3 className="text-lg font-semibold">{t("doctorRating")}</h3>
         <div className="flex flex-wrap">
           <Input
             id="doctor-rating-slider"
@@ -178,7 +180,7 @@ function SidebarContent({
             htmlFor="inStock"
             className="text-sm font-medium cursor-pointer ml-2"
           >
-            In Stock
+            {t("inStock")}
           </label>
         </div>
         <div className="flex items-center gap-2">
@@ -196,7 +198,7 @@ function SidebarContent({
             htmlFor="outOfStock"
             className="text-sm font-medium cursor-pointer ml-2"
           >
-            Out of Stock
+            {t("outOfStock")}
           </label>
         </div>
       </div>
@@ -204,11 +206,11 @@ function SidebarContent({
       <Accordion type="multiple" className="m-0">
         <AccordionItem value="categories">
           <AccordionTrigger className="text-lg font-semibold mb-2">
-            Categories
+            {t("categories")}
           </AccordionTrigger>
           <AccordionContent>
             <Input
-              placeholder="Search categories..."
+              placeholder={t("searchCategories")}
               onChange={(e) => {
                 const query = e.target.value.toLowerCase();
                 const filtered = categories.filter((cat) =>
@@ -247,11 +249,11 @@ function SidebarContent({
         </AccordionItem>
         <AccordionItem value="brands">
           <AccordionTrigger className="text-lg font-semibold mb-2">
-            Brands
+            {t("brands")}
           </AccordionTrigger>
           <AccordionContent>
             <Input
-              placeholder="Search brands..."
+              placeholder={t("searchBrands")}
               onChange={(e) => {
                 const query = e.target.value.toLowerCase();
                 const filtered = brands.filter((brand) =>
@@ -294,10 +296,10 @@ function SidebarContent({
 
       <div className="">
         <Button onClick={handleApply} className="w-full mt-4">
-          Apply Filters
+          {t("applyFilters")}
         </Button>
         <Button variant="outline" onClick={handleReset} className="w-full mt-2">
-          Reset Filters
+          {t("resetFilters")}
         </Button>
       </div>
     </aside>
@@ -314,6 +316,7 @@ function ProductSidebar({ revalidate }: { revalidate: () => void }) {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [inStock, setInStock] = useState<string>("");
+  const { t } = useTranslation();
 
   const handleApply = () => {
     const params = new URLSearchParams(searchParams.toString());
@@ -333,9 +336,9 @@ function ProductSidebar({ revalidate }: { revalidate: () => void }) {
       params.delete("user_rating_min");
     }
     if (doctorRating) {
-      params.set("pharmacist_rating_min", String(doctorRating));
+      params.set("doctor_rating_min", String(doctorRating));
     } else {
-      params.delete("pharmacist_rating_min");
+      params.delete("doctor_rating_min");
     }
     if (selectedCategories.length > 0) {
       params.set("categoryId", selectedCategories.join(","));
@@ -381,7 +384,7 @@ function ProductSidebar({ revalidate }: { revalidate: () => void }) {
         <Sheet>
           <SheetTrigger asChild>
             <Button variant="secondary" className="absolute">
-              <Filter /> Filters
+              <Filter /> {t("filters")}
             </Button>
           </SheetTrigger>
           <SheetContent side="left" className="bg-white dark:bg-slate-900">

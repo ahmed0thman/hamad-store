@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "@/hooks/useTranslation";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,30 +19,33 @@ import SpinnerMini from "@/components/custom/SpinnerMini";
 import { useGetProfile } from "@/hooks/useGetProfile";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { AvatarFallback } from "@radix-ui/react-avatar";
+import { Locale } from "@/localization/en";
 
-const userMenuItems = [
+const getUserMenuItems = (t: (key: keyof Locale) => string) => [
   {
-    title: "Account",
+    title: t("account"),
     href: "/account/profile",
     icon: <User />,
   },
   {
-    title: "Notification",
+    title: t("notification"),
     href: "/notifications",
     icon: <Bell />,
   },
   {
-    title: "Favorites",
+    title: t("favorites"),
     href: "/favorites",
     icon: <Heart />,
   },
 ];
 
 const UserButton = ({ user }: { user: UserType | null }) => {
+  const { t } = useTranslation();
   const [dialogOpen, setDialogOpen] = useState(false);
   let totalNotifications = 0;
   const { notificationsData, isLoadingNotifications } = useGetNotifications();
   const { isLoadoingProfile, profileData } = useGetProfile();
+  const userMenuItems = getUserMenuItems(t);
 
   if (isLoadingNotifications || isLoadoingProfile) {
     return <SpinnerMini />;
@@ -65,13 +69,13 @@ const UserButton = ({ user }: { user: UserType | null }) => {
         <div className="flex-center gap-2" style={{ fontFamily: "Poppins" }}>
           <Button asChild>
             <Link href="/signin" className="flex-center ">
-              Signin
+              {t("signin")}
             </Link>
           </Button>
 
           <Button variant="outline" asChild>
             <Link href="/register" className="flex-center  font-medium">
-              Signup
+              {t("signup")}
             </Link>
           </Button>
         </div>
@@ -92,7 +96,7 @@ const UserButton = ({ user }: { user: UserType | null }) => {
                   variant="ghost"
                   className="w-8 h-8 aspect-square rounded-full ms-2 flex items-center justify-center bg-secondary text-primary"
                 >
-                  <Avatar>
+                  <Avatar className="flex-center">
                     <AvatarImage
                       src={profile?.profile_image || ""}
                       alt={`${profile?.first_name} ${profile?.last_name}`}
@@ -135,7 +139,7 @@ const UserButton = ({ user }: { user: UserType | null }) => {
                     >
                       {item.icon}
                       <span>{item.title}</span>
-                      {item.title === "Notification" &&
+                      {item.title === t("notification") &&
                         totalNotifications > 0 && (
                           <span className="ms-auto bg-red-500 text-white text-xs px-2 max-w-8  rounded-full flex items-center justify-center">
                             {totalNotifications > 99
@@ -155,7 +159,7 @@ const UserButton = ({ user }: { user: UserType | null }) => {
                   onClick={() => setDialogOpen(true)}
                 >
                   <LogOut className="text-destructive" />
-                  Sign Out
+                  {t("signOut")}
                 </Button>
               </DropdownMenuItem>
             </DropdownMenuContent>

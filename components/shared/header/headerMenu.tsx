@@ -41,23 +41,33 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ReactNode, useEffect, useState, useTransition } from "react";
 import ButtonLang from "./buttonLang";
+import { useTranslation } from "@/hooks/useTranslation";
 
-const headerPages = [
-  { title: "Home", path: "/", icon: <Home /> },
-  { title: "About", path: "/about", icon: <Info /> },
-  { title: "Contact Us", path: "/contact-us", icon: <Mail /> },
-];
-
-const accountPages = [
-  { title: "Personal Info", path: "/account/profile", icon: <UserCircle /> },
-  { title: "Addresses", path: "/account/addresses", icon: <MapPin /> },
-  { title: "Returns", path: "/account/refund", icon: <RotateCcw /> },
-  { title: "Wallet", path: "/account/wallet", icon: <Wallet /> },
-  { title: "Compare Products", path: "/account/compare", icon: <PanelLeft /> },
-  { title: "Favorites", path: "/favorites", icon: <Heart /> },
-  // { title: "Settings", path: "/settings", icon: <Settings /> },
-];
 const HeaderMenu = ({ session }: { session: any }) => {
+  const { t } = useTranslation();
+
+  const headerPages = [
+    { title: t("home"), path: "/", icon: <Home /> },
+    { title: t("about"), path: "/about", icon: <Info /> },
+    { title: t("contactUs"), path: "/contact-us", icon: <Mail /> },
+  ];
+
+  const accountPages = [
+    {
+      title: t("personalInfo"),
+      path: "/account/profile",
+      icon: <UserCircle />,
+    },
+    { title: t("addresses"), path: "/account/addresses", icon: <MapPin /> },
+    { title: t("returns"), path: "/account/refund", icon: <RotateCcw /> },
+    { title: t("wallet"), path: "/account/wallet", icon: <Wallet /> },
+    {
+      title: t("compareProducts"),
+      path: "/account/compare",
+      icon: <PanelLeft />,
+    },
+    { title: t("favorites"), path: "/favorites", icon: <Heart /> },
+  ];
   const { theme, setTheme } = useTheme();
   const [pending, startTransition] = useTransition();
   const [mounted, setMounted] = useState(false);
@@ -108,7 +118,7 @@ const HeaderMenu = ({ session }: { session: any }) => {
   return (
     <nav className="lg:hidden">
       <Sheet>
-        <SheetTrigger className="align-middle  p-1 rounded-md text-stone-500 ">
+        <SheetTrigger className="align-middle  p-1 rounded-md text-stone-500 " aria-label={t("menu")}>
           <MenuIcon />
         </SheetTrigger>
         <SheetContent className="flex flex-col items-start p-4 overflow-auto">
@@ -124,7 +134,9 @@ const HeaderMenu = ({ session }: { session: any }) => {
                 />
               ) : (
                 <div className="w-[50px] h-[50px] rounded-full bg-primary flex items-center justify-center">
-                  <span className="text-white font-medium">{initials}</span>
+                  <span className="text-white font-medium capitalize">
+                    {initials}
+                  </span>
                 </div>
               )}
               <p className="text-gray-600 font-medium text-lg">
@@ -136,7 +148,7 @@ const HeaderMenu = ({ session }: { session: any }) => {
           <div className="flex-grow-1 w-full flex flex-col divide-y divide-gray-200 dark:divide-slate-700">
             {!isAuth ? (
               <Menu>
-                <MenuItem href="/signin" title="signin" icon={<LogIn />} />
+                <MenuItem href="/signin" title={t("signin")} icon={<LogIn />} />
               </Menu>
             ) : null}
             {/* Menu Main Pages */}
@@ -151,11 +163,35 @@ const HeaderMenu = ({ session }: { session: any }) => {
               ))}
             </Menu>
 
+            {/* Account */}
+            {isAuth ? (
+              // <Accordion type="single" collapsible>
+              //   <AccordionItem value="account">
+              //     <AccordionTrigger className="py-3 px-6 text-lg hover:no-underline">
+              //       {t("account")}
+              //     </AccordionTrigger>
+              //     <AccordionContent>
+
+              //     </AccordionContent>
+              //   </AccordionItem>
+              // </Accordion>
+              <Menu>
+                {accountPages.map((ele) => (
+                  <MenuItem
+                    key={`${ele.title}-account`}
+                    title={ele.title}
+                    href={ele.path}
+                    icon={ele.icon}
+                  />
+                ))}
+              </Menu>
+            ) : null}
+
             {/* Categories */}
             <Accordion type="single" collapsible>
               <AccordionItem value="categories">
                 <AccordionTrigger className="py-3 px-6 text-lg hover:no-underline">
-                  Categories
+                  {t("categories")}
                 </AccordionTrigger>
                 <AccordionContent>
                   <Menu>
@@ -171,29 +207,6 @@ const HeaderMenu = ({ session }: { session: any }) => {
               </AccordionItem>
             </Accordion>
 
-            {/* Account */}
-            {isAuth ? (
-              <Accordion type="single" collapsible>
-                <AccordionItem value="account">
-                  <AccordionTrigger className="py-3 px-6 text-lg hover:no-underline">
-                    Account
-                  </AccordionTrigger>
-                  <AccordionContent>
-                    <Menu>
-                      {accountPages.map((ele) => (
-                        <MenuItem
-                          key={`${ele.title}-account`}
-                          title={ele.title}
-                          href={ele.path}
-                          icon={ele.icon}
-                        />
-                      ))}
-                    </Menu>
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
-            ) : null}
-
             {/* Menu Actions */}
             <Menu>
               <ButtonLang>
@@ -204,7 +217,7 @@ const HeaderMenu = ({ session }: { session: any }) => {
                 />
               </ButtonLang>
               <MenuItem
-                title={theme === "light" ? "Light Mode" : "Dark Mode"}
+                title={theme === "light" ? t("lightMode") : t("darkMode")}
                 icon={theme === "dark" ? <Sun /> : <Moon />}
                 handleClick={toggleTheme}
               />
@@ -214,7 +227,7 @@ const HeaderMenu = ({ session }: { session: any }) => {
             {isAuth ? (
               <Menu>
                 <MenuItem
-                  title="Logout"
+                  title={t("signOut")}
                   icon={<LogOut />}
                   color="text-destructive"
                   handleClick={() => startTransition(handleSignOut)}

@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "@/hooks/useTranslation";
 import {
   Card,
   CardDescription,
@@ -29,6 +30,7 @@ import { redirect } from "next/navigation";
 // 3|e8wTV7x6fnsJjPbowVI3OmVxM78DqkGSnj68G7BDc3155768
 
 const RegisterUser = () => {
+  const { t } = useTranslation();
   const [formErrors, setFormErrors] = React.useState<string[]>([]);
   const {
     register,
@@ -66,9 +68,9 @@ const RegisterUser = () => {
             priority
           />
         </Link>
-        <CardTitle className="text-center">Sign Up</CardTitle>
+        <CardTitle className="text-center">{t("signUpTitle")}</CardTitle>
         <CardDescription className="text-center">
-          Create your account, enter your information below.
+          {t("signUpDescription")}
         </CardDescription>
       </CardHeader>
       <form
@@ -77,7 +79,7 @@ const RegisterUser = () => {
       >
         <div>
           <Label htmlFor="first_name" className="block text-sm font-medium">
-            First Name
+            {t("firstName")}
           </Label>
           <Input
             id="first_name"
@@ -95,7 +97,7 @@ const RegisterUser = () => {
 
         <div>
           <Label htmlFor="last_name" className="block text-sm font-medium">
-            Last Name
+            {t("lastName")}
           </Label>
           <Input
             id="last_name"
@@ -113,7 +115,7 @@ const RegisterUser = () => {
 
         <div>
           <Label htmlFor="address" className="block text-sm font-medium">
-            Address
+            {t("address")}
           </Label>
           <Input
             id="address"
@@ -129,7 +131,7 @@ const RegisterUser = () => {
 
         <div>
           <Label htmlFor="gender" className="block text-sm font-medium">
-            Gender
+            {t("gender")}
           </Label>
           <select
             id="gender"
@@ -137,8 +139,8 @@ const RegisterUser = () => {
             defaultValue={signUpDefaultValues.gender}
             className="mt-1 block w-full border py-1 px-3 bg-input/30 rounded-md shadow-sm"
           >
-            <option value="male">Male</option>
-            <option value="female">Female</option>
+            <option value="male">{t("male")}</option>
+            <option value="female">{t("female")}</option>
           </select>
           {errors.gender && (
             <p className="text-red-500 text-sm mt-1">{errors.gender.message}</p>
@@ -147,7 +149,7 @@ const RegisterUser = () => {
 
         <div>
           <Label htmlFor="age" className="block text-sm font-medium">
-            Age
+            {t("age")}
           </Label>
           <Input
             id="age"
@@ -163,7 +165,7 @@ const RegisterUser = () => {
 
         <div>
           <Label htmlFor="phone" className="block text-sm font-medium">
-            Phone
+            {t("phone")}
           </Label>
           <Input
             id="phone"
@@ -179,7 +181,7 @@ const RegisterUser = () => {
 
         <div>
           <Label htmlFor="email" className="block text-sm font-medium">
-            Email
+            {t("email")}
           </Label>
           <Input
             id="email"
@@ -195,7 +197,7 @@ const RegisterUser = () => {
 
         <div>
           <Label htmlFor="password" className="block text-sm font-medium">
-            Password
+            {t("password")}
           </Label>
           <Input
             id="password"
@@ -216,7 +218,7 @@ const RegisterUser = () => {
             htmlFor="password_confirmation"
             className="block text-sm font-medium"
           >
-            Confirm Password
+            {t("confirmPassword")}
           </Label>
           <Input
             id="password_confirmation"
@@ -248,13 +250,13 @@ const RegisterUser = () => {
             type="submit"
             className="w-fit mx-auto"
           >
-            {isSubmitting ? <SpinnerMini /> : "Register"}
+            {isSubmitting ? <SpinnerMini /> : t("register")}
           </Button>
         </div>
         <div className="col-span-full text-center text-sm text-muted-foreground">
-          Already have an account?
+          {t("alreadyHaveAccount")}
           <Link href="/signin" target="_self" className="link">
-            Sign In
+            {t("signin")}
           </Link>
         </div>
       </form>

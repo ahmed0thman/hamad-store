@@ -29,6 +29,9 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
+import getLocaleStrings from "@/localization";
+import { auth } from "@/lib/auth";
+import { CURRENCY_CODE } from "@/lib/constants";
 
 interface PageProps {
   params: Promise<{
@@ -78,14 +81,38 @@ const getStatusIcon = (status: string) => {
 
 export default async function RefundRequestDetailsPage({ params }: PageProps) {
   const { id } = await params;
+  const session = await auth();
   const response = await getReturnRequestDetails(id);
+  const locale = await getLocaleStrings();
 
   if (!response?.success || !response.data) {
     notFound();
   }
 
   const request = response.data as ReturnRequestDetails;
-  const currency = "EGP"; // You can get this from the API if available
+  const currency = session?.user?.currency_code || CURRENCY_CODE; // You can get this from the API if available
+
+  const getStatusTranslation = (status: string) => {
+    const statusKey = status.toLowerCase().replace(/\s+/g, "_");
+    switch (statusKey) {
+      case "pending":
+        return locale.pending;
+      case "platform_received":
+        return locale.platformReceived;
+      case "pharmacy_pending":
+        return locale.pharmacyPending;
+      case "pharmacy_received":
+        return locale.pharmacyReceived;
+      case "approved":
+        return locale.approved;
+      case "rejected":
+        return locale.rejected;
+      case "refunded":
+        return locale.refunded;
+      default:
+        return status.replace(/_/g, " ");
+    }
+  };
 
   return (
     <section className="py-8">
@@ -100,7 +127,7 @@ export default async function RefundRequestDetailsPage({ params }: PageProps) {
           >
             <Link href="/account/refund">
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Refund Requests
+              {locale.backToRefundRequests}
             </Link>
           </Button>
 
@@ -111,19 +138,19 @@ export default async function RefundRequestDetailsPage({ params }: PageProps) {
                 <div className="space-y-2">
                   <div className="flex items-center gap-3">
                     <CardTitle className="text-2xl">
-                      Request #{request.id}
+                      {locale.request} #{request.id}
                     </CardTitle>
                     <Badge className={getStatusColor(request.status)}>
                       <span className="flex items-center gap-1">
                         {getStatusIcon(request.status)}
                         <span className="capitalize">
-                          {request.status.replace(/_/g, " ")}
+                          {getStatusTranslation(request.status)}
                         </span>
                       </span>
                     </Badge>
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    Order #{request.order_number}
+                    {locale.order} #{request.order_number}
                   </p>
                 </div>
 
@@ -131,7 +158,7 @@ export default async function RefundRequestDetailsPage({ params }: PageProps) {
                 {request.is_refunded && (
                   <Badge className="bg-emerald-100 text-emerald-800 dark:bg-emerald-800 dark:text-emerald-100 h-fit">
                     <CheckCircle2 className="h-4 w-4 mr-1" />
-                    Refunded
+                    {locale.refunded}
                   </Badge>
                 )}
               </div>
@@ -142,7 +169,7 @@ export default async function RefundRequestDetailsPage({ params }: PageProps) {
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 bg-muted/50 rounded-lg">
                 <div>
                   <p className="text-xs text-muted-foreground mb-1">
-                    Total Amount
+                    {locale.totalAmount}
                   </p>
                   <p className="text-lg font-bold text-foreground">
                     {formatCurrency(Number(request.total_amount), currency)}
@@ -150,7 +177,7 @@ export default async function RefundRequestDetailsPage({ params }: PageProps) {
                 </div>
                 <div>
                   <p className="text-xs text-muted-foreground mb-1">
-                    Refund Amount
+                    {locale.refundAmount}
                   </p>
                   <p className="text-lg font-bold text-primary">
                     {formatCurrency(Number(request.refund_amount), currency)}
@@ -158,18 +185,20 @@ export default async function RefundRequestDetailsPage({ params }: PageProps) {
                 </div>
                 <div>
                   <p className="text-xs text-muted-foreground mb-1">
-                    Refund Method
+                    {locale.refundMethod}
                   </p>
                   <div className="flex items-center gap-2">
                     {request.refund_to_wallet ? (
                       <>
                         <Wallet className="h-4 w-4 text-primary" />
-                        <span className="font-medium">Wallet</span>
+                        <span className="font-medium">{locale.wallet}</span>
                       </>
                     ) : (
                       <>
                         <Package className="h-4 w-4 text-muted-foreground" />
-                        <span className="font-medium">Original Method</span>
+                        <span className="font-medium">
+                          {locale.originalMethod}
+                        </span>
                       </>
                     )}
                   </div>
@@ -181,7 +210,7 @@ export default async function RefundRequestDetailsPage({ params }: PageProps) {
                 <div className="flex items-center gap-2">
                   <FileText className="h-4 w-4 text-muted-foreground" />
                   <h3 className="font-semibold text-foreground">
-                    Return Reason
+                    {locale.returnReason}
                   </h3>
                 </div>
                 <p className="text-sm text-foreground bg-muted/30 p-3 rounded-md">
@@ -197,7 +226,7 @@ export default async function RefundRequestDetailsPage({ params }: PageProps) {
                   <div className="flex items-center gap-2">
                     <AlertTriangle className="h-4 w-4 text-blue-500" />
                     <h3 className="font-semibold text-foreground">
-                      Platform Notes
+                      {locale.platformNotes}
                     </h3>
                   </div>
                   <p className="text-sm text-foreground bg-blue-50 dark:bg-blue-950/20 p-3 rounded-md border border-blue-200 dark:border-blue-800">
@@ -212,7 +241,7 @@ export default async function RefundRequestDetailsPage({ params }: PageProps) {
                   <div className="flex items-center gap-2">
                     <AlertTriangle className="h-4 w-4 text-purple-500" />
                     <h3 className="font-semibold text-foreground">
-                      Pharmacy Notes
+                      {locale.pharmacyNotes}
                     </h3>
                   </div>
                   <p className="text-sm text-foreground bg-purple-50 dark:bg-purple-950/20 p-3 rounded-md border border-purple-200 dark:border-purple-800">
@@ -228,7 +257,7 @@ export default async function RefundRequestDetailsPage({ params }: PageProps) {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Package className="h-5 w-5" />
-                Returned Items
+                {locale.returnedItems}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -237,24 +266,32 @@ export default async function RefundRequestDetailsPage({ params }: PageProps) {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Product</TableHead>
-                      <TableHead className="text-center">Image</TableHead>
+                      <TableHead>{locale.product}</TableHead>
                       <TableHead className="text-center">
-                        Quantity Returned
+                        {locale.image}
                       </TableHead>
                       <TableHead className="text-center">
-                        Original Qty
+                        {locale.quantityReturned}
                       </TableHead>
-                      <TableHead className="text-right">Unit Price</TableHead>
-                      <TableHead className="text-right">Total</TableHead>
-                      <TableHead className="text-center">Status</TableHead>
+                      <TableHead className="text-center">
+                        {locale.originalQty}
+                      </TableHead>
+                      <TableHead className="text-right">
+                        {locale.unitPrice}
+                      </TableHead>
+                      <TableHead className="text-right">
+                        {locale.total}
+                      </TableHead>
+                      <TableHead className="text-center">
+                        {locale.status}
+                      </TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {request.items.map((item) => (
                       <TableRow key={item.id}>
                         <TableCell className="font-medium">
-                          Product ID: {item.product_id}
+                          {locale.productId}: {item.product_id}
                         </TableCell>
                         <TableCell className="text-center">
                           {item.image ? (
@@ -294,12 +331,12 @@ export default async function RefundRequestDetailsPage({ params }: PageProps) {
                           {item.approved ? (
                             <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100">
                               <CheckCircle2 className="h-3 w-3 mr-1" />
-                              Approved
+                              {locale.approved}
                             </Badge>
                           ) : (
                             <Badge className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100">
                               <Clock className="h-3 w-3 mr-1" />
-                              Pending
+                              {locale.pending}
                             </Badge>
                           )}
                         </TableCell>
@@ -318,21 +355,21 @@ export default async function RefundRequestDetailsPage({ params }: PageProps) {
                       <div className="flex items-start justify-between">
                         <div>
                           <p className="font-medium text-foreground">
-                            Product ID: {item.product_id}
+                            {locale.productId}: {item.product_id}
                           </p>
                           <p className="text-sm text-muted-foreground">
-                            Item #{item.id}
+                            {locale.itemNumber} #{item.id}
                           </p>
                         </div>
                         {item.approved ? (
                           <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100">
                             <CheckCircle2 className="h-3 w-3 mr-1" />
-                            Approved
+                            {locale.approved}
                           </Badge>
                         ) : (
                           <Badge className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100">
                             <Clock className="h-3 w-3 mr-1" />
-                            Pending
+                            {locale.pending}
                           </Badge>
                         )}
                       </div>
@@ -352,13 +389,17 @@ export default async function RefundRequestDetailsPage({ params }: PageProps) {
                       {/* Quantities */}
                       <div className="grid grid-cols-2 gap-3 text-sm">
                         <div>
-                          <p className="text-muted-foreground">Returned</p>
+                          <p className="text-muted-foreground">
+                            {locale.returned}
+                          </p>
                           <Badge variant="outline" className="mt-1">
                             {item.quantity_returned}
                           </Badge>
                         </div>
                         <div>
-                          <p className="text-muted-foreground">Original</p>
+                          <p className="text-muted-foreground">
+                            {locale.original}
+                          </p>
                           <p className="font-medium mt-1">
                             {item.quantity_original}
                           </p>
@@ -369,14 +410,14 @@ export default async function RefundRequestDetailsPage({ params }: PageProps) {
                       <Separator />
                       <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">
-                          Unit Price:
+                          {locale.unitPrice}:
                         </span>
                         <span className="font-medium">
                           {formatCurrency(Number(item.unit_price), currency)}
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="font-medium">Total:</span>
+                        <span className="font-medium">{locale.total}:</span>
                         <span className="font-bold text-primary">
                           {formatCurrency(Number(item.total_price), currency)}
                         </span>

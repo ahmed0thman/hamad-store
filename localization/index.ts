@@ -1,14 +1,22 @@
 "use server";
 import en, { Locale } from "./en";
 import ar from "./ar";
-import { auth } from "@/lib/auth";
+import { cookies } from "next/headers";
 
 const getLocaleStrings = async (): Promise<Locale> => {
-  const session = await auth();
-  const lang: string = session?.user?.language || "en";
+  const cookieStore = await cookies();
+  const lang = cookieStore.get("language")?.value || "ar";
   if (lang === "ar") return ar;
   return en;
 };
 
-export default getLocaleStrings;
+const getLocale = async (): Promise<"ar" | "en"> => {
+  const cookieStore = await cookies();
+  const lang = cookieStore.get("language")?.value || "ar";
+  if (lang === "ar") return "ar";
+  return "en";
+};
 
+export { getLocale };
+
+export default getLocaleStrings;

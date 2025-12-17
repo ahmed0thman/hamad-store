@@ -4,14 +4,16 @@ import Image from "next/image";
 import { Briefcase, Users, ShoppingCart, Globe } from "lucide-react";
 import { aboutSEO } from "@/lib/seo";
 import { getAboutPage } from "@/lib/api/apiSiteInfo";
+import getLocaleStrings from "@/localization";
 
 export const metadata = aboutSEO;
 
 const About = async () => {
   const aboutData = await getAboutPage();
+  const locale = await getLocaleStrings();
   const stats = [
     {
-      label: "إجمالي المبيعات السنوية",
+      label: locale.totalAnnualSales,
       value: aboutData.success
         ? aboutData.data?.annual_sales?.toString() || "15+"
         : "15+",
@@ -19,7 +21,7 @@ const About = async () => {
       icon: <Briefcase className="w-8 h-8 text-teal-600" />,
     },
     {
-      label: "البائعون النشطون على موقعنا",
+      label: locale.activeVendors,
       value: aboutData.success
         ? aboutData.data?.active_vendors?.toString() || "700+"
         : "700+",
@@ -27,7 +29,7 @@ const About = async () => {
       icon: <Users className="w-8 h-8 text-teal-600" />,
     },
     {
-      label: "مبيعات المنتجات الشهرية",
+      label: locale.monthlyProductSales,
       value: aboutData.success
         ? aboutData.data?.monthly_sales?.toString() || "5000+"
         : "5000+",
@@ -35,7 +37,7 @@ const About = async () => {
       icon: <ShoppingCart className="w-8 h-8 text-teal-600" />,
     },
     {
-      label: "الزائرون النشطون على موقعنا",
+      label: locale.activeVisitors,
       value: aboutData.success
         ? aboutData.data?.active_customers?.toString() || "3000+"
         : "3000+",
@@ -67,8 +69,8 @@ const About = async () => {
       <Separator />
 
       <section className="grid grid-cols-1 md:grid-cols-2 gap-10">
-        <div className="space-y-4 text-right">
-          <h2 className="text-3xl font-bold text-teal-700">من نحن</h2>
+        <div className="space-y-4 text-start">
+          <h2 className="text-3xl font-bold text-teal-700">{locale.aboutUs}</h2>
           {aboutData.data?.text ? (
             <div
               dangerouslySetInnerHTML={{ __html: aboutData.data.text }}
@@ -76,18 +78,16 @@ const About = async () => {
           ) : (
             <>
               <p className="text-muted-foreground leading-loose text-lg">
-                نعتني بصحتك... لأنك تستحق الأفضل
+                {locale.weCareAboutYourHealth}
                 <br />
-                نحرص على تقديم خدمات دوائية وصحية موثوقة، مدعومة بخبرة فريقنا من
-                الصيادلة المؤهلين الذين يعملون بكل تفاني لتوفير الرعاية التي
-                تستحقها.
+                {locale.weTakeCareToProvide}
               </p>
               <ul className="list-disc pr-5 space-y-2 text-muted-foreground text-base">
-                <li>صرف الأدوية بوصفة طبية وبدون وصفة</li>
-                <li>استشارات صيدلانية مجانية</li>
-                <li>قياس الضغط والسكر</li>
-                <li>توفير مستلزمات الأطفال والعناية الشخصية</li>
-                <li>عروض خاصة على الفيتامينات والمكملات الغذائية</li>
+                <li>{locale.prescriptionAndOTC}</li>
+                <li>{locale.freePharmacyConsultations}</li>
+                <li>{locale.bloodPressureAndSugarMeasurement}</li>
+                <li>{locale.babySuppliesAndPersonalCare}</li>
+                <li>{locale.specialOffersOnVitamins}</li>
               </ul>
             </>
           )}

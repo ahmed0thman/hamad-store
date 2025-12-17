@@ -1,25 +1,22 @@
 "use client";
 
+import SpinnerMini from "@/components/custom/SpinnerMini";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { signInDefaultValues } from "@/lib/constants";
-import Link from "next/link";
-import { useFormStatus } from "react-dom";
-import loader from "@/assets/loader.gif";
-import Image from "next/image";
-import { redirect, useRouter, useSearchParams } from "next/navigation";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+import { useTranslation } from "@/hooks/useTranslation";
 import { signInWithCredentials } from "@/lib/api/apiUser";
+import { signInDefaultValues } from "@/lib/constants";
 import { signInSchema } from "@/lib/validators";
 import { SignInFormData } from "@/types";
+import { zodResolver } from "@hookform/resolvers/zod";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
-import { revalidatePath } from "next/cache";
-import SpinnerMini from "@/components/custom/SpinnerMini";
+import { useForm } from "react-hook-form";
 
 const CredentialsSignInForm = () => {
+  const { t } = useTranslation();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/";
   const [formError, setFormError] = useState<string | null>(null);
@@ -43,7 +40,7 @@ const CredentialsSignInForm = () => {
     // Add your sign-in logic here
     const res = await signInWithCredentials(data);
     if (res?.success === false) {
-      setFormError("Invalid email or password");
+      setFormError(t("invalidEmailOrPassword"));
       return;
     }
     if (res?.success) {
@@ -56,7 +53,7 @@ const CredentialsSignInForm = () => {
       <input type="hidden" name="callbackUrl" value={callbackUrl} />
       <div className="space-y-6">
         <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
+          <Label htmlFor="email">{t("email")}</Label>
           <Input
             id="email"
             {...register("email")}
@@ -69,7 +66,7 @@ const CredentialsSignInForm = () => {
           )}
         </div>
         <div className="space-y-2">
-          <Label htmlFor="password">Password</Label>
+          <Label htmlFor="password">{t("password")}</Label>
           <Input
             id="password"
             {...register("password")}
@@ -90,13 +87,13 @@ const CredentialsSignInForm = () => {
             </div>
           )}
           <Button className="w-full" variant="default">
-            {pending ? <SpinnerMini /> : "Sign In"}
+            {pending ? <SpinnerMini /> : t("signInTitle")}
           </Button>
         </div>
         <div className="text-center text-sm text-muted-foreground">
-          <span className="me-1">Don&apos;t have an account?</span>
+          <span className="me-1">{t("dontHaveAccount")}</span>
           <Link href="/register" target="_self" className="link">
-            Sign Up
+            {t("signup")}
           </Link>
         </div>
       </div>

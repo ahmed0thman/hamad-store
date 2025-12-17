@@ -50,15 +50,23 @@ export function createSEOMetadata({
   noIndex?: boolean;
 }): Metadata {
   const siteUrl = process.env.NEXTAUTH_URL || "https://valideria.com";
-  const fullTitle = title.includes("فاليديريا")
-    ? title
-    : `${title} | فاليديريا - الصيدلية الإلكترونية الرائدة`;
+  const fullTitle =
+    title.includes("فاليديريا") || title.includes("Valideria")
+      ? title
+      : `${title} | Valideria - فاليديريا | Multi-Vendor Medical & Cosmetics Store - منصة متعددة البائعين للمنتجات الطبية ومستحضرات التجميل`;
   const fullImage = ogImage || `${siteUrl}/images/logos/valideria-og.jpg`;
 
   return {
     title: fullTitle,
     description,
-    keywords: keywords.join(", "),
+    keywords: [
+      "Valideria",
+      "فاليديريا",
+      "فاليدريا",
+      "valideria",
+      "VALIDERIA",
+      ...keywords,
+    ].join(", "),
 
     robots: noIndex
       ? {
@@ -82,14 +90,15 @@ export function createSEOMetadata({
       title: fullTitle,
       description,
       url: canonicalUrl || siteUrl,
-      siteName: "فاليديريا",
+      siteName: "Valideria - فاليديريا",
       locale: "ar_EG",
+      alternateLocale: ["en_US", "ar_SA"],
       images: [
         {
           url: fullImage,
           width: 1200,
           height: 630,
-          alt: title,
+          alt: `${title} - Valideria فاليديريا`,
         },
       ],
     },
@@ -105,6 +114,10 @@ export function createSEOMetadata({
 
     alternates: {
       canonical: canonicalUrl,
+      languages: {
+        "ar-EG": canonicalUrl || siteUrl,
+        "en-US": canonicalUrl || siteUrl,
+      },
     },
 
     other: structuredData

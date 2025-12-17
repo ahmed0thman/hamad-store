@@ -14,6 +14,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import useGetOrderDetails from "@/hooks/useGetOrderDetails";
+import { useTranslation } from "@/hooks/useTranslation";
 import { formatCurrency, formatCurrencyEGP } from "@/lib/utils";
 import {
   clearReturnRequest as clearReturnRequestStorage,
@@ -57,6 +58,7 @@ export default function OrderDetailsPage() {
   const [itemsToReturn, setItemsToReturn] = useState<OrderDetailsItem[]>([]);
   const [isRefundDialogOpen, setIsRefundDialogOpen] = useState(false);
   const { orderDetailsData, isLoadingOrderDetails } = useGetOrderDetails();
+  const { t } = useTranslation();
 
   // Load return requests from localStorage on mount
   useEffect(() => {
@@ -161,13 +163,13 @@ export default function OrderDetailsPage() {
       {/* Order Header */}
       <div className="">
         <h1 className="flex gap-3 items-center text-2xl font-bold tracking-tight text-foreground">
-          Order #{orderDetails?.id}
+          {t("order")} #{orderDetails?.id}
           <Badge
             className={`${getStatusColor(
               orderDetails?.status || ""
             )} text-base`}
           >
-            {orderDetails?.status}
+            {t((orderDetails?.status.toLowerCase() as keyof typeof t) || "")}
           </Badge>
           {orderDetails?.is_request_return && (
             <Badge
@@ -175,7 +177,7 @@ export default function OrderDetailsPage() {
               className="text-base bg-orange-50 dark:bg-orange-950 border-orange-300 dark:border-orange-700 text-orange-700 dark:text-orange-300"
             >
               <AlertCircle className="w-4 h-4 me-1" />
-              Return Requested
+              {t("returnRequested")}
             </Badge>
           )}
         </h1>
@@ -187,21 +189,21 @@ export default function OrderDetailsPage() {
           <TableHeader className="bg-muted">
             <TableRow>
               <TableHead className="p-4 font-medium text-foreground">
-                Name
+                {t("name")}
               </TableHead>
               <TableHead className="p-4 font-medium text-foreground">
-                Quantity
+                {t("quantity")}
               </TableHead>
               <TableHead className="p-4 font-medium text-foreground">
-                Unit Price
+                {t("unitPrice")}
               </TableHead>
               <TableHead className="p-4 font-medium text-foreground">
-                Total
+                {t("total")}
               </TableHead>
               {(orderDetails?.status.toLowerCase() === "delivered" ||
                 orderDetails?.status.toLowerCase() === "completed") && (
                 <TableHead className="p-4 font-medium text-foreground">
-                  Actions
+                  {t("actions")}
                 </TableHead>
               )}
             </TableRow>
@@ -257,23 +259,23 @@ export default function OrderDetailsPage() {
                             toast(
                               <div className="space-y-2 ">
                                 <span>
-                                  ${item.product_name} has been added. You can
-                                  add more or view the request.
+                                  {item.product_name}{" "}
+                                  {t("productAddedToRefund")}
                                 </span>
                                 <Button
                                   variant="link"
                                   className="underline block ms-auto"
                                   onClick={() => setIsRefundDialogOpen(true)}
                                 >
-                                  View Request
+                                  {t("viewRequest")}
                                 </Button>
                               </div>
                             );
                           }}
                         >
                           {isItemAlreadyAdded(item.product_id)
-                            ? "remove from return"
-                            : "Add to Return"}
+                            ? t("removeFromReturn")
+                            : t("addToReturn")}
                         </Button>
                       )}
                   </TableCell>
@@ -292,16 +294,15 @@ export default function OrderDetailsPage() {
               <AlertCircle className="w-5 h-5 text-orange-600 dark:text-orange-400 flex-shrink-0 mt-0.5" />
               <div className="space-y-1">
                 <h3 className="font-semibold text-orange-900 dark:text-orange-100">
-                  Return Request Submitted
+                  {t("returnRequestSubmitted")}
                 </h3>
                 <p className="text-sm text-orange-700 dark:text-orange-300">
-                  A return request has already been submitted for this order.
-                  You can view the status in your{" "}
+                  {t("returnRequestAlreadySubmitted")}{" "}
                   <Link
                     href="/account/refund"
                     className="underline font-medium hover:text-orange-900 dark:hover:text-orange-100"
                   >
-                    refund requests
+                    {t("refundRequests")}
                   </Link>
                   .
                 </p>
@@ -319,7 +320,7 @@ export default function OrderDetailsPage() {
             size="lg"
             className="shadow-lg h-14 px-6 rounded-full"
           >
-            View Return Request ({itemsToReturn.length})
+            {t("viewReturnRequest")} ({itemsToReturn.length})
           </Button>
         </div>
       )}
@@ -327,8 +328,8 @@ export default function OrderDetailsPage() {
       {/* if there are items to return show a dialog button that opens the return request dialog */}
       {itemsToReturn.length > 0 && (
         <Button onClick={() => setIsRefundDialogOpen(true)}>
-          Show Return Request ({itemsToReturn.length} item
-          {itemsToReturn.length > 1 ? "s" : ""})
+          {t("showReturnRequest")} ({itemsToReturn.length}{" "}
+          {itemsToReturn.length > 1 ? t("items") : t("item")})
         </Button>
       )}
 
@@ -346,9 +347,9 @@ export default function OrderDetailsPage() {
       {/* Order Summary */}
       <Card>
         <CardContent className="space-y-2">
-          <h3 className="text-lg font-bold">Order Summary</h3>
+          <h3 className="text-lg font-bold">{t("orderSummary")}</h3>
           <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">Subtotal</span>
+            <span className="text-muted-foreground">{t("subtotal")}</span>
             <span>
               {formatCurrency(
                 Number(orderDetails?.total),
@@ -358,14 +359,14 @@ export default function OrderDetailsPage() {
           </div>
           {orderDetails?.coupon_discount && (
             <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Coupon</span>
+              <span className="text-muted-foreground">{t("coupon")}</span>
               <span>
                 {formatCurrencyEGP(Number(orderDetails?.coupon_discount))}
               </span>
             </div>
           )}
           <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">Shipping</span>
+            <span className="text-muted-foreground">{t("shipping")}</span>
             <span>
               {formatCurrency(
                 Number(orderDetails?.shipping_cost),
@@ -374,7 +375,7 @@ export default function OrderDetailsPage() {
             </span>
           </div>
           <div className="flex justify-between text-sm font-semibold">
-            <span>Total</span>
+            <span>{t("total")}</span>
             <span>
               {formatCurrency(
                 Number(orderDetails?.total_after_shipping),
@@ -387,27 +388,27 @@ export default function OrderDetailsPage() {
 
       {/* Shipping Address */}
       <div className="space-y-2">
-        <h3 className="text-lg font-bold">Shipping Address</h3>
+        <h3 className="text-lg font-bold">{t("shippingAddress")}</h3>
         <p className="text-sm">
-          {orderDetails?.shipping_address || "No shipping address provided"}
+          {orderDetails?.shipping_address || t("noShippingAddress")}
         </p>
       </div>
 
       {/* Payment Method */}
       <div className="space-y-2">
-        <h3 className="text-lg font-bold">Payment Method</h3>
+        <h3 className="text-lg font-bold">{t("paymentMethod")}</h3>
 
         <p className="text-base truncate capitalize">
-          {orderDetails?.payment_type || "No payment method provided"}
+          {orderDetails?.payment_type || t("noPaymentMethod")}
         </p>
       </div>
 
       {/* Delivery */}
       <div className="space-y-2">
-        <h3 className="text-lg font-bold">Delivery Date</h3>
+        <h3 className="text-lg font-bold">{t("deliveryDate")}</h3>
         <p className="text-sm">
-          Estimated delivery:{" "}
-          {orderDetails?.due_date || "No delivery date provided"}
+          {t("estimatedDelivery")}{" "}
+          {orderDetails?.due_date || t("noDeliveryDate")}
         </p>
       </div>
     </div>

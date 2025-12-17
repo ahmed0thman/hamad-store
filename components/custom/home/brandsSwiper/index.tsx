@@ -28,7 +28,7 @@ const BrandSwiper = ({
             <span>{headLine}</span>{" "}
             <span className="text-teal-600">{highlight}</span>
           </h3>
-          <p className="text-gray-500 font-medium lg:font-semibold text-base lg:text-lg dark:text-slate-500 text-center mb-6">
+          <p className="text-gray-600 dark:text-gray-400 font-medium lg:font-semibold text-base lg:text-lg text-center mb-6">
             {subHeadign}
           </p>
         </div>

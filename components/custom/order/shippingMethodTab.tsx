@@ -1,25 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { useEffect, useState, useTransition } from "react";
-import ButtonStepNav from "./buttonStepNav";
-import { ArrowLeft, ArrowRight, CheckCircle, OctagonX } from "lucide-react";
-import { useOrder } from "@/contexts/OrderContext";
-import {
-  CartData,
-  CartPharmacy,
-  orderSaveParams,
-  ShippingMethod,
-} from "@/types";
-import { useSession } from "next-auth/react";
-import {
-  getPharmacyShippingMethods,
-  getSiteShippingMethods,
-} from "@/lib/api/apiUser";
-import Spinner from "../spinner";
-import { formatCurrency, formatCurrencyEGP } from "@/lib/utils";
-import { useSearchParams } from "next/navigation";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -27,15 +9,33 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import Link from "next/link";
-import SpinnerMini from "../SpinnerMini";
-import { addCouponToCart, getCartData } from "@/lib/api/apiCart";
-import { toast } from "sonner";
-import { saveOrder } from "@/lib/api/apiOrders";
-import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { useOrder } from "@/contexts/OrderContext";
 import { useGetProfile } from "@/hooks/useGetProfile";
+import { getCartData } from "@/lib/api/apiCart";
+import { saveOrder } from "@/lib/api/apiOrders";
+import {
+  getPharmacyShippingMethods,
+  getSiteShippingMethods,
+} from "@/lib/api/apiUser";
 import { CURRENCY_CODE } from "@/lib/constants";
+import { formatCurrency } from "@/lib/utils";
+import {
+  CartData,
+  CartPharmacy,
+  orderSaveParams,
+  ShippingMethod,
+} from "@/types";
+import { ArrowLeft, CheckCircle, OctagonX } from "lucide-react";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useState, useTransition } from "react";
+import { toast } from "sonner";
+import Spinner from "../spinner";
+import SpinnerMini from "../SpinnerMini";
+import ButtonStepNav from "./buttonStepNav";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export default function ShippingMethodTab({ onBack }: { onBack: () => void }) {
   const searchParams = useSearchParams();
@@ -59,7 +59,7 @@ export default function ShippingMethodTab({ onBack }: { onBack: () => void }) {
   const [pendingShippingMethods, startTransitionShippingMethods] =
     useTransition();
   const [couponCode, setCouponCode] = useState<string>("");
-
+  const { t } = useTranslation();
   const { profileData, isLoadoingProfile } = useGetProfile();
 
   async function fetchShippingMethods() {
@@ -122,10 +122,7 @@ export default function ShippingMethodTab({ onBack }: { onBack: () => void }) {
       toast(
         <div className="flex items-center gap-2">
           <OctagonX className="inline-block ms-2 text-red-500" />
-          <span>
-            Please select a shipping address, shipping method, and payment
-            method.
-          </span>
+          <span>{t("selectShippingError")}</span>
         </div>
       );
       return;
@@ -190,7 +187,7 @@ export default function ShippingMethodTab({ onBack }: { onBack: () => void }) {
   return (
     <div className="space-y-4 pt-4">
       <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100">
-        Shipping Method
+        {t("shippingMethod")}
       </h3>
       <RadioGroup
         value={shippingMethod}
@@ -225,13 +222,16 @@ export default function ShippingMethodTab({ onBack }: { onBack: () => void }) {
                     {method.type}
                   </p>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Estimated delivery: <b>{method.duration} hours</b>
+                    {t("estimatedDelivery")}{" "}
+                    <b>
+                      {method.duration} {t("hours")}
+                    </b>
                   </p>
                 </div>
               </div>
               <div className="flex items-center">
                 <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-semibold">
-                  Fees: {formatCurrency(+method.value, currency)}
+                  {t("fees")} {formatCurrency(+method.value, currency)}
                 </span>
               </div>
             </label>
@@ -257,7 +257,7 @@ export default function ShippingMethodTab({ onBack }: { onBack: () => void }) {
       {!pending && pharmacyData && (
         <div className="max-w-xl mx-auto mt-8 mb-6">
           <div className="bg-primary/10 dark:bg-muted border border-border rounded-xl shadow-sm p-6">
-            <h4 className="text-lg font-semibold mb-4">Order Summary</h4>
+            <h4 className="text-lg font-semibold mb-4">{t("orderSummary")}</h4>
             <div className="mb-4">
               {pharmacyData.items.map((item) => (
                 <div
@@ -278,41 +278,41 @@ export default function ShippingMethodTab({ onBack }: { onBack: () => void }) {
             </div>
             <div className="space-y-3 divide-y divide-accent text-sm">
               <div className="flex justify-between">
-                <span>Products Total</span>
+                <span>{t("productsTotal")}</span>
                 <span className="font-medium">
                   {formatCurrency(pharmacyData.total, currency)}
                 </span>
               </div>
               {pharmacyData.promocoded && (
                 <div className="flex justify-between">
-                  <span>Coupon</span>
+                  <span>{t("coupon")}</span>
                   <span className="font-medium text-green-600">
                     - {formatCurrency(pharmacyData.coupon_discount, currency)}
                   </span>
                 </div>
               )}
               <div className="flex justify-between capitalize">
-                <span>Location</span>
+                <span>{t("location")}</span>
                 <span className="font-medium">{shippingAddressValue}</span>
               </div>
               <div className="flex justify-between">
-                <span>Shipping Method</span>
+                <span>{t("shippingMethod")}</span>
                 <span className="font-medium capitalize">
                   {shippingMethodValue}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span>Payment Method</span>
+                <span>{t("paymentMethod")}</span>
                 <span className="font-medium capitalize">{paymentMethod}</span>
               </div>
               {!is_doctor && (
                 <>
                   <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-                    use coupon code to earn points
+                    {t("useCouponCode")}
                   </p>
                   <div className="flex items-center gap-2">
                     <Input
-                      placeholder="أدخل الكوبون"
+                      placeholder={t("enterCoupon")}
                       className="flex-grow"
                       value={couponCode}
                       onChange={(e) => setCouponCode(e.target.value)}
@@ -329,7 +329,7 @@ export default function ShippingMethodTab({ onBack }: { onBack: () => void }) {
               )}
               <div className="border-t border-border my-3"></div>
               <div className="flex justify-between text-base font-bold">
-                <span>Total</span>
+                <span>{t("total")}</span>
                 <span>
                   {formatCurrency(pharmacyData.total + shippingFees, currency)}
                 </span>
@@ -342,10 +342,10 @@ export default function ShippingMethodTab({ onBack }: { onBack: () => void }) {
       <div className="flex justify-end items-center gap-3 pt-4">
         <ButtonStepNav handleClick={onBack}>
           <ArrowLeft className="auto-dir" />
-          Back
+          {t("back")}
         </ButtonStepNav>
         <Button onClick={handlePlaceOrder}>
-          {pendingSave ? <SpinnerMini /> : "Place Order"}
+          {pendingSave ? <SpinnerMini /> : t("placeOrder")}
         </Button>
       </div>
 
@@ -360,23 +360,23 @@ export default function ShippingMethodTab({ onBack }: { onBack: () => void }) {
           </div>
           <DialogHeader>
             <DialogTitle className="text-green-600 text-center">
-              Order Placed Successfully!
+              {t("orderPlacedSuccessfully")}
             </DialogTitle>
           </DialogHeader>
           <div className="my-4">
             <p className="text-base text-muted-foreground mb-2">
-              Your order has been placed. Thank you for shopping with us!
+              {t("orderPlacedThankYou")}
             </p>
           </div>
           <DialogFooter className="flex flex-col gap-2">
             <Button asChild variant="default" className="">
               <Link href="/account/orders" replace>
-                Show Order
+                {t("showOrder")}
               </Link>
             </Button>
             <Button asChild variant="secondary" className="">
               <Link href="/" replace>
-                Keep Shopping
+                {t("keepShopping")}
               </Link>
             </Button>
           </DialogFooter>

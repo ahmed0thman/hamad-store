@@ -18,6 +18,7 @@ import { toast } from "sonner";
 import SpinnerMini from "../SpinnerMini";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useGetCart } from "@/hooks/useGetCart";
+import { useTranslation } from "@/hooks/useTranslation";
 
 const ButtonSubmit = ({ children }: { children: React.ReactNode }) => {
   const { pending } = useFormStatus();
@@ -36,6 +37,7 @@ const AddToCart = ({
   productId: number;
   stock: number;
 }) => {
+  const locale = useTranslation();
   const pathName = usePathname();
   const router = useRouter();
   const [inCart, setInCart] = useState(false);
@@ -52,7 +54,7 @@ const AddToCart = ({
       if (response && response.success) {
         setInCartCount(1);
         setInCart(true);
-        showToast("Item added to cart successfully");
+        showToast(locale.t("itemAddedToCart"));
         queryClient.invalidateQueries({ queryKey: ["cart"] });
       }
     },
@@ -63,13 +65,13 @@ const AddToCart = ({
     onSuccess: (response) => {
       if (response && response.success) {
         setInCartCount((prev) => prev + 1);
-        showToast("Item updated in cart successfully");
+        showToast(locale.t("itemUpdatedInCart"));
         queryClient.invalidateQueries({ queryKey: ["cart"] });
       }
       if (response && response.stockOut) {
-        toast.error("Not enough stock available", {
+        toast.error(locale.t("notEnoughStock"), {
           action: {
-            label: "View Cart",
+            label: locale.t("viewCart"),
             onClick: () => {
               router.push("/cart");
             },
@@ -84,7 +86,7 @@ const AddToCart = ({
     onSuccess: (response) => {
       if (response && response.success) {
         setInCartCount((prev) => Math.max(prev - 1, 0));
-        showToast("Item updated in cart successfully");
+        showToast(locale.t("itemUpdatedInCart"));
         queryClient.invalidateQueries({ queryKey: ["cart"] });
         if (inCartCount === 1) {
           setInCart(false);
@@ -134,7 +136,7 @@ const AddToCart = ({
     // revalidate(pathName);
     toast.success(message, {
       action: {
-        label: "View Cart",
+        label: locale.t("viewCart"),
         onClick: () => {
           router.push("/cart");
         },
@@ -146,9 +148,9 @@ const AddToCart = ({
     return (
       <Button
         onClick={() => {
-          toast.warning("You are not signed in!", {
+          toast.warning(locale.t("notSignedIn"), {
             action: {
-              label: "go to sign in",
+              label: locale.t("goToSignIn"),
               onClick: () => {
                 router.push(`/signin?callbackUrl=${pathName}`);
               },
@@ -157,7 +159,7 @@ const AddToCart = ({
         }}
       >
         <ShoppingCart className="w-5 h-5" />
-        أضف إلى العربة
+        {locale.t("addToCart")}
       </Button>
     );
   }
@@ -210,7 +212,7 @@ const AddToCart = ({
         ) : (
           <>
             <Plus className="w-5 h-5" />
-            أضف إلى العربة
+            {locale.t("addToCart")}
           </>
         )}
       </Button>

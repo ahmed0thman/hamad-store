@@ -6,6 +6,7 @@ import { Session } from "next-auth";
 import { useTheme } from "next-themes";
 import { ReactNode, useEffect, useState } from "react";
 import ButtonLang from "./buttonLang";
+import { useTranslation } from "@/hooks/useTranslation";
 
 const HeaderButtons = ({
   children,
@@ -16,6 +17,7 @@ const HeaderButtons = ({
 }) => {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const { t } = useTranslation();
 
   useEffect(() => {
     setMounted(true);
@@ -30,7 +32,12 @@ const HeaderButtons = ({
       <ButtonLang />
       <div suppressHydrationWarning>
         {mounted && (
-          <Button onClick={toggleTheme} variant="ghost" className=" p-0">
+          <Button
+            onClick={toggleTheme}
+            variant="ghost"
+            className=" p-0"
+            aria-label={t("toggleTheme")}
+          >
             {theme === "light" ? (
               <Moon className="!w-6 !h-6" />
             ) : (

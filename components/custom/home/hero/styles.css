@@ -1,4 +1,11 @@
 .heroCarousel {
+  contain: layout style paint;
+  will-change: transform;
+
+  .swiper-slide {
+    contain: layout paint;
+  }
+
   .swiper-pagination {
     bottom: 6rem;
     inset-inline-start: 25%;

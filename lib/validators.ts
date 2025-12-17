@@ -1,5 +1,8 @@
 import z, { boolean, optional } from "zod";
 import { formatCurrencyEGP } from "./utils";
+import { getValidatorTranslations } from "./getValidatorTranslations";
+
+const t = () => getValidatorTranslations();
 
 export const currency = z.string().refine(
   (val) => {
@@ -9,7 +12,7 @@ export const currency = z.string().refine(
       return false;
     }
   },
-  { message: "Invalid currency format" }
+  { message: t().invalidCurrencyFormat }
 );
 
 export const gender = z.string().refine(
@@ -17,54 +20,44 @@ export const gender = z.string().refine(
     return val === "male" || val === "female";
   },
   {
-    message: "Gender must be either 'male' or 'female'",
+    message: t().genderMustBeMaleOrFemale,
   }
 );
 
 // Global reusable phone number schema
 export const phoneNumberSchema = z
   .string()
-  .min(5, "Phone number must be at least 5 characters")
-  .max(20, "Phone number must not exceed 20 characters")
-  .regex(
-    /^[\d+\-_() .]+$/,
-    "Invalid phone number. Only digits, +, -, _, (), spaces, and . are allowed."
-  )
-  .refine(
-    (val) => /\d/.test(val),
-    "Phone number must contain at least one digit"
-  );
+  .min(5, t().phoneNumberMin)
+  .max(20, t().phoneNumberMax)
+  .regex(/^[\d+\-_() .]+$/, t().invalidPhoneNumber)
+  .refine((val) => /\d/.test(val), t().phoneNumberMustHaveDigit);
 
 export const cartItemSchema = z.object({
-  productId: z.string().min(1, "Product ID is required"),
-  name: z.string().min(1, "Product name is required"),
-  slug: z.string().min(1, "Product slug is required"),
-  quantity: z.number().int().min(1, "Quantity must be at least 1"),
-  image: z.string().url("Image must be a valid URL"),
+  productId: z.string().min(1, t().productIdRequired),
+  name: z.string().min(1, t().productNameRequired),
+  slug: z.string().min(1, t().productSlugRequired),
+  quantity: z.number().int().min(1, t().quantityMin),
+  image: z.string().url(t().imageMustBeUrl),
   unitPrice: currency,
   totalPrice: currency,
 });
 
 export const insertCartSchema = z.object({
-  items: z.array(cartItemSchema).min(1, "Cart must have at least one item"),
+  items: z.array(cartItemSchema).min(1, t().cartMinItems),
   total: currency,
-  totalItems: z.number().int().min(1, "Total items must be at least 1"),
+  totalItems: z.number().int().min(1, t().totalItemsMin),
   totalPrice: currency,
   totalPriceWithDiscount: currency.optional(),
-  discount: z.number().int().min(0, "Discount must be at least 0").optional(),
+  discount: z.number().int().min(0, t().discountMin).optional(),
   userId: z.string().optional().nullable(),
-  sessionCartId: z.string().min(1, "Session Cart ID is required"),
+  sessionCartId: z.string().min(1, t().sessionCartIdRequired),
 });
 
 export const cardSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  number: z
-    .string()
-    .regex(/^\d{4} \d{4} \d{4} \d{4}$/, "Card number must be 16 digits"),
-  expiry: z
-    .string()
-    .regex(/^(0[1-9]|1[0-2])\/\d{2}$/, "Expiry must be in MM/YY format"),
-  cvv: z.string().regex(/^\d{3,4}$/, "Invalid CVV"),
+  name: z.string().min(1, t().nameRequired),
+  number: z.string().regex(/^\d{4} \d{4} \d{4} \d{4}$/, t().cardNumberInvalid),
+  expiry: z.string().regex(/^(0[1-9]|1[0-2])\/\d{2}$/, t().expiryInvalid),
+  cvv: z.string().regex(/^\d{3,4}$/, t().cvvInvalid),
   setDefault: z.boolean().optional(),
 });
 
@@ -72,26 +65,24 @@ export const cardSchema = z.object({
 
 export const registerSchema = z
   .object({
-    first_name: z.string().min(1, "First name is required"),
-    last_name: z.string().min(1, "Last name is required"),
-    state: z.string().min(1, "Address is required"),
+    first_name: z.string().min(1, t().firstNameRequired),
+    last_name: z.string().min(1, t().lastNameRequired),
+    state: z.string().min(1, t().addressRequired),
     gender: gender,
-    age: z.string().regex(/^\d+$/, "Age must be a valid number"),
+    age: z.string().regex(/^\d+$/, t().ageRequired),
     phone: phoneNumberSchema,
-    email: z.string().email("Email must be a valid email address"),
-    password: z.string().min(8, "Password must be at least 8 characters"),
-    password_confirmation: z
-      .string()
-      .min(8, "Password confirmation must be at least 8 characters"),
+    email: z.string().email(t().emailRequired),
+    password: z.string().min(8, t().passwordMin),
+    password_confirmation: z.string().min(8, t().passwordConfirmationMin),
   })
   .refine((data) => data.password === data.password_confirmation, {
-    message: "Passwords must match",
+    message: t().passwordsMustMatch,
     path: ["password_confirmation"],
   });
 
 // Doctor Rigister schema
 export const doctorRegisterSchema = registerSchema.extend({
-  license_number: z.string().min(1, "License number is required"),
+  license_number: z.string().min(1, t().licenseNumberRequired),
   certificate_file: z.string().refine(
     (val) => {
       // Accept URLs ending with allowed extensions
@@ -101,31 +92,30 @@ export const doctorRegisterSchema = registerSchema.extend({
       );
     },
     {
-      message:
-        "Certificate file must be a valid PDF, DOC, DOCX, JPG, PNG, JPEG, or SVG file URL",
+      message: t().certificateFileInvalid,
     }
   ),
-  specialization_id: z.string().min(1, "Specialization is required"),
+  specialization_id: z.string().min(1, t().specializationRequired),
   is_doctor: z.number().min(0).max(1).default(1).optional(),
 });
 
 // Create the signin schema
 export const signInSchema = z.object({
-  email: z.string().email("Email must be a valid email address"),
-  password: z.string().min(8, "Password must be at least 8 characters"),
+  email: z.string().email(t().emailRequired),
+  password: z.string().min(8, t().passwordMin),
 });
 
 export const profileSchema = z.object({
   id: z.string().optional(),
-  first_name: z.string().min(2, "First name is required"),
+  first_name: z.string().min(2, t().firstNameMin),
   last_name: z.string().optional(),
   phone: phoneNumberSchema,
   language: z.string().optional(),
   gender: gender,
-  state: z.string().min(1, "address is required"),
-  age: z.number().int().min(0, "Age must be a valid number"),
-  email: z.string().email("Email must be a valid email address"),
-  profile_image: z.string().url("Profile image must be a valid URL").optional(),
+  state: z.string().min(1, t().addressRequired),
+  age: z.number().int().min(0, t().ageMin),
+  email: z.string().email(t().emailRequired),
+  profile_image: z.string().url(t().profileImageUrl).optional(),
   is_doctor: boolean().optional(),
   currency_code: z.string().optional(),
   Professional_info: z
@@ -146,8 +136,7 @@ export const profileSchema = z.object({
             );
           },
           {
-            message:
-              "Certificate file must be a valid PDF, DOC, DOCX, JPG, PNG, JPEG, or SVG file URL",
+            message: t().certificateFileInvalid,
           }
         )
         .optional(),
@@ -158,42 +147,36 @@ export const profileSchema = z.object({
 });
 
 export const userAddressSchema = z.object({
-  name: z.string().min(1, "Address name is required"),
+  name: z.string().min(1, t().addressNameRequired),
   phone: phoneNumberSchema,
-  building: z.string().min(1, "Building is required"),
-  area: z.string().min(1, "Area is required"),
-  city: z.string().min(1, "City is required"),
+  building: z.string().min(1, t().buildingRequired),
+  area: z.string().min(1, t().areaRequired),
+  city: z.string().min(1, t().cityRequired),
   is_default: z.number().int().min(0).max(1).optional(),
 });
 
 // Plan Subscription schema
 export const planSubscriptionFormSchema = z
   .object({
-    plan_id: z.number().int().min(1, "Plan ID is required"),
-    name: z.string().min(1, "Name is required"),
-    email: z.string().email("Email must be a valid email address"),
+    plan_id: z.number().int().min(1, t().planIdRequired),
+    name: z.string().min(1, t().nameRequired),
+    email: z.string().email(t().emailRequired),
     phone: phoneNumberSchema,
-    password: z.string().min(8, "Password must be at least 8 characters"),
+    password: z.string().min(8, t().passwordMin),
     password_confirmation: z
       .string()
-      .min(8, "Password confirmation must be at least 8 characters")
+      .min(8, t().passwordConfirmationMin)
       .optional(),
-    pharmacy_name_ar: z.string().min(1, "Pharmacy name in Arabic is required"),
-    pharmacy_name_en: z.string().min(1, "Pharmacy name in English is required"),
-    pharmacy_address_ar: z
-      .string()
-      .min(1, "Pharmacy address in Arabic is required"),
-    pharmacy_address_en: z
-      .string()
-      .min(1, "Pharmacy address in English is required"),
+    pharmacy_name_ar: z.string().min(1, t().pharmacyNameArRequired),
+    pharmacy_name_en: z.string().min(1, t().pharmacyNameEnRequired),
+    pharmacy_address_ar: z.string().min(1, t().pharmacyAddressArRequired),
+    pharmacy_address_en: z.string().min(1, t().pharmacyAddressEnRequired),
     pharmacy_phone: phoneNumberSchema,
-    pharmacy_email: z
-      .string()
-      .email("Pharmacy email must be a valid email address"),
+    pharmacy_email: z.string().email(t().pharmacyEmailInvalid),
     payment_method: z
       .enum(["card", "cash", "wallet"])
       .refine((val) => ["card", "cash", "wallet"].includes(val), {
-        message: "Payment method must be either 'card', 'cash', or 'wallet'",
+        message: t().paymentMethodInvalid,
       }),
   })
   .refine(
@@ -201,27 +184,25 @@ export const planSubscriptionFormSchema = z
       !data.password_confirmation ||
       data.password === data.password_confirmation,
     {
-      message: "Passwords must match",
+      message: t().passwordsMustMatch,
       path: ["password_confirmation"],
     }
   );
 
 export const updateUserPasswordSchema = z
   .object({
-    current_password: z.string().min(8, "Current password is required"),
-    password: z.string().min(8, "New password must be at least 8 characters"),
-    password_confirmation: z
-      .string()
-      .min(8, "New password confirmation must be at least 8 characters"),
+    current_password: z.string().min(8, t().currentPasswordRequired),
+    password: z.string().min(8, t().newPasswordMin),
+    password_confirmation: z.string().min(8, t().newPasswordConfirmationMin),
   })
   .refine((data) => data.password === data.password_confirmation, {
-    message: "New passwords must match",
+    message: t().newPasswordsMustMatch,
     path: ["new_password_confirmation"],
   });
 
 export const contactMessageSchema = z.object({
-  name: z.string().min(1, "Name is required"),
+  name: z.string().min(1, t().nameRequired),
   phone: phoneNumberSchema,
-  email: z.string().email("Email must be a valid email address"),
-  message: z.string().min(1, "Message is required"),
+  email: z.string().email(t().emailRequired),
+  message: z.string().min(1, t().messageRequired),
 });

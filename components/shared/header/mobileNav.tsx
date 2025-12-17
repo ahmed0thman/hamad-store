@@ -1,7 +1,9 @@
 "use client";
 
 import { useGetCart } from "@/hooks/useGetCart";
+import { useTranslation } from "@/hooks/useTranslation";
 import { CartData } from "@/types";
+import { Locale } from "@/localization/en";
 import {
   House,
   MessagesSquare,
@@ -9,23 +11,27 @@ import {
   Search,
   ShoppingCart,
   TruckElectric,
+  PanelLeft,
 } from "lucide-react";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
 
-const navItems = [
-  { href: "/", icon: House, label: "الرئيسية" },
-  // { href: "/account/portions", icon: Pill, label: "جرعتي" },
-  { href: "/products", icon: Pill, label: "المنتجات" },
-  { href: "/account/orders", icon: Search, label: "بحث", id: "search-nav" },
-  { href: "/cart", icon: ShoppingCart, label: "العربة" },
-  { href: "/account/orders", icon: TruckElectric, label: "طلباتي" },
-  // { href: "/account/chat", icon: MessagesSquare, label: "المحادثات" },
+const getNavItems = (t: (key: keyof Locale) => string) => [
+  { href: "/", icon: House, label: t("home") },
+  // { href: "/account/portions", icon: Pill, label: t("myDose") },
+  // { href: "/products", icon: Pill, label: t("products") },
+  { href: "/account/compare", icon: PanelLeft, label: t("compareProducts") },
+  // { href: "/search", icon: Search, label: t("search"), id: "search-nav" },
+  { href: "/cart", icon: ShoppingCart, label: t("cart") },
+  { href: "/account/orders", icon: TruckElectric, label: t("myOrders") },
+  // { href: "/account/chat", icon: MessagesSquare, label: t("myChats") },
 ];
 
 const MobileNav = () => {
+  const { t } = useTranslation();
+  const navItems = getNavItems(t);
   const pathName = usePathname();
   const isActive = (href: string) => {
     if (href === "/") {

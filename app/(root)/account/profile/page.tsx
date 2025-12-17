@@ -23,6 +23,7 @@ import ChangePassword from "@/components/custom/profile/changePassword";
 import { useGetProfile } from "@/hooks/useGetProfile";
 import { useQueryClient } from "@tanstack/react-query";
 import useGetDoctorsSpecializations from "@/hooks/useGetDoctorsSpecializations";
+import { useTranslation } from "@/hooks/useTranslation";
 
 const Profile = () => {
   const { isLoadoingProfile, profileData } = useGetProfile();
@@ -31,6 +32,7 @@ const Profile = () => {
     useGetDoctorsSpecializations();
   const router = useRouter();
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
   const {
     register,
     handleSubmit,
@@ -106,15 +108,16 @@ const Profile = () => {
     // Call the API to update the profile
     const response = await updateUserProfile(updatedProfileData);
     if (response && response.success) {
-      toast.success("تم تحديث الملف الشخصي بنجاح", {
+      toast.success(t("profileUpdatedSuccessfully"), {
         duration: 3000,
-        description: "تم حفظ التغييرات بنجاح.",
+        description: t("changesSavedSuccessfully"),
       });
       queryClient.invalidateQueries({ queryKey: ["profile"] });
     } else {
-      toast.error("فشل تحديث الملف الشخصي", {
+      toast.error(t("failedToUpdateProfile"), {
         duration: 3000,
-        description: response?.message || "حدث خطأ أثناء تحديث الملف الشخصي.",
+        description:
+          response?.message || t("errorOccurredWhileUpdatingProfile"),
       });
     }
   }
@@ -150,12 +153,12 @@ const Profile = () => {
   }
 
   const specializations = specializationsResponse?.data as specializationT[];
+
   return (
     <div className="">
       <h1 className="text-2xl font-bold text-gray-800 dark:text-white mb-6">
-        تفاصيل الحساب
-      </h1>
-
+        {t("accountDetails")}
+      </h1>{" "}
       <form
         className="grid grid-cols-1 md:grid-cols-2 gap-6"
         onSubmit={handleSubmit(updateProfile)}
@@ -165,12 +168,12 @@ const Profile = () => {
             htmlFor="first-name"
             className="mb-1 block text-sm font-medium text-muted-foreground"
           >
-            الاسم الأول *
+            {t("firstName")} *
           </Label>
           <Input
             id="first-name"
             {...register("first_name")}
-            placeholder="الاسم الأول"
+            placeholder={t("firstName")}
             type="text"
           />
           {errors.first_name && (
@@ -184,12 +187,12 @@ const Profile = () => {
             htmlFor="last-name"
             className="mb-1 block text-sm font-medium text-muted-foreground"
           >
-            الاسم الأخير *
+            {t("lastName")} *
           </Label>
           <Input
             id="last-name"
             {...register("last_name")}
-            placeholder="الاسم الأخير"
+            placeholder={t("lastName")}
             type="text"
           />
           {errors.last_name && (
@@ -203,12 +206,12 @@ const Profile = () => {
             htmlFor="phone"
             className="mb-1 block text-sm font-medium text-muted-foreground"
           >
-            رقم الهاتف *
+            {t("phone")} *
           </Label>
           <Input
             id="phone"
             {...register("phone")}
-            placeholder="رقم الهاتف"
+            placeholder={t("phone")}
             type="tel"
           />
           {errors.phone && (
@@ -220,12 +223,12 @@ const Profile = () => {
             htmlFor="email"
             className="mb-1 block text-sm font-medium text-muted-foreground"
           >
-            البريد الإلكتروني *
+            {t("email")} *
           </Label>
           <Input
             id="email"
             {...register("email")}
-            placeholder="البريد الإلكتروني"
+            placeholder={t("email")}
             type="text"
           />
           {errors.email && (
@@ -237,12 +240,12 @@ const Profile = () => {
             htmlFor="age"
             className="mb-1 block text-sm font-medium text-muted-foreground"
           >
-            العمر *
+            {t("age")} *
           </Label>
           <Input
             id="age"
             {...register("age", { valueAsNumber: true })}
-            placeholder="العمر"
+            placeholder={t("age")}
             type="number"
           />
           {errors.age && (
@@ -254,12 +257,12 @@ const Profile = () => {
             htmlFor="gender"
             className="mb-1 block text-sm font-medium text-muted-foreground"
           >
-            النوع *
+            {t("gender")} *
           </Label>
           <Input
             id="gender"
             {...register("gender")}
-            placeholder="الجنس"
+            placeholder={t("gender")}
             type="text"
           />
           {errors.gender && (
@@ -273,9 +276,9 @@ const Profile = () => {
             htmlFor="state"
             className="mb-1 block text-sm font-medium text-muted-foreground"
           >
-            العنوان *
+            {t("address")} *
           </Label>
-          <Input id="state" {...register("state")} placeholder="العنوان" />
+          <Input id="state" {...register("state")} placeholder={t("address")} />
           {errors.state && (
             <span className="text-red-500 text-xs">{errors.state.message}</span>
           )}
@@ -287,7 +290,7 @@ const Profile = () => {
                 htmlFor="specialization"
                 className="mb-1 block text-sm font-medium text-muted-foreground"
               >
-                التخصص المهني
+                {t("specialization")}
               </Label>
               <Select
                 onValueChange={(value) =>
@@ -298,7 +301,7 @@ const Profile = () => {
                 }
               >
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="اختر التخصص" />
+                  <SelectValue placeholder={t("selectSpecialization")} />
                 </SelectTrigger>
                 <SelectContent>
                   {specializations?.map((spec) => (
@@ -320,13 +323,13 @@ const Profile = () => {
                 htmlFor="license_number"
                 className="mb-1 block text-sm font-medium text-muted-foreground"
               >
-                رقم الترخيص
+                {t("licenseNumber")}
               </Label>
               <Input
                 id="license_number"
                 {...register("Professional_info.license_number")}
                 type="text"
-                placeholder="رقم الترخيص"
+                placeholder={t("licenseNumber")}
               />
               {errors.Professional_info?.license_number && (
                 <span className="text-red-500 text-xs">
@@ -340,12 +343,12 @@ const Profile = () => {
                 htmlFor="bio"
                 className="mb-1 block text-sm font-medium text-muted-foreground"
               >
-                السيرة المهنية
+                {t("bio")}
               </Label>
               <Input
                 id="bio"
                 {...register("Professional_info.bio")}
-                placeholder="السيرة المهنية"
+                placeholder={t("bio")}
               />
               {errors.Professional_info?.bio && (
                 <span className="text-red-500 text-xs">
@@ -359,7 +362,7 @@ const Profile = () => {
                 htmlFor="certificate_file"
                 className="mb-1 block text-sm font-medium text-muted-foreground"
               >
-                ملف الشهادة
+                {t("certificate")}
               </Label>
               <Input
                 id="certificate"
@@ -384,7 +387,7 @@ const Profile = () => {
                     rel="noopener noreferrer"
                     className="text-blue-600 underline"
                   >
-                    عرض الشهادة
+                    {t("viewCertificate")}
                   </a>
                 )}
               {/* Preview the newly selected certificate file */}
@@ -395,7 +398,7 @@ const Profile = () => {
                 htmlFor="promo_code"
                 className="mb-1 block text-sm font-medium text-muted-foreground"
               >
-                رمز ترويجي
+                {t("promoCode")}
               </Label>
               <Input
                 id="promo_code"
@@ -412,13 +415,11 @@ const Profile = () => {
         )}
         <div className="mt-8 flex justify-end md:col-span-2">
           <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? <SpinnerMini /> : "حفظ "}
+            {isSubmitting ? <SpinnerMini /> : t("save")}
           </Button>
         </div>
       </form>
-
       <hr className="my-8 border-muted" />
-
       <ChangePassword />
     </div>
   );

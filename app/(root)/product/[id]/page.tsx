@@ -11,6 +11,7 @@ import {
   generateBreadcrumbSchema,
   generateReviewSchema,
 } from "@/lib/structured-data";
+import getLocaleStrings from "@/localization";
 
 interface ProductPageProps {
   params: Promise<{ id: string }>;
@@ -22,12 +23,12 @@ export async function generateMetadata({
 }: ProductPageProps): Promise<Metadata> {
   const { id: productId } = await params;
   const product = await getProduct(productId);
+  const locale = await getLocaleStrings();
 
   if (!product) {
     return {
-      title: "المنتج غير موجود | فاليديريا - الصيدلية الإلكترونية",
-      description:
-        "المنتج المطلوب غير متوفر حالياً. تصفح مجموعتنا الواسعة من الأدوية والمنتجات الصحية.",
+      title: `${locale.productNotFound} | فاليديريا - الصيدلية الإلكترونية`,
+      description: locale.productNotFoundDescription,
       robots: {
         index: false,
         follow: false,
@@ -69,8 +70,8 @@ export async function generateMetadata({
   });
 
   const breadcrumbSchema = generateBreadcrumbSchema([
-    { name: "الرئيسية", url: "/" },
-    { name: "المنتجات", url: "/products" },
+    { name: locale.home, url: "/" },
+    { name: locale.products, url: "/products" },
     {
       name: product.categoryName,
       url: `/products?category=${product.categoryName}`,
@@ -124,11 +125,12 @@ export async function generateMetadata({
 const ProductPage = async ({ params }: ProductPageProps) => {
   const { id: productId } = await params;
   const product = await getProduct(productId);
+  const locale = await getLocaleStrings();
 
   if (!product) {
     return (
       <div className="flex-center h-screen">
-        <h1 className="text-2xl font-bold">Product not found</h1>
+        <h1 className="text-2xl font-bold">{locale.productNotFound}</h1>
       </div>
     );
   }
@@ -152,8 +154,8 @@ const ProductPage = async ({ params }: ProductPageProps) => {
   });
 
   const breadcrumbSchema = generateBreadcrumbSchema([
-    { name: "الرئيسية", url: "/" },
-    { name: "المنتجات", url: "/products" },
+    { name: locale.home, url: "/" },
+    { name: locale.products, url: "/products" },
     {
       name: product.categoryName,
       url: `/products?category=${product.categoryName}`,
@@ -203,13 +205,13 @@ const ProductPage = async ({ params }: ProductPageProps) => {
           <ol className="flex items-center space-x-2 rtl:space-x-reverse">
             <li>
               <Link href="/" className="hover:text-primary">
-                الرئيسية
+                {locale.home}
               </Link>
             </li>
             <span>/</span>
             <li>
               <Link href="/products" className="hover:text-primary">
-                المنتجات
+                {locale.products}
               </Link>
             </li>
             <span>/</span>
@@ -222,7 +224,7 @@ const ProductPage = async ({ params }: ProductPageProps) => {
               </Link>
             </li>
             <span>/</span>
-            <li className="text-gray-900 font-medium" aria-current="page">
+            <li className="text-gray-500 font-medium" aria-current="page">
               {product.name}
             </li>
           </ol>
@@ -242,10 +244,9 @@ const ProductPage = async ({ params }: ProductPageProps) => {
         {/* Similar Products Section */}
         {product.similar_products && product.similar_products.length > 0 && (
           <section>
-            <h2 className="text-2xl font-bold mb-6">المنتجات المشابهة</h2>
             <ProductSwiper
               products={product.similar_products}
-              headLine="المنتجات المشابهة"
+              headLine={locale.similarProducts}
             />
           </section>
         )}

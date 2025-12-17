@@ -12,11 +12,16 @@ import { getCartData } from "@/lib/api/apiCart";
 import { category } from "@/types";
 import { getAllCategories } from "@/lib/api/apiProducts";
 import HeaderPages from "./headerPages";
+import getLocaleStrings from "@/localization";
+import { Search } from "lucide-react";
+import { useState } from "react";
 
 const Header = async () => {
   const session = await auth();
   const cart = await getCartData();
   const categories: category[] = await getAllCategories();
+  const locale = await getLocaleStrings();
+
   let user = null;
   if (session?.user) {
     user = session.user;
@@ -25,11 +30,11 @@ const Header = async () => {
     <>
       <header className="border-b sticky top-0 start-0 end-0 bg-background z-50">
         <div className="wrapper">
-          <div className="!grid grid-cols-4 grid-row-2 sm:!flex flex-between sm:gap-2">
+          <div className="!grid grid-cols-4 grid-row-2 sm:!flex flex-between sm:gap-2 relative">
             <div className="flex justify-end items-center gap-2 col-start-2 col-span-3 row-start-1 row-span-1">
               {user ? (
                 <div className="ms-auto sm:ms-0 sm:hidden text-gray-600 text-sm dark:text-gray-300 ">
-                  <span className="font-semibold">Welcome,</span>
+                  <span className="font-semibold">{locale.welcome},</span>{" "}
                   {user.firstName} {user.lastName}.
                 </div>
               ) : null}
@@ -45,8 +50,9 @@ const Header = async () => {
               <HeaderCart session={session} />
             </HeaderButtons>
             <UserButton user={user} />
-            <div className=" col-start-1 col-span-1">
+            <div className=" col-start-1 col-span-1 flex justify-start items-center gap-2">
               <HeaderMenu session={session} />
+              
             </div>
             <MobileNav />
           </div>

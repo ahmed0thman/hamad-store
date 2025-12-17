@@ -134,8 +134,8 @@ export type ProductItem = {
   average_rating: {
     user: number;
     count_user_rate: number;
-    pharmacist: number;
-    count_pharmacist_rate: number;
+    doctor: number;
+    count_doctor_rate: number;
   };
   tax_rate: number;
   final_price: number;
@@ -206,6 +206,7 @@ export type Product = {
   user_comments: Comment[];
   doctors_comments: Comment[];
   similar_products: ProductItem[];
+  currency_symbol: string;
 };
 
 export type addRate = {
@@ -269,6 +270,7 @@ export type CartPharmacy = {
   total_after_coupon: number;
   coupon_id: string | null;
   promocoded: string | null;
+  currency_code: string;
 };
 
 export type CartData = {
@@ -461,6 +463,14 @@ export type siteInformationT = {
   Linkein_link?: string;
   site_year?: string;
   logo_path?: string;
+};
+
+export type privacyPolicyT = {
+  id: number;
+  content: string;
+  slug: string;
+  created_at: string;
+  updated_at: string;
 };
 
 export type specializationT = {
