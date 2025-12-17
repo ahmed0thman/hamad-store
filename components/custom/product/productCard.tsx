@@ -9,9 +9,9 @@ import { getFavorites } from "@/lib/api/apiFavorites";
 import ButtonFavorite from "./buttonFavorite";
 import { Badge } from "@/components/ui/badge";
 import ButtonAddToCompare from "./buttonAddToCompare";
-import Image from "next/image";
 import { CURRENCY_CODE } from "@/lib/constants";
 import getLocaleStrings from "@/localization";
+import ProductCardImage from "./ProductCardImage";
 
 const ProductCard = async ({ productItem }: { productItem: ProductItem }) => {
   const locale = await getLocaleStrings();
@@ -42,16 +42,9 @@ const ProductCard = async ({ productItem }: { productItem: ProductItem }) => {
 
       <div className="relative w-full aspect-square !max-h-[150px]">
         <Link href={`/product/${productItem.id}`}>
-          <Image
+          <ProductCardImage
             src={image || "/images/no-image.jpg"}
             alt={productItem?.name || "Product image"}
-            fill
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            className="object-cover rounded-md"
-            loading="lazy"
-            onError={(e) => {
-              e.currentTarget.src = "/images/no-image.jpg";
-            }}
           />
         </Link>
       </div>
