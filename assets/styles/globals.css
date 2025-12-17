@@ -120,9 +120,12 @@
 
   footer {
     @apply bg-teal-600 text-white dark:bg-slate-700/50 dark:text-slate-300;
+    min-height: fit-content;
+    contain: layout;
 
     .menus-wrapper {
       @apply py-20 px-3 sm:px-0 grid sm:grid-cols-2 lg:grid-cols-4 gap-4;
+      min-height: 200px;
     }
 
     .menu {
@@ -130,11 +133,18 @@
 
       .title {
         @apply text-xl font-medium;
+        font-weight: 500;
+        line-height: 1.5;
       }
 
       a {
         @apply transition duration-300 block hover:-translate-x-0.5;
       }
+    }
+
+    /* Prevent layout shift from images */
+    img {
+      display: block;
     }
   }
 }
