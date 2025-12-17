@@ -219,6 +219,11 @@ export default function RootLayout({
       <head>
         <link rel="preconnect" href="https://backend.valideria.com" />
         <link rel="dns-prefetch" href="https://backend.valideria.com" />
+        {/* Google Search Console Verification - Replace with your actual verification code */}
+        <meta
+          name="google-site-verification"
+          content="_uBwP6UTqJYlMvIaNJTN0aLS6nvr8OThrmNZpXYj1bg"
+        />
       </head>
       <body className={` ${poppins.className} ${cairo.className} antialiased`}>
         <SessionProvider>
