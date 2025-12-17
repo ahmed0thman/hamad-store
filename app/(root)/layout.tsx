@@ -1,4 +1,3 @@
-import Footer from "@/components/shared/footer";
 import Header from "@/components/shared/header";
 import { getCartData } from "@/lib/api/apiCart";
 import { auth } from "@/lib/auth";
@@ -9,6 +8,12 @@ import {
   HydrationBoundary,
   QueryClient,
 } from "@tanstack/react-query";
+import dynamic from "next/dynamic";
+
+// Lazy load Footer to reduce initial bundle
+const Footer = dynamic(() => import("@/components/shared/footer"), {
+  loading: () => <div className="h-96" />,
+});
 
 export default async function RootLayout({
   children,

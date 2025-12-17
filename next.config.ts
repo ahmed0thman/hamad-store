@@ -16,6 +16,8 @@ const nextConfig: NextConfig = {
       "react-hook-form",
       "@tanstack/react-query",
     ],
+    // Reduce client-side JavaScript
+    serverComponentsExternalPackages: ["axios"],
   },
   // Reduce JavaScript bundle size
   compiler: {
@@ -25,6 +27,8 @@ const nextConfig: NextConfig = {
             exclude: ["error", "warn"],
           }
         : false,
+    // Remove React properties in production
+    reactRemoveProperties: process.env.NODE_ENV === "production",
   },
   // Optimize production builds
   productionBrowserSourceMaps: false,
