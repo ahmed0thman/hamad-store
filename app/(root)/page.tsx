@@ -1,3 +1,5 @@
+import Hero from "@/components/custom/home/hero";
+import FeatureCards from "@/components/custom/home/featureCard";
 import {
   getAllCategories,
   getBrandsBytitle,
@@ -7,33 +9,13 @@ import { auth } from "@/lib/auth";
 import { homeSEO } from "@/lib/seo";
 import getLocaleStrings from "@/localization";
 import dynamic from "next/dynamic";
-import { Suspense } from "react";
 
-// Lazy load Hero with Swiper to reduce initial JS
-const Hero = dynamic(() => import("@/components/custom/home/hero"), {
-  loading: () => (
-    <div className="h-screen max-h-[calc(100vh_-_8rem)] animate-pulse bg-muted" />
-  ),
-});
-
-// Lazy load below-the-fold components to reduce initial JavaScript
-const FeatureCards = dynamic(
-  () => import("@/components/custom/home/featureCard"),
-  {
-    loading: () => <div className="h-64 animate-pulse bg-muted" />,
-  }
-);
+// Only lazy load heavy Swipers that are far below the fold
 const BrandSwiper = dynamic(
-  () => import("@/components/custom/home/brandsSwiper"),
-  {
-    loading: () => <div className="h-96 animate-pulse bg-muted" />,
-  }
+  () => import("@/components/custom/home/brandsSwiper")
 );
 const ProductSwiper = dynamic(
-  () => import("@/components/custom/product/productSwiper"),
-  {
-    loading: () => <div className="h-96 animate-pulse bg-muted" />,
-  }
+  () => import("@/components/custom/product/productSwiper")
 );
 
 export const metadata = homeSEO;
@@ -62,102 +44,54 @@ export default async function Home() {
   return (
     <>
       <Hero />
-      <Suspense
-        fallback={
-          <div className="h-64 animate-pulse bg-muted rounded-lg m-4" />
-        }
-      >
-        <FeatureCards />
-      </Suspense>
-      <Suspense
-        fallback={
-          <div className="h-96 animate-pulse bg-muted rounded-lg m-4" />
-        }
-      >
-        {offersProducts && offersProducts.length > 0 && (
-          <ProductSwiper
-            headLine={locals.offers}
-            products={offersProducts}
-            showAll
-          />
-        )}
-      </Suspense>
-      <Suspense
-        fallback={
-          <div className="h-96 animate-pulse bg-muted rounded-lg m-4" />
-        }
-      >
-        <BrandSwiper
-          items={homeCategories}
-          headLine={locals.browseAll}
-          highlight={locals.categories}
-          subHeadign={locals.categoriesSubheading}
+      <FeatureCards />
+      {offersProducts && offersProducts.length > 0 && (
+        <ProductSwiper
+          headLine={locals.offers}
+          products={offersProducts}
+          showAll
         />
-      </Suspense>
-      <Suspense
-        fallback={
-          <div className="h-96 animate-pulse bg-muted rounded-lg m-4" />
-        }
-      >
-        {uniqueProducts && uniqueProducts.length > 0 && (
-          <ProductSwiper
-            products={uniqueProducts}
-            headLine={locals.uniqueProducts}
-            showAll
-          />
-        )}
-      </Suspense>
-      <Suspense
-        fallback={
-          <div className="h-96 animate-pulse bg-muted rounded-lg m-4" />
-        }
-      >
-        <BrandSwiper
-          items={brandCategories}
-          headLine={locals.browseAll}
-          highlight={locals.brands}
-          subHeadign={locals.brandsSubheading}
+      )}
+      <BrandSwiper
+        items={homeCategories}
+        headLine={locals.browseAll}
+        highlight={locals.categories}
+        subHeadign={locals.categoriesSubheading}
+      />
+      {uniqueProducts && uniqueProducts.length > 0 && (
+        <ProductSwiper
+          products={uniqueProducts}
+          headLine={locals.uniqueProducts}
+          showAll
         />
-      </Suspense>
-      <Suspense
-        fallback={
-          <div className="h-96 animate-pulse bg-muted rounded-lg m-4" />
-        }
-      >
-        {topRatesProducts && topRatesProducts.length > 0 && (
-          <ProductSwiper
-            products={topRatesProducts}
-            headLine={locals.topRatedProducts}
-            showAll
-          />
-        )}
-      </Suspense>
+      )}
+      <BrandSwiper
+        items={brandCategories}
+        headLine={locals.browseAll}
+        highlight={locals.brands}
+        subHeadign={locals.brandsSubheading}
+      />
+      {topRatesProducts && topRatesProducts.length > 0 && (
+        <ProductSwiper
+          products={topRatesProducts}
+          headLine={locals.topRatedProducts}
+          showAll
+        />
+      )}
       {/* <Banner /> */}
-      <Suspense
-        fallback={
-          <div className="h-96 animate-pulse bg-muted rounded-lg m-4" />
-        }
-      >
-        <BrandSwiper
-          items={brandCategories}
-          headLine={locals.top}
-          highlight={locals.ratedBrands}
-          subHeadign=""
+      <BrandSwiper
+        items={brandCategories}
+        headLine={locals.top}
+        highlight={locals.ratedBrands}
+        subHeadign=""
+      />
+      {topSellingProducts && topSellingProducts.length > 0 && (
+        <ProductSwiper
+          products={topSellingProducts}
+          headLine={locals.topSellingProducts}
+          showAll
         />
-      </Suspense>
-      <Suspense
-        fallback={
-          <div className="h-96 animate-pulse bg-muted rounded-lg m-4" />
-        }
-      >
-        {topSellingProducts && topSellingProducts.length > 0 && (
-          <ProductSwiper
-            products={topSellingProducts}
-            headLine={locals.topSellingProducts}
-            showAll
-          />
-        )}
-      </Suspense>
+      )}
     </>
   );
 }

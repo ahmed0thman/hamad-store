@@ -17,14 +17,7 @@ const nextConfig: NextConfig = {
       "date-fns",
       "react-hook-form",
       "@tanstack/react-query",
-      "swiper",
-      "swiper/react",
     ],
-    // Turbo mode for faster builds
-    turbo: {
-      loaders: {},
-      resolveAlias: {},
-    },
   },
   // Modularize imports for better tree-shaking
   modularizeImports: {
