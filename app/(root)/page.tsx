@@ -41,6 +41,8 @@ export default async function Home() {
     getBrandsBytitle(),
   ]);
 
+  console.log("token: ", session?.accessToken);
+
   return (
     <>
       <Hero />

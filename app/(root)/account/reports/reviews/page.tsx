@@ -24,11 +24,12 @@ import { useGetDoctorOrdersReport } from "@/hooks/useGetDoctorOrdersReport";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import Pagination from "@/components/custom/pagination";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export default function ReviewsPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-
+  const { t } = useTranslation();
   const [fromDate, setFromDate] = useState<string>(
     searchParams.get("from_date")?.replace(/\//g, "-") || ""
   );
@@ -76,7 +77,7 @@ export default function ReviewsPage() {
   if (error) {
     return (
       <div className="text-center text-destructive">
-        حدث خطأ أثناء تحميل التقرير
+        {t("errorLoadingReport")}
       </div>
     );
   }
@@ -84,7 +85,7 @@ export default function ReviewsPage() {
   if (!reportData) {
     return (
       <div className="text-center text-muted-foreground">
-        لا توجد بيانات متاحة
+        {t("noDataAvailable")}
       </div>
     );
   }
@@ -105,7 +106,7 @@ export default function ReviewsPage() {
         <Card>
           <CardHeader>
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              اسم الطبيب
+              {t("doctorName")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -116,7 +117,7 @@ export default function ReviewsPage() {
         <Card>
           <CardHeader>
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              كود البروموشن
+              {t("promoCode")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -129,7 +130,7 @@ export default function ReviewsPage() {
         <Card>
           <CardHeader>
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              إجمالي النقاط
+              {t("totalPoints")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -142,7 +143,7 @@ export default function ReviewsPage() {
         <Card>
           <CardHeader>
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              عدد الطلبات
+              {t("ordersCount")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -155,7 +156,7 @@ export default function ReviewsPage() {
         <Card>
           <CardHeader>
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              استخدام الكود
+              {t("promoCodeUsage")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -169,22 +170,22 @@ export default function ReviewsPage() {
       {/* Filter bar */}
       <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-2">
         <div className="flex-center gap-2">
-          <label className="">من</label>
+          <label className="">{t("from")}</label>
           <Input
             type="date"
             value={fromDate}
             onChange={(e) => setFromDate(e.target.value)}
-            placeholder="من"
+            placeholder={t("from")}
             className="w-fit"
           />
         </div>
         <div className="flex-center gap-2">
-          <label className="">إلى</label>
+          <label className="">{t("to")}</label>
           <Input
             type="date"
             value={toDate}
             onChange={(e) => setToDate(e.target.value)}
-            placeholder="إلى"
+            placeholder={t("to")}
             className="w-fit"
           />
         </div>
@@ -206,9 +207,9 @@ export default function ReviewsPage() {
           </Select>
         </div> */}
         <div className="flex gap-2">
-          <Button onClick={handleApplyFilters}>تطبيق الفلتر</Button>
+          <Button onClick={handleApplyFilters}>{t("applyFilter")}</Button>
           <Button variant="outline" onClick={handleClearFilters}>
-            إعادة تعيين
+            {t("reset")}
           </Button>
         </div>
       </div>
@@ -218,7 +219,7 @@ export default function ReviewsPage() {
         <Card className="gap-1">
           <CardHeader>
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              طلبات الطبيب
+              {t("doctorOrders")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -226,7 +227,7 @@ export default function ReviewsPage() {
               {reportData.summary.doctor_orders_count}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              عدد الطلبات من الطبيب
+              {t("doctorOrdersCount")}
             </p>
           </CardContent>
         </Card>
@@ -234,7 +235,7 @@ export default function ReviewsPage() {
         <Card className="gap-1">
           <CardHeader>
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              طلبات المرضى
+              {t("patientOrders")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -242,7 +243,7 @@ export default function ReviewsPage() {
               {reportData.summary.patient_orders_count}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              عدد طلبات المرضى
+              {t("patientOrdersCount")}
             </p>
           </CardContent>
         </Card>
@@ -250,7 +251,7 @@ export default function ReviewsPage() {
         <Card className="gap-1">
           <CardHeader>
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              نقاط من المرضى
+              {t("pointsFromPatients")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -258,64 +259,70 @@ export default function ReviewsPage() {
               {reportData.summary.points_from_patients}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              النقاط المكتسبة من المرضى
+              {t("pointsEarnedFromPatients")}
             </p>
           </CardContent>
         </Card>
       </div>
 
       {/* Orders Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>الطلبات</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>رقم الطلب</TableHead>
-                <TableHead>اسم العميل</TableHead>
-                <TableHead>الصيدلية</TableHead>
-                <TableHead>نقاط الصيدلية</TableHead>
-                <TableHead>نقاط الموقع</TableHead>
-                <TableHead>إجمالي النقاط</TableHead>
-                <TableHead>الحالة</TableHead>
-                <TableHead>التاريخ</TableHead>
-                <TableHead>المصدر</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredOrders.map((order) => (
-                <TableRow key={order.id}>
-                  <TableCell className="font-medium">
-                    {order.order_number}
-                  </TableCell>
-                  <TableCell>{order.customer_name}</TableCell>
-                  <TableCell>{order.pharmacy_name_en}</TableCell>
-                  <TableCell>{order.doctor_pharmacy_points}</TableCell>
-                  <TableCell>{order.doctor_site_points}</TableCell>
-                  <TableCell className="font-bold">
-                    {order.total_points}
-                  </TableCell>
-                  <TableCell>
-                    <Badge
-                      variant={
-                        order.status === "completed" ? "default" : "secondary"
-                      }
-                    >
-                      {order.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>{formatDate(order.created_at)}</TableCell>
-                  <TableCell className="text-sm text-muted-foreground">
-                    {order.source}
-                  </TableCell>
+      {filteredOrders.length === 0 ? (
+        <div className="text-center text-muted-foreground mt-4">
+          {t("noDataAvailable")}
+        </div>
+      ) : (
+        <Card>
+          <CardHeader>
+            <CardTitle>{t("orders")}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow className="text-center">
+                  <TableHead>{t("orderNumber")}</TableHead>
+                  <TableHead>{t("customerName")}</TableHead>
+                  <TableHead>{t("pharmacy")}</TableHead>
+                  <TableHead>{t("pharmacyPoints")}</TableHead>
+                  <TableHead>{t("sitePoints")}</TableHead>
+                  <TableHead>{t("totalPoints")}</TableHead>
+                  <TableHead>{t("status")}</TableHead>
+                  <TableHead>{t("date")}</TableHead>
+                  <TableHead>{t("source")}</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+              </TableHeader>
+              <TableBody>
+                {filteredOrders.map((order) => (
+                  <TableRow key={order.id} className="text-center">
+                    <TableCell className="font-medium">
+                      {order.order_number}
+                    </TableCell>
+                    <TableCell>{order.customer_name}</TableCell>
+                    <TableCell>{order.pharmacy_name_en}</TableCell>
+                    <TableCell>{order.doctor_pharmacy_points}</TableCell>
+                    <TableCell>{order.doctor_site_points}</TableCell>
+                    <TableCell className="font-bold">
+                      {order.total_points}
+                    </TableCell>
+                    <TableCell>
+                      <Badge
+                        variant={
+                          order.status === "completed" ? "default" : "secondary"
+                        }
+                      >
+                        {order.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>{formatDate(order.created_at)}</TableCell>
+                    <TableCell className="text-sm text-muted-foreground">
+                      {order.source}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Pagination */}
       {reportData.details.pagination && (

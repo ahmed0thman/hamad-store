@@ -10,6 +10,7 @@ const ar: Locale = {
   currentLang: "ع",
   currentLanguage: "عربي",
   offers: "عروض",
+  doctorPrefix: "د.",
 
   // Accessibility
   menu: "القائمة",
@@ -603,6 +604,45 @@ const ar: Locale = {
   termsOfServiceDescription: "شروط وأحكام استخدام منصة Valideria",
   failedToLoadPrivacyPolicy: "فشل تحميل سياسة الخصوصية",
   failedToLoadTermsOfService: "فشل تحميل شروط الاستخدام",
+
+  // FAQ Page (custom additions)
+
+  faqTitle: "الأسئلة الشائعة",
+  faqDescription:
+    "هل لديك أسئلة؟ تحقق من الأسئلة الشائعة أدناه للحصول على إجابات سريعة حول خدماتنا، الطلبات، الشحن، وأكثر من ذلك.",
+  noFaqsForNow: " لا توجد أسئلة شائعة حالياً.",
+  didntFindAnswer: "لم تجد إجابتك؟",
+  contactUsForMoreHelp: "اتصل بنا لمزيد من المساعدة.",
+
+  // Comments Report Page (custom additions)
+  errorLoadingReport: "حدث خطأ أثناء تحميل التقرير",
+  noDataAvailable: "لا توجد بيانات متاحة",
+  doctorName: "اسم الطبيب",
+  totalComments: "إجمالي التعليقات",
+
+  topPharmacy: "أفضل صيدلية",
+
+  applyFilter: "تطبيق الفلتر",
+
+  comment: "التعليق",
+  addedAt: "تاريخ الإضافة",
+  updatedAt: "آخر تحديث",
+
+  // Reviews Report Page (custom additions)
+
+  promoCodeUsage: "استخدام الكود",
+  doctorOrders: "طلبات الطبيب",
+  doctorOrdersCount: "عدد الطلبات من الطبيب",
+  patientOrders: "طلبات المرضى",
+  patientOrdersCount: "عدد طلبات المرضى",
+  pointsFromPatients: "نقاط من المرضى",
+  pointsEarnedFromPatients: "النقاط المكتسبة من المرضى",
+  pharmacyPoints: "نقاط الصيدلية",
+  sitePoints: "نقاط الموقع",
+  customerName: "اسم العميل",
+  ordersCount: "عدد الطلبات",
+  date: "التاريخ",
+  source: "المصدر",
 };
 
 export default ar;

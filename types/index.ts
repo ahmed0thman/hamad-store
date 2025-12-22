@@ -184,8 +184,22 @@ export type Product = {
   strength: string;
   price: number;
   quantity: number;
-  brand_id: number;
-  category_id: number;
+  brand: {
+    id: number;
+    name: {
+      ar: string;
+      en: string;
+    };
+    image: string | null;
+  };
+  category: {
+    id: number;
+    name: {
+      ar: string;
+      en: string;
+    };
+    image: string | null;
+  };
   image: string | null;
   average_rating: {
     user: number;
@@ -445,6 +459,17 @@ export type siteFeatureT = {
   sub_title?: string;
 };
 
+export type storeInformationT = {
+  id: number;
+  name?: string;
+  address?: string;
+  phone?: string;
+  opening_time?: string;
+  closing_time?: string;
+  working_hours?: string;
+  image?: string;
+};
+
 export type siteBannerT = {
   path?: string;
   banner_head_text?: string;
@@ -518,6 +543,7 @@ export type DoctorOrderReport = {
 export type DoctorCommentReportDetail = {
   product_id: number;
   product: string;
+  pharmacy_id: number;
   pharmacy: string;
   comment: string;
   points: number;
@@ -539,4 +565,31 @@ export type DoctorCommentReport = {
     data: DoctorCommentReportDetail[];
     pagination: Pagination;
   };
+};
+
+export type DoctorProfileT = {
+  id: number;
+  first_name: string;
+  last_name: string;
+  phone: string;
+  profile_image: string | null;
+  specialization: string;
+  certificate_file: string | null;
+  bio: string;
+  gender: string;
+};
+
+export type faqT = {
+  id: number;
+  question: string;
+  answer: string;
+  is_active: boolean;
+};
+
+export type currencyT = {
+  id: number;
+  code: string;
+  symbol: string;
+  name: string;
+  is_default: boolean;
 };

@@ -211,7 +211,14 @@ export default function OrderDetailsPage() {
           <TableBody className="divide-y">
             {orderDetails?.items.map((item) => (
               <TableRow key={item.product_id}>
-                <TableCell className="p-4">{item.product_name}</TableCell>
+                <TableCell className="p-4">
+                  <Link
+                    href={`/product/${item.product_id}`}
+                    className="font-medium hover:underline"
+                  >
+                    {item.product_name}
+                  </Link>
+                </TableCell>
                 <TableCell className="p-4">{item.quantity}</TableCell>
                 <TableCell className="p-4 text-muted-foreground">
                   {formatCurrency(+item.unit_price, orderDetails?.currency)}

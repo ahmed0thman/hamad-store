@@ -1,4 +1,5 @@
 "use client";
+import { useTranslation } from "@/hooks/useTranslation";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -8,18 +9,8 @@ export default function ReportsLayout({
   children: React.ReactNode;
 }) {
   const pathName = usePathname();
-  console.log("current path", pathName);
-  // const session = await auth();
-  // if (!session?.user?.is_doctor) {
-  //   return (
-  //     <div className="container mx-auto p-4">
-  //       <h1 className="text-2xl font-semibold mb-4">Reports</h1>
-  //       <p className="text-red-500">
-  //         Access denied. You do not have permission to view this page.
-  //       </p>
-  //     </div>
-  //   );
-  // }
+  const { t } = useTranslation();
+
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-semibold mb-4">Reports</h1>
@@ -44,7 +35,7 @@ export default function ReportsLayout({
                 : "text-muted-foreground"
             }`}
           >
-            التقارير
+            {t("reports")}
           </Link>
           <Link
             href="/account/reports/comments"
@@ -54,7 +45,7 @@ export default function ReportsLayout({
                 : "text-muted-foreground"
             }`}
           >
-            التعليقات
+            {t("comments")}
           </Link>
         </div>
       </div>

@@ -1,12 +1,18 @@
-import React from "react";
-import Image from "next/image";
-import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Clock, Home, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { getStoreBanners, getStoreInformation } from "@/lib/api/apiSiteInfo";
+import { Pharmacy, siteBannerT, storeInformationT } from "@/types";
+import { Clock, Home, Phone } from "lucide-react";
 import ButtonShare from "../buttonShare";
-import { Pharmacy } from "@/types";
-const StoreHero = ({ pharmacy }: { pharmacy: Pharmacy | null }) => {
+import StoreHeroClient from "./storeHeroClient";
+
+const StoreHero = async ({ pharmacy }: { pharmacy: Pharmacy }) => {
+  const bannersRes = await getStoreBanners(pharmacy?.id);
+  const banners = bannersRes.data as siteBannerT[];
+  const infoRes = await getStoreInformation(pharmacy?.id);
+  const info = infoRes.data as storeInformationT;
+  console.log(banners);
   if (!pharmacy) {
     return (
       <section className="mb-12">
@@ -22,16 +28,13 @@ const StoreHero = ({ pharmacy }: { pharmacy: Pharmacy | null }) => {
     .map((word) => word.charAt(0).toUpperCase())
     .join("");
 
+  //
+
   return (
     <section className="mb-24 relative">
-      {/* Hero Image */}
+      {/* Hero Banner Swiper */}
       <div className="relative w-full aspect-video max-h-[50vh] overflow-hidden">
-        <Image
-          src="/images/uploads/store-hero.jpg"
-          fill
-          alt="Store Hero"
-          className="object-cover"
-        />
+        <StoreHeroClient banners={banners} />
       </div>
       {/* Store Card Info */}
       <Card className="absolute bottom-0 w-11/12 max-w-xl translate-y-1/2 left-1/2 -translate-x-1/2 bg-background">
@@ -41,31 +44,27 @@ const StoreHero = ({ pharmacy }: { pharmacy: Pharmacy | null }) => {
             <AvatarFallback>{initials || "Store"}</AvatarFallback>
           </Avatar>
           <div className="space-y-1 flex-grow">
-            <h1 className="text-lg font-semibold text-primary">
-              {pharmacy.name}
-            </h1>
+            <h1 className="text-lg font-semibold text-primary">{info.name}</h1>
 
             <div className="space-y-3 text-sm text-muted-foreground">
               <p className="flex items-center gap-1">
                 <Phone className="w-4 h-4" />
                 <span className="ml-2">
-                  {pharmacy.phone || "No phone number available"}
+                  {info.phone || "No phone number available"}
                 </span>
               </p>
 
               <p className="flex items-center gap-1">
                 <Home className="w-4 h-4" />
                 <span className="ml-2">
-                  {pharmacy.address || "No address available"}
+                  {info.address || "No address available"}
                 </span>
               </p>
 
-              {/* <p className="flex items-center gap-1">
+              <p className="flex items-center gap-1">
                 <Clock className="w-4 h-4" />
-                <span className="ml-2">
-                  {pharmacy. || "No hours available"}
-                </span>
-              </p> */}
+                <span className="ml-2">{info.opening_time}</span>
+              </p>
 
               <span className=" px-3 py-0.5 font-medium bg-green-100 text-green-800 border border-green-200 rounded-full">
                 Open Now

@@ -118,6 +118,10 @@
       }
     }
   }
+  .text-phone {
+    @apply rtl:!text-end;
+    direction: ltr !important;
+  }
 
   select {
     @apply !pe-2;

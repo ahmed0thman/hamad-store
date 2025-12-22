@@ -15,6 +15,9 @@ import {
 import { Product, Comment } from "@/types";
 import getLocaleStrings from "@/localization";
 import { Locale } from "@/localization/en";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { AvatarImage } from "@radix-ui/react-avatar";
+import Link from "next/link";
 
 function CommentCard({
   name,
@@ -41,22 +44,17 @@ function CommentCard({
   return (
     <div className="p-4 space-y-2">
       <div className="flex items-center gap-3">
-        {avatarUrl?.endsWith(".jpg") || avatarUrl?.endsWith(".png") ? (
-          <Image
-            src={avatarUrl}
-            width={40}
-            height={40}
-            alt={name}
-            className="rounded-full object-cover overflow-hidden w-10 h-10"
-          />
-        ) : (
-          <div className="w-10 h-10 rounded-full bg-slate-300 dark:bg-muted flex items-center justify-center text-sm font-bold font-sans">
-            {initials}
-          </div>
-        )}
+        <Avatar className="rounded-full object-cover overflow-hidden w-10 h-10">
+          <AvatarImage src={avatarUrl || ""} alt={name} />
+          <AvatarFallback>{initials}</AvatarFallback>
+        </Avatar>
         <div>
           <div className="font-semibold text-primary mb-0.5 text-start">
-            {name}
+            {type === "doctor" ? (
+              <Link href={`/doctor/${name}`}> {name}</Link>
+            ) : (
+              name
+            )}
           </div>
           <div className={`flex items-center gap-0.5 ${starColor}`}>
             <StarRating value={rating} outOf={5} color={starColor} />

@@ -4,7 +4,7 @@ import { getFavorites } from "@/lib/api/apiFavorites";
 import { auth } from "@/lib/auth";
 import { CURRENCY_CODE } from "@/lib/constants";
 import { formatCurrency } from "@/lib/utils";
-import { FavoriteItem, Product } from "@/types";
+import { FavoriteItem, Product, ProductItem } from "@/types";
 import { Box, FileText, Layers, Scaling, Store, Tag } from "lucide-react";
 import Link from "next/link";
 import ButtonShare from "../buttonShare";
@@ -14,17 +14,18 @@ import ButtonAddToCompare from "./buttonAddToCompare";
 import ButtonFavorite from "./buttonFavorite";
 import ProductAddCart from "./productAddCart";
 import ProductImages from "./productImage";
-import getLocaleStrings from "@/localization";
+import getLocaleStrings, { getLocale } from "@/localization";
 
 const ProductMainInfo = async ({ product }: { product: Product }) => {
   const locale = await getLocaleStrings();
+  const lang = await getLocale();
   const session = await auth();
   // let favorites: FavoriteItem[] | null = null;
   let inFavorites = false;
   if (session && session.user) {
     const res = await getFavorites();
     if (res && res.success && !res.empty) {
-      const favorites = res.data as FavoriteItem[];
+      const favorites = res.data as ProductItem[];
       inFavorites = favorites.some((item) => item.id === product.id);
     }
   }
@@ -127,7 +128,7 @@ const ProductMainInfo = async ({ product }: { product: Product }) => {
                 {locale.category}
               </TableCell>
               <TableCell className="font-medium">
-                {product.categoryName}
+                {product.category.name[lang === "ar" ? "ar" : "en"]}
               </TableCell>
             </TableRow>
             <TableRow>
@@ -135,7 +136,9 @@ const ProductMainInfo = async ({ product }: { product: Product }) => {
                 <Tag className="w-4 h-4" />
                 {locale.brand}
               </TableCell>
-              <TableCell className="font-medium">{product.brandName}</TableCell>
+              <TableCell className="font-medium">
+                {product.brand.name[lang === "ar" ? "ar" : "en"]}
+              </TableCell>
             </TableRow>
             <TableRow>
               <TableCell className="flex items-center gap-2 font-semibold bg-muted">

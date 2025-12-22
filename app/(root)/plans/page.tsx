@@ -24,33 +24,33 @@ const PlansPage = () => {
   const [error, setError] = useState<string | null>(null);
   const { t } = useTranslation();
 
-  const planFeatures: Record<string, string[]> = {
-    monthly: [
-      t("fullInventoryManagement"),
-      t("basicAnalyticsDashboard"),
-      t("emailSupport"),
-      t("mobileAppAccess"),
-      t("upTo1000Products"),
-    ],
-    annual: [
-      t("fullInventoryManagement"),
-      t("advancedAnalyticsReports"),
-      t("priority247Support"),
-      t("mobileAppAccess"),
-      t("unlimitedProducts"),
-      t("customBranding"),
-      t("apiAccess"),
-      t("dedicatedAccountManager"),
-    ],
-    quarterly: [
-      t("fullInventoryManagement"),
-      t("standardAnalyticsDashboard"),
-      t("emailChatSupport"),
-      t("mobileAppAccess"),
-      t("upTo5000Products"),
-      t("customBranding"),
-    ],
-  };
+  // const planFeatures: Record<string, string[]> = {
+  //   monthly: [
+  //     t("fullInventoryManagement"),
+  //     t("basicAnalyticsDashboard"),
+  //     t("emailSupport"),
+  //     t("mobileAppAccess"),
+  //     t("upTo1000Products"),
+  //   ],
+  //   annual: [
+  //     t("fullInventoryManagement"),
+  //     t("advancedAnalyticsReports"),
+  //     t("priority247Support"),
+  //     t("mobileAppAccess"),
+  //     t("unlimitedProducts"),
+  //     t("customBranding"),
+  //     t("apiAccess"),
+  //     t("dedicatedAccountManager"),
+  //   ],
+  //   quarterly: [
+  //     t("fullInventoryManagement"),
+  //     t("standardAnalyticsDashboard"),
+  //     t("emailChatSupport"),
+  //     t("mobileAppAccess"),
+  //     t("upTo5000Products"),
+  //     t("customBranding"),
+  //   ],
+  // };
 
   // Fetch plans from API
   useEffect(() => {
@@ -130,7 +130,7 @@ const PlansPage = () => {
                 plan.currency,
                 plan.duration_in_days
               );
-              const features = planFeatures[plan.type] || [];
+              // const features = planFeatures[plan.type] || [];
 
               return (
                 <Card
@@ -189,8 +189,7 @@ const PlansPage = () => {
                     </div>
                   </CardHeader>
 
-                  <CardContent className="px-6 pb-6">
-                    {/* Features List */}
+                  {/* <CardContent className="px-6 pb-6">
                     <ul className="space-y-3">
                       {features.map((feature, index) => (
                         <li key={index} className="flex items-start gap-3">
@@ -201,7 +200,7 @@ const PlansPage = () => {
                         </li>
                       ))}
                     </ul>
-                  </CardContent>
+                  </CardContent> */}
 
                   <CardFooter className="px-6 pb-6 mt-auto">
                     <Button

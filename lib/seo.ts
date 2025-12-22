@@ -24,9 +24,8 @@ export function generateSEO({
 }: SEOProps): Metadata {
   const fullTitle = `${title} | ${APP_NAME} - منصة التسوق الصحي المتعددة`;
   const url = `${SITE_URL}${path}`;
-  const fullImage = image
-    ? `${SITE_URL}${image}`
-    : `${SITE_URL}/images/logos/valideria-og.jpg`;
+  // Use provided image or fallback to og-image.jpg
+  const fullImage = image ? `${SITE_URL}${image}` : `${SITE_URL}/og-image.jpg`;
 
   // Base keywords for all pages
   const baseKeywords = [
