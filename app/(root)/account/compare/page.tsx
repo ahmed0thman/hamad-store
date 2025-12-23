@@ -93,12 +93,12 @@ const ProductComparison = () => {
               </div>
 
               {/* Product Details */}
-              <ul className="text-sm space-y-3">
+              <ul className="text-sm flex-grow space-y-3">
                 <li className="flex gap-2 items-start">
                   <Building2 className="text-teal-600 mt-1" size={16} />
-                  <span>
+                  <Link href={`/store/${product.pharmacy.id}`}>
                     <strong>{t("vendor")}:</strong> {product.pharmacy.name}
-                  </span>
+                  </Link>
                 </li>
                 <li className="flex gap-2 items-start">
                   <Landmark className="text-teal-600 mt-1" size={16} />
@@ -118,12 +118,12 @@ const ProductComparison = () => {
                     <strong>{t("form")}:</strong> {product.form}
                   </span>
                 </li>
-                <li className="flex gap-2 items-start">
+                {/* <li className="flex gap-2 items-start">
                   <PackageCheck className="text-teal-600 mt-1" size={16} />
                   <span>
                     <strong>{t("strength")}:</strong> {product.strength}
                   </span>
-                </li>
+                </li> */}
                 <li className="flex gap-2 items-start">
                   <CircleCheckBig className="text-teal-600 mt-1" size={16} />
                   <span>
@@ -131,13 +131,13 @@ const ProductComparison = () => {
                     {formatCurrencyEGP(product.price)}
                   </span>
                 </li>
-                <li className="flex gap-2 items-start">
+                {/* <li className="flex gap-2 items-start">
                   <CircleCheckBig className="text-teal-600 mt-1" size={16} />
                   <span>
                     <strong>{t("availableQuantity")}:</strong>{" "}
                     {product.quantity}
                   </span>
-                </li>
+                </li> */}
                 {product.pack_size && (
                   <li className="flex gap-2 items-start">
                     <PackageCheck className="text-teal-600 mt-1" size={16} />
@@ -146,7 +146,7 @@ const ProductComparison = () => {
                     </span>
                   </li>
                 )}
-                <li className="flex gap-2 items-start">
+                {/* <li className="flex gap-2 items-start">
                   <Calendar className="text-teal-600 mt-1" size={16} />
                   <span>
                     <strong>{t("productionDate")}:</strong>{" "}
@@ -161,7 +161,7 @@ const ProductComparison = () => {
                     <strong>{t("expiryDate")}:</strong>{" "}
                     {new Date(product.expiry_date).toLocaleDateString("ar-EG")}
                   </span>
-                </li>
+                </li> */}
 
                 {/* Ratings */}
                 <li className="flex gap-2 items-start">
@@ -175,10 +175,9 @@ const ProductComparison = () => {
                 <li className="flex gap-2 items-start">
                   <Star className="text-blue-500 mt-1" size={16} />
                   <span>
-                    <strong>{t("pharmacistRating")}:</strong>{" "}
-                    {product.average_rating.pharmacist}/5 (
-                    {product.average_rating.count_pharmacist_rate}{" "}
-                    {t("reviews")})
+                    <strong>{t("doctorRating")}:</strong>{" "}
+                    {product.average_rating.doctor}/5 (
+                    {product.average_rating.count_doctor_rate} {t("reviews")})
                   </span>
                 </li>
               </ul>

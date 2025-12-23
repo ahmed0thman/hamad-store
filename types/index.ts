@@ -165,8 +165,8 @@ export type ProductItemCompare = {
   average_rating: {
     user: number;
     count_user_rate: number;
-    pharmacist: number;
-    count_pharmacist_rate: number;
+    doctor: number;
+    count_doctor_rate: number;
   };
   tax_rate: string;
   production_date: string;
