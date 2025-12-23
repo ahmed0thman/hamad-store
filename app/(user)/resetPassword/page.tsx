@@ -5,25 +5,19 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { auth } from "@/lib/auth";
 import { APP_NAME } from "@/lib/constants";
+import getLocaleStrings from "@/localization";
 import Image from "next/image";
 import Link from "next/link";
-import CredentialsSignInForm from "./credentialsSignInForm";
-import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import getLocaleStrings from "@/localization";
-import { authSEO } from "@/lib/seo";
+import ResetPasswordForm from "./resetPasswordForm";
 
-export const metadata = authSEO.signin;
-
-const SignInPage = async (props: {
-  searchParams: Promise<{ callbackUrl: string }>;
-}) => {
+const ResetPassword = async () => {
   const session = await auth();
-  const { callbackUrl } = await props.searchParams;
   const locale = await getLocaleStrings();
 
-  if (session?.user) return redirect(callbackUrl || "/");
+  if (session?.user) return redirect("/");
   return (
     <div className="w-full max-w-md mx-auto m-auto">
       <Card className="bg-teal-100/20 dark:bg-background">
@@ -37,17 +31,17 @@ const SignInPage = async (props: {
               priority
             />
           </Link>
-          <CardTitle className="text-center">{locale.signInTitle}</CardTitle>
+          <CardTitle className="text-center">{locale.resetPassword}</CardTitle>
           <CardDescription className="text-center">
-            {locale.signInDescription}
+            {locale.resetPasswordDescription}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <CredentialsSignInForm />
+          <ResetPasswordForm />
         </CardContent>
       </Card>
     </div>
   );
 };
 
-export default SignInPage;
+export default ResetPassword;

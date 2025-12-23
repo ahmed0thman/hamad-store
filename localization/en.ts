@@ -634,6 +634,28 @@ const en = {
   customerName: "Customer Name",
   date: "Date",
   source: "Source",
+
+  // forget password
+  forgetPassword: "Forget Password?",
+  forgetPasswordTitle: "Forget Your Password",
+  forgetPasswordDescription:
+    "Enter your email address to receive a link to reset your password.",
+  emailAddress: "Email Address",
+  enterYourEmail: "Enter your email",
+  resetPassword: "Reset Password",
+  resetPasswordDescription:
+    "Enter the secret key sent to your email and set a new password for your account.",
+  sendResetLink: "Send Reset Link",
+  resetLinkSent: "Reset link sent to your email",
+  tokenRequired: "Token is required",
+  verifyEmailButton: "Verify",
+  emailNotFound: "Email address not found",
+  checkYourEmailForSecretKey:
+    "Check your email for the secret key to reset your password.",
+  secretKey: "Secret Key",
+  newpassword: "New Password",
+  confirmNewPassword: "Confirm New Password",
+  passwordResetSuccess: "Password reset successfully. You can now sign in.",
 };
 
 export default en;

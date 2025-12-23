@@ -310,6 +310,21 @@ export const authSEO = {
     path: "/register",
     noIndex: true,
   }),
+
+  forgetPassword: generateSEO({
+    title: "نسيت كلمة المرور - استعادة الوصول إلى حسابك",
+    description:
+      "هل نسيت كلمة المرور؟ استعد الوصول إلى حسابك في فاليديريا بسهولة. أدخل بريدك الإلكتروني لتلقي رابط إعادة تعيين كلمة المرور بسرعة وأمان. نحن هنا لمساعدتك في استعادة حسابك ومتابعة تسوقك الصحي.",
+    keywords: [
+      "نسيت كلمة المرور",
+      "استعادة الحساب",
+      "إعادة تعيين كلمة المرور",
+      "forget password",
+      "reset password",
+    ],
+    path: "/forgetPassword",
+    noIndex: true,
+  }),
 };
 
 // Plans/Subscription pages SEO

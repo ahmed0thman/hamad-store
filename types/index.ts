@@ -3,10 +3,12 @@ import {
   cartItemSchema,
   contactMessageSchema,
   doctorRegisterSchema,
+  forgetPasswordSchema,
   insertCartSchema,
   planSubscriptionFormSchema,
   profileSchema,
   registerSchema,
+  resetPasswordSchema,
   signInSchema,
   updateUserPasswordSchema,
   userAddressSchema,
@@ -43,6 +45,9 @@ export type plan = {
 export class SignInError extends CredentialsSignin {
   message = "signin_error";
 }
+
+export type forgetPasswordT = z.infer<typeof forgetPasswordSchema>;
+export type resetPasswordT = z.infer<typeof resetPasswordSchema>;
 
 export type User = {
   id: string;

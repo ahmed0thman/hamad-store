@@ -643,6 +643,28 @@ const ar: Locale = {
   ordersCount: "عدد الطلبات",
   date: "التاريخ",
   source: "المصدر",
+
+  // forget password
+  forgetPassword: "نسيت كلمة المرور؟",
+  forgetPasswordTitle: "استعادة كلمة المرور",
+  forgetPasswordDescription:
+    "أدخل عنوان بريدك الإلكتروني لتلقي رابط لإعادة تعيين كلمة المرور الخاصة بك.",
+  emailAddress: "عنوان البريد الإلكتروني",
+  enterYourEmail: "أدخل بريدك الإلكتروني",
+  resetPassword: "إعادة تعيين كلمة المرور",
+  resetPasswordDescription:
+    "أدخل رمز التحقق المرسل إلى بريدك الإلكتروني وقم بتعيين كلمة مرور جديدة لحسابك.",
+  sendResetLink: "إرسال رابط إعادة التعيين",
+  resetLinkSent: "تم إرسال رابط إعادة التعيين إلى بريدك الإلكتروني",
+  tokenRequired: "مطلوب رمز التحقق لإعادة تعيين كلمة المرور",
+  verifyEmailButton: "تحقق",
+  emailNotFound: "البريد الإلكتروني غير موجود",
+  checkYourEmailForSecretKey: "تحقق من بريدك الإلكتروني للحصول على رمز التحقق.",
+  secretKey: "رمز التحقق",
+  newpassword: "كلمة المرور الجديدة",
+  confirmNewPassword: "تأكيد كلمة المرور الجديدة",
+  passwordResetSuccess:
+    "تم إعادة تعيين كلمة المرور بنجاح. يمكنك الآن تسجيل الدخول.",
 };
 
 export default ar;

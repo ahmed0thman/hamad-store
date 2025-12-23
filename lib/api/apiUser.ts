@@ -2,7 +2,9 @@
 
 import {
   DoctorRegisterFormData,
+  forgetPasswordT,
   RegisterFormData,
+  resetPasswordT,
   ShippingMethod,
   SignInFormData,
   specializationT,
@@ -151,6 +153,63 @@ export async function signOutUser(token: string) {
   }
 }
 
+export async function forgetPasswordCheckEmail(data: forgetPasswordT) {
+  try {
+    const response = await api.post("forgot-password", {
+      email: data.email,
+    });
+
+    console.log("forget password response:", response.data);
+    if (response.data.result === "Success") {
+      return {
+        success: true,
+        message: response.data.message,
+      };
+    } else {
+      return {
+        success: false,
+        message: response.data.message,
+      };
+    }
+    // Redirect to the sign-in page after successful sign-out
+  } catch (error) {
+    console.error("Error during sign-out:", error);
+    if (error instanceof AxiosError) {
+      return {
+        success: false,
+        message: error.response?.data?.message || "Failed to send reset link",
+      };
+    }
+  }
+}
+
+export async function resetPasswordCheckToken(data: resetPasswordT) {
+  try {
+    const response = await api.post("reset-password", data);
+
+    console.log("reset password response:", response.data);
+    if (response.data.result === "Success") {
+      return {
+        success: true,
+        message: response.data.message,
+      };
+    } else {
+      return {
+        success: false,
+        message: response.data.message,
+      };
+    }
+    // Redirect to the sign-in page after successful sign-out
+  } catch (error) {
+    console.error("Error during reset password:", error);
+    if (error instanceof AxiosError) {
+      return {
+        success: false,
+        message: error.response?.data?.message || "Failed to reset password",
+      };
+    }
+  }
+}
 export async function getProfile(userToken?: string) {
   try {
     const authResult = await getAuthToken(userToken);

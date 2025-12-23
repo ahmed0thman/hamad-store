@@ -8,22 +8,19 @@ import {
 import { APP_NAME } from "@/lib/constants";
 import Image from "next/image";
 import Link from "next/link";
-import CredentialsSignInForm from "./credentialsSignInForm";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import getLocaleStrings from "@/localization";
 import { authSEO } from "@/lib/seo";
+import ForgetPasswordForm from "./forgetPasswordForm";
 
-export const metadata = authSEO.signin;
+export const metadata = authSEO.forgetPassword;
 
-const SignInPage = async (props: {
-  searchParams: Promise<{ callbackUrl: string }>;
-}) => {
+const ForgetPassword = async () => {
   const session = await auth();
-  const { callbackUrl } = await props.searchParams;
   const locale = await getLocaleStrings();
 
-  if (session?.user) return redirect(callbackUrl || "/");
+  if (session?.user) return redirect("/");
   return (
     <div className="w-full max-w-md mx-auto m-auto">
       <Card className="bg-teal-100/20 dark:bg-background">
@@ -37,17 +34,19 @@ const SignInPage = async (props: {
               priority
             />
           </Link>
-          <CardTitle className="text-center">{locale.signInTitle}</CardTitle>
+          <CardTitle className="text-center">
+            {locale.forgetPasswordTitle}
+          </CardTitle>
           <CardDescription className="text-center">
-            {locale.signInDescription}
+            {locale.forgetPasswordDescription}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <CredentialsSignInForm />
+          <ForgetPasswordForm />
         </CardContent>
       </Card>
     </div>
   );
 };
 
-export default SignInPage;
+export default ForgetPassword;

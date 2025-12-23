@@ -42,6 +42,21 @@ export const cartItemSchema = z.object({
   totalPrice: currency,
 });
 
+export const forgetPasswordSchema = z.object({
+  email: z.string().email(t().emailRequired),
+});
+
+export const resetPasswordSchema = forgetPasswordSchema
+  .extend({
+    token: z.string().min(1, t().tokenRequired),
+    password: z.string().min(8, t().passwordMin),
+    password_confirmation: z.string().min(8, t().passwordConfirmationMin),
+  })
+  .refine((data) => data.password === data.password_confirmation, {
+    message: t().passwordsMustMatch,
+    path: ["password_confirmation"],
+  });
+
 export const insertCartSchema = z.object({
   items: z.array(cartItemSchema).min(1, t().cartMinItems),
   total: currency,

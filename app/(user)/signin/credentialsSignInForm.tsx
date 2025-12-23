@@ -86,9 +86,15 @@ const CredentialsSignInForm = () => {
               </ul>
             </div>
           )}
-          <Button className="w-full" variant="default">
+          <Button className="w-full" variant="default" disabled={pending}>
             {pending ? <SpinnerMini /> : t("signInTitle")}
           </Button>
+        </div>
+        {/* Forget Password */}
+        <div className="text-center text-sm text-muted-foreground">
+          <Link href="/forgetPassword" target="_self" className="text-red-500">
+            {t("forgetPassword")}
+          </Link>
         </div>
         <div className="text-center text-sm text-muted-foreground">
           <span className="me-1">{t("dontHaveAccount")}</span>
