@@ -3,8 +3,15 @@ import { DoctorProfileT } from "@/types";
 import React from "react";
 import DoctorProfileCard from "@/components/custom/doctor/DoctorProfileCard";
 
-const Doctor = async ({ params }: { params: { id: string } }) => {
-  const res = await getDoctorProfile(Number(params.id));
+import type { Metadata, ResolvingMetadata } from "next";
+
+interface PageProps {
+  params: Promise<{ id: string }>;
+}
+
+const Doctor = async ({ params }: PageProps) => {
+  const resolvedParams = await params;
+  const res = await getDoctorProfile(Number(resolvedParams.id));
 
   if (!res.success) {
     return <div>Error: {res.message}</div>;
