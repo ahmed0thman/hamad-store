@@ -242,7 +242,7 @@ export async function getProfile(userToken?: string) {
 export async function updateUserProfile(
   profileData: Omit<UserProfile, "Professional_info"> & {
     Professional_info: {
-      specialization: string;
+      specialization_id: string;
       license_number: string;
       bio: string;
       promo_code: string;
@@ -594,6 +594,7 @@ export async function updateUserCurrency(currency: string, userToken?: string) {
     }
   }
 }
+
 export async function getDoctorsSpecializations() {
   try {
     const response = await api.get("/doctor/specializations");
@@ -614,11 +615,6 @@ export async function getDoctorsSpecializations() {
     }
     return { success: false, message: "An unknown error occurred" };
   }
-}
-
-export async function getAuthData() {
-  const session = await auth();
-  return session;
 }
 
 export async function getDoctorOrdersReport(
@@ -791,4 +787,17 @@ export async function updateProfileImage(image: File, userToken?: string) {
     }
     return { success: false, message: "An unknown error occurred" };
   }
+}
+
+
+
+
+
+
+
+
+
+export async function getAuthData() {
+  const session = await auth();
+  return session;
 }

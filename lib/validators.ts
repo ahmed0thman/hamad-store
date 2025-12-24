@@ -47,7 +47,7 @@ export const forgetPasswordSchema = z.object({
 });
 
 export const resetPasswordSchema = forgetPasswordSchema
-  .extend({
+  .safeExtend({
     token: z.string().min(1, t().tokenRequired),
     password: z.string().min(8, t().passwordMin),
     password_confirmation: z.string().min(8, t().passwordConfirmationMin),
@@ -96,7 +96,7 @@ export const registerSchema = z
   });
 
 // Doctor Rigister schema
-export const doctorRegisterSchema = registerSchema.extend({
+export const doctorRegisterSchema = registerSchema.safeExtend({
   license_number: z.string().min(1, t().licenseNumberRequired),
   certificate_file: z.string().refine(
     (val) => {
@@ -128,7 +128,7 @@ export const profileSchema = z.object({
   language: z.string().optional(),
   gender: gender,
   state: z.string().min(1, t().addressRequired),
-  age: z.number().int().min(0, t().ageMin),
+  age: z.number(t().ageMin).int(t().ageMin).min(0, t().ageMin),
   email: z.string().email(t().emailRequired),
   profile_image: z.string().url(t().profileImageUrl).optional(),
   is_doctor: boolean().optional(),
@@ -137,24 +137,21 @@ export const profileSchema = z.object({
     .object({
       bio: z.string().optional(),
       specialization: z.string().optional(),
-      license_number: z.string().optional(),
-      certificate_file: z
-        .string()
-        .optional()
-        .refine(
-          (val) => {
-            if (!val?.trim()) return true;
-            // Accept URLs ending with allowed extensions
-            return (
-              typeof val === "string" &&
-              /\.(pdf|doc|docx|jpg|jpeg|png|svg)$/i.test(val)
-            );
-          },
-          {
-            message: t().certificateFileInvalid,
-          }
-        )
-        .optional(),
+      specialization_id: z.string(t().specializationRequired),
+      license_number: z.string().min(1, t().licenseNumberRequired),
+      certificate_file: z.string(t().certificateFileInvalid).refine(
+        (val) => {
+          if (!val?.trim()) return true;
+          // Accept URLs ending with allowed extensions
+          return (
+            typeof val === "string" &&
+            /\.(pdf|doc|docx|jpg|jpeg|png|svg)$/i.test(val)
+          );
+        },
+        {
+          message: t().certificateFileInvalid,
+        }
+      ),
       promo_code: z.string().optional(),
       status: z.string().optional(),
     })

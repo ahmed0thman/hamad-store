@@ -21,7 +21,7 @@ const ProductCard = async ({ productItem }: { productItem: ProductItem }) => {
   if (session && session.user) {
     const res = await getFavorites();
     if (res && res.success && !res.empty) {
-      const favorites = res.data as FavoriteItem[];
+      const favorites = res.data as ProductItem[];
       inFavorites = favorites.some((item) => item.id === productItem.id);
     }
   }

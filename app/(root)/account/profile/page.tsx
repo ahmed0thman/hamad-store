@@ -38,6 +38,7 @@ const Profile = () => {
     handleSubmit,
     formState: { errors, isSubmitting },
     setValue,
+    getValues,
     reset,
   } = useForm<UserProfile>({
     resolver: zodResolver(profileSchema),
@@ -56,7 +57,7 @@ const Profile = () => {
         gender: profile.gender || "",
         state: profile.state || "",
         Professional_info: {
-          specialization: profile.Professional_info?.specialization || "",
+          specialization_id: profile.Professional_info?.specialization_id || "",
           license_number: profile.Professional_info?.license_number || "",
           bio: profile.Professional_info?.bio || "",
           certificate_file: profile.Professional_info?.certificate_file || "",
@@ -94,7 +95,8 @@ const Profile = () => {
       is_doctor: profile?.is_doctor,
       currency_code: profile?.currency_code,
       Professional_info: {
-        specialization: data.Professional_info?.specialization || "",
+        specialization_id: data.Professional_info?.specialization_id || "",
+
         license_number: data.Professional_info?.license_number || "",
         bio: data.Professional_info?.bio || "",
         promo_code: data.Professional_info?.promo_code || "",
@@ -293,27 +295,32 @@ const Profile = () => {
                 {t("specialization")}
               </Label>
               <Select
-                onValueChange={(value) =>
-                  setValue("Professional_info.specialization", value)
-                }
-                value={
-                  profileData?.data?.Professional_info?.specialization || ""
-                }
+                onValueChange={(value) => {
+                  const key = specializations?.find(
+                    (spec) => spec.name === value
+                  )?.id;
+                  console.log("Professional_info.specialization_id", key);
+                  setValue(
+                    "Professional_info.specialization_id",
+                    key?.toString()
+                  );
+                }}
+                value={getValues("Professional_info.specialization_id") || ""}
               >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder={t("selectSpecialization")} />
                 </SelectTrigger>
                 <SelectContent>
                   {specializations?.map((spec) => (
-                    <SelectItem key={spec.id} value={spec.name}>
+                    <SelectItem key={`${spec.id}`} value={spec.name}>
                       {spec.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-              {errors.Professional_info?.specialization && (
+              {errors.Professional_info?.specialization_id && (
                 <span className="text-red-500 text-xs">
-                  {errors.Professional_info.specialization.message}
+                  {errors.Professional_info.specialization_id.message}
                 </span>
               )}
             </div>
