@@ -81,7 +81,7 @@ export const registerSchema = z
   });
 
 // Doctor Rigister schema
-export const doctorRegisterSchema = registerSchema.extend({
+export const doctorRegisterSchema = registerSchema.safeExtend({
   license_number: z.string().min(1, t().licenseNumberRequired),
   certificate_file: z.string().refine(
     (val) => {
