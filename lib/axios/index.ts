@@ -14,6 +14,7 @@ const getLanguage = async () => {
 
 export const api = axios.create({
   baseURL: API_URL,
+  timeout: 1000, // 10 seconds
   headers: {
     "Content-Type": "application/json",
   },
