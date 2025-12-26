@@ -1,16 +1,15 @@
-import { Heart, Star } from "lucide-react";
-import { formatCurrency, formatCurrencyEGP } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { FavoriteItem, ProductItem } from "@/types";
-import StarRating from "../starRating";
-import { auth } from "@/lib/auth";
-import { getFavorites } from "@/lib/api/apiFavorites";
-import ButtonFavorite from "./buttonFavorite";
 import { Badge } from "@/components/ui/badge";
-import ButtonAddToCompare from "./buttonAddToCompare";
+import { Button } from "@/components/ui/button";
+import { getFavorites } from "@/lib/api/apiFavorites";
+import { auth } from "@/lib/auth";
 import { CURRENCY_CODE } from "@/lib/constants";
+import { formatCurrency } from "@/lib/utils";
 import getLocaleStrings from "@/localization";
+import { ProductItem } from "@/types";
+import Link from "next/link";
+import StarRating from "../starRating";
+import ButtonAddToCompare from "./buttonAddToCompare";
+import ButtonFavorite from "./buttonFavorite";
 import ProductCardImage from "./ProductCardImage";
 
 const ProductCard = async ({ productItem }: { productItem: ProductItem }) => {
@@ -21,7 +20,7 @@ const ProductCard = async ({ productItem }: { productItem: ProductItem }) => {
   if (session && session.user) {
     const res = await getFavorites();
     if (res && res.success && !res.empty) {
-      const favorites = res.data as FavoriteItem[];
+      const favorites = res.data as ProductItem[];
       inFavorites = favorites.some((item) => item.id === productItem.id);
     }
   }

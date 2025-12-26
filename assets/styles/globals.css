@@ -214,6 +214,10 @@ html[dir="rtl"] {
       animation: none;
     }
   }
+  .text-phone {
+    @apply rtl:!text-end;
+    direction: ltr !important;
+  }
 }
 
 /*  ---break--- */

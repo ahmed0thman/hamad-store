@@ -1,33 +1,28 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import Pagination from "@/components/custom/pagination";
+import Spinner from "@/components/custom/spinner";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from "@/components/ui/select";
-import {
   Table,
-  TableHeader,
-  TableHead,
   TableBody,
-  TableRow,
   TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/ui/table";
-import Spinner from "@/components/custom/spinner";
 import { useGetDoctorCommentsReport } from "@/hooks/useGetDoctorCommentsReport";
+import { useTranslation } from "@/hooks/useTranslation";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import Pagination from "@/components/custom/pagination";
+import { useMemo, useState } from "react";
 
 export default function CommentsPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-
+  const { t } = useTranslation();
   const [fromDate, setFromDate] = useState<string>(
     searchParams.get("from_date")?.replace(/\//g, "-") || ""
   );
@@ -63,14 +58,6 @@ export default function CommentsPage() {
     router.push("/account/reports/comments");
   };
 
-  const pharmacies = useMemo(() => {
-    if (!reportData) return [];
-    const uniquePharmacies = Array.from(
-      new Set(reportData.details.data.map((d) => d.pharmacy))
-    );
-    return uniquePharmacies.map((name) => ({ id: name, name }));
-  }, [reportData]);
-
   const filteredComments = useMemo(() => {
     if (!reportData) return [];
     return reportData.details.data;
@@ -83,7 +70,7 @@ export default function CommentsPage() {
   if (error) {
     return (
       <div className="text-center text-destructive">
-        حدث خطأ أثناء تحميل التقرير
+        {t("errorLoadingReport")}
       </div>
     );
   }
@@ -91,7 +78,7 @@ export default function CommentsPage() {
   if (!reportData) {
     return (
       <div className="text-center text-muted-foreground">
-        لا توجد بيانات متاحة
+        {t("noDataAvailable")}
       </div>
     );
   }
@@ -112,7 +99,7 @@ export default function CommentsPage() {
         <Card>
           <CardHeader>
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              اسم الطبيب
+              {t("doctorName")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -123,7 +110,7 @@ export default function CommentsPage() {
         <Card>
           <CardHeader>
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              إجمالي التعليقات
+              {t("totalComments")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -136,7 +123,7 @@ export default function CommentsPage() {
         <Card>
           <CardHeader>
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              إجمالي النقاط
+              {t("totalPoints")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -149,7 +136,7 @@ export default function CommentsPage() {
         <Card>
           <CardHeader>
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              أفضل صيدلية
+              {t("topPharmacy")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -157,7 +144,7 @@ export default function CommentsPage() {
               {reportData.top_pharmacy.pharmacy}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              {reportData.top_pharmacy.points} نقطة
+              {reportData.top_pharmacy.points} {t("points")}
             </p>
           </CardContent>
         </Card>
@@ -166,22 +153,22 @@ export default function CommentsPage() {
       {/* Filter bar */}
       <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mb-2">
         <div className="flex-center gap-2">
-          <label>من</label>
+          <label>{t("from")}</label>
           <Input
             type="date"
             value={fromDate}
             onChange={(e) => setFromDate(e.target.value)}
-            placeholder="من"
+            placeholder={t("from")}
             className="w-fit"
           />
         </div>
         <div className="flex-center gap-2">
-          <label>إلى</label>
+          <label>{t("to")}</label>
           <Input
             type="date"
             value={toDate}
             onChange={(e) => setToDate(e.target.value)}
-            placeholder="إلى"
+            placeholder={t("to")}
             className="w-fit"
           />
         </div>
@@ -203,9 +190,9 @@ export default function CommentsPage() {
           </Select>
         </div> */}
         <div className="flex gap-2">
-          <Button onClick={handleApplyFilters}>تطبيق الفلتر</Button>
+          <Button onClick={handleApplyFilters}>{t("applyFilter")}</Button>
           <Button variant="outline" onClick={handleClearFilters}>
-            إعادة تعيين
+            {t("reset")}
           </Button>
         </div>
       </div>
@@ -213,27 +200,33 @@ export default function CommentsPage() {
       {/* Comments Table */}
       <Card>
         <CardHeader>
-          <CardTitle>التعليقات</CardTitle>
+          <CardTitle>{t("comments")}</CardTitle>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>المنتج</TableHead>
-                <TableHead>الصيدلية</TableHead>
-                <TableHead>التعليق</TableHead>
-                <TableHead>النقاط</TableHead>
-                <TableHead>تاريخ الإضافة</TableHead>
-                <TableHead>آخر تحديث</TableHead>
+                <TableHead>{t("product")}</TableHead>
+                <TableHead>{t("pharmacy")}</TableHead>
+                <TableHead>{t("comment")}</TableHead>
+                <TableHead>{t("points")}</TableHead>
+                <TableHead>{t("addedAt")}</TableHead>
+                <TableHead>{t("updatedAt")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredComments.map((comment, index) => (
                 <TableRow key={index}>
                   <TableCell className="font-medium">
-                    {comment.product}
+                    <Link href={`/product/${comment.product_id}`}>
+                      {comment.product}
+                    </Link>
                   </TableCell>
-                  <TableCell>{comment.pharmacy}</TableCell>
+                  <TableCell>
+                    <Link href={`/store/${comment.pharmacy_id}`}>
+                      {comment.pharmacy}
+                    </Link>
+                  </TableCell>
                   <TableCell className="max-w-xs truncate">
                     {comment.comment}
                   </TableCell>

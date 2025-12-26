@@ -8,6 +8,7 @@ const en = {
   currentLang: "En",
   currentLanguage: "English",
   offers: "Offers",
+  doctorPrefix: "Dr.",
 
   // Accessibility
   menu: "Menu",
@@ -595,6 +596,66 @@ const en = {
   failedToLoadPrivacyPolicy: "Failed to load privacy policy",
   failedToLoadTermsOfService: "Failed to load terms of service",
   refundAmount: "Refund Amount",
+
+  // FAQ Page
+  noFaqsForNow: "No FAQs available for now.",
+  faqTitle: "Frequently Asked Questions",
+  faqDescription:
+    "Find answers to common questions about our services and platform.",
+  didntFindAnswer: "Didn't find the answer you were looking for?",
+  contactUsForMoreHelp: "Contact us for more help.",
+
+  // Comments Report Page (custom additions)
+  errorLoadingReport: "An error occurred while loading the report",
+  noDataAvailable: "No data available",
+  doctorName: "Doctor Name",
+  totalComments: "Total Comments",
+
+  topPharmacy: "Top Pharmacy",
+
+  applyFilter: "Apply Filter",
+
+  comment: "Comment",
+  addedAt: "Added At",
+  updatedAt: "Updated At",
+
+  // Reviews Report Page (custom additions)
+  promoCodeUsage: "Promo Code Usage",
+  ordersCount: "Orders Count",
+  doctorOrders: "Doctor Orders",
+  doctorOrdersCount: "Number of orders from doctor",
+  patientOrders: "Patient Orders",
+  patientOrdersCount: "Number of patient orders",
+  pointsFromPatients: "Points from Patients",
+  pointsEarnedFromPatients: "Points earned from patients",
+  pharmacyPoints: "Pharmacy Points",
+  sitePoints: "Site Points",
+
+  customerName: "Customer Name",
+  date: "Date",
+  source: "Source",
+
+  // forget password
+  forgetPassword: "Forget Password?",
+  forgetPasswordTitle: "Forget Your Password",
+  forgetPasswordDescription:
+    "Enter your email address to receive a link to reset your password.",
+  emailAddress: "Email Address",
+  enterYourEmail: "Enter your email",
+  resetPassword: "Reset Password",
+  resetPasswordDescription:
+    "Enter the secret key sent to your email and set a new password for your account.",
+  sendResetLink: "Send Reset Link",
+  resetLinkSent: "Reset link sent to your email",
+  tokenRequired: "Token is required",
+  verifyEmailButton: "Verify",
+  emailNotFound: "Email address not found",
+  checkYourEmailForSecretKey:
+    "Check your email for the secret key to reset your password.",
+  secretKey: "Secret Key",
+  newpassword: "New Password",
+  confirmNewPassword: "Confirm New Password",
+  passwordResetSuccess: "Password reset successfully. You can now sign in.",
 };
 
 export default en;

@@ -25,7 +25,7 @@ const Footer = async () => {
             <div className="space-y-3">
               <div>{siteInfo.address}</div>
               <div>{siteInfo.email}</div>
-              <div>{siteInfo.phone}</div>
+              <div className="text-phone">{siteInfo.phone}</div>
             </div>
           </div>
 

@@ -61,7 +61,7 @@ const HeaderSearch = ({ categories }: { categories: category[] }) => {
   return (
     <div className="relative">
       <button
-        className="text-gray-800 dark:text-gray-400 fixed z-10 top-[14px] start-12 sm:hidden"
+        className="text-gray-800 dark:text-gray-400 fixed z-10 top-[14px] start-34 sm:hidden"
         onClick={() => setShowSearch(!showSearch)}
         aria-label={showSearch ? "Close search" : "Open search"}
         aria-expanded={showSearch}

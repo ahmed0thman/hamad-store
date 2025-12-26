@@ -7,6 +7,7 @@ import { useTheme } from "next-themes";
 import { ReactNode, useEffect, useState } from "react";
 import ButtonLang from "./buttonLang";
 import { useTranslation } from "@/hooks/useTranslation";
+import ButtonCurrency from "./buttonCurrency";
 
 const HeaderButtons = ({
   children,
@@ -30,6 +31,7 @@ const HeaderButtons = ({
   return (
     <div className="flex-center text-stone-700 dark:text-stone-400 !hidden lg:!flex">
       <ButtonLang />
+      <ButtonCurrency />
       <div suppressHydrationWarning>
         {mounted && (
           <Button

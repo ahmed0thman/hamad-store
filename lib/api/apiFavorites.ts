@@ -1,11 +1,9 @@
 "use server";
 
-import { api } from "../axios";
+import { ProductItem } from "@/types";
 import { AxiosError } from "axios";
 import { auth } from "../auth";
-import { delay } from "../utils";
-import { FavoriteItem } from "@/types";
-import { revalidatePath } from "next/cache";
+import { api } from "../axios";
 
 export const getFavorites = async () => {
   const session = await auth();
@@ -24,7 +22,7 @@ export const getFavorites = async () => {
     if (res.length > 0) {
       return {
         success: true,
-        data: res as FavoriteItem[],
+        data: res as ProductItem[],
       };
     } else {
       return { success: true, message: "No favorites found", empty: true };

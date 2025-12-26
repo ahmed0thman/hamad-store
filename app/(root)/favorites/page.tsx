@@ -28,24 +28,12 @@ const Favorites = async () => {
       </section>
     );
   const favoritesRes = await getFavorites();
-  const productsRes = await getFilteredProducts();
-  if (!favoritesRes.success || !productsRes.success) {
-    return <NoData message={locale.yourFavoritesListIsEmpty} />;
-  }
 
-  const favorites: FavoriteItem[] = favoritesRes.data as FavoriteItem[];
+  const favoriteProducts = favoritesRes.data as ProductItem[];
   // console.log(favorites.length);
 
-  const products: ProductItem[] = productsRes.products as ProductItem[];
-  // console.log(products.length);
-
-  const favoriteProducts = products.filter(
-    (product) =>
-      Array.isArray(favorites) &&
-      favorites.some((favorite) => favorite.id === product.id)
-  );
   // console.log(favoriteProducts.length);
-  if (!productsRes.success)
+  if (!favoritesRes.success)
     return <NoData message={locale.somethingWentWrong} />;
   return (
     <section className="wrapper">

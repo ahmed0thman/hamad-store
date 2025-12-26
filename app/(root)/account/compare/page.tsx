@@ -204,7 +204,7 @@ const ProductComparison = () => {
 
               {/* button show product page */}
               <Button asChild>
-                <Link href={`/products/${product.id}`}>{t("viewDetails")}</Link>
+                <Link href={`/product/${product.id}`}>{t("viewDetails")}</Link>
               </Button>
             </div>
           ))}

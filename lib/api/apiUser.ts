@@ -197,13 +197,15 @@ export async function updateUserProfile(
     return { success: false, message: authResult.message };
   }
   userToken = authResult.token;
+  const data = { ...profileData, ...profileData.Professional_info };
+  console.log("profile Data: ", data);
   try {
     let response;
     if (profileData.is_doctor) {
       response = await api.patch(
         "doctor/update/data",
         {
-          ...{ ...profileData, ...profileData.Professional_info },
+          data,
         },
         {
           headers: {
@@ -492,6 +494,47 @@ export async function updateUserLanguage(language: string, userToken?: string) {
   }
 }
 
+export async function updateUserCurrency(currency: string, userToken?: string) {
+  const authResult = await getAuthToken(userToken);
+  if (!authResult.success) {
+    return { success: false, message: authResult.message };
+  }
+  userToken = authResult.token;
+  try {
+    const response = await api.put(
+      "user-currency",
+      {
+        currency_code: currency,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      }
+    );
+    if (response.data.result === "Success") {
+      // Return success with updated data
+      // The client should call update() from useSession to refresh the session
+      return {
+        success: true,
+        data: response.data.data as UserProfile,
+        message: "Currency updated successfully",
+      };
+    }
+    return {
+      success: false,
+      message: response.data.message || "Failed to update currency",
+    };
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      console.error("Error updating user currency:", error.response);
+      return {
+        success: false,
+        message: error.response?.data?.message || "Failed to update currency",
+      };
+    }
+  }
+}
 export async function getDoctorsSpecializations() {
   try {
     const response = await api.get("/doctor/specializations");

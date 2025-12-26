@@ -10,6 +10,7 @@ const ar: Locale = {
   currentLang: "ع",
   currentLanguage: "عربي",
   offers: "عروض",
+  doctorPrefix: "د.",
 
   // Accessibility
   menu: "القائمة",
@@ -603,6 +604,67 @@ const ar: Locale = {
   termsOfServiceDescription: "شروط وأحكام استخدام منصة Valideria",
   failedToLoadPrivacyPolicy: "فشل تحميل سياسة الخصوصية",
   failedToLoadTermsOfService: "فشل تحميل شروط الاستخدام",
+
+  // FAQ Page (custom additions)
+
+  faqTitle: "الأسئلة الشائعة",
+  faqDescription:
+    "هل لديك أسئلة؟ تحقق من الأسئلة الشائعة أدناه للحصول على إجابات سريعة حول خدماتنا، الطلبات، الشحن، وأكثر من ذلك.",
+  noFaqsForNow: " لا توجد أسئلة شائعة حالياً.",
+  didntFindAnswer: "لم تجد إجابتك؟",
+  contactUsForMoreHelp: "اتصل بنا لمزيد من المساعدة.",
+
+  // Comments Report Page (custom additions)
+  errorLoadingReport: "حدث خطأ أثناء تحميل التقرير",
+  noDataAvailable: "لا توجد بيانات متاحة",
+  doctorName: "اسم الطبيب",
+  totalComments: "إجمالي التعليقات",
+
+  topPharmacy: "أفضل صيدلية",
+
+  applyFilter: "تطبيق الفلتر",
+
+  comment: "التعليق",
+  addedAt: "تاريخ الإضافة",
+  updatedAt: "آخر تحديث",
+
+  // Reviews Report Page (custom additions)
+
+  promoCodeUsage: "استخدام الكود",
+  doctorOrders: "طلبات الطبيب",
+  doctorOrdersCount: "عدد الطلبات من الطبيب",
+  patientOrders: "طلبات المرضى",
+  patientOrdersCount: "عدد طلبات المرضى",
+  pointsFromPatients: "نقاط من المرضى",
+  pointsEarnedFromPatients: "النقاط المكتسبة من المرضى",
+  pharmacyPoints: "نقاط الصيدلية",
+  sitePoints: "نقاط الموقع",
+  customerName: "اسم العميل",
+  ordersCount: "عدد الطلبات",
+  date: "التاريخ",
+  source: "المصدر",
+
+  // forget password
+  forgetPassword: "نسيت كلمة المرور؟",
+  forgetPasswordTitle: "استعادة كلمة المرور",
+  forgetPasswordDescription:
+    "أدخل عنوان بريدك الإلكتروني لتلقي رابط لإعادة تعيين كلمة المرور الخاصة بك.",
+  emailAddress: "عنوان البريد الإلكتروني",
+  enterYourEmail: "أدخل بريدك الإلكتروني",
+  resetPassword: "إعادة تعيين كلمة المرور",
+  resetPasswordDescription:
+    "أدخل رمز التحقق المرسل إلى بريدك الإلكتروني وقم بتعيين كلمة مرور جديدة لحسابك.",
+  sendResetLink: "إرسال رابط إعادة التعيين",
+  resetLinkSent: "تم إرسال رابط إعادة التعيين إلى بريدك الإلكتروني",
+  tokenRequired: "مطلوب رمز التحقق لإعادة تعيين كلمة المرور",
+  verifyEmailButton: "تحقق",
+  emailNotFound: "البريد الإلكتروني غير موجود",
+  checkYourEmailForSecretKey: "تحقق من بريدك الإلكتروني للحصول على رمز التحقق.",
+  secretKey: "رمز التحقق",
+  newpassword: "كلمة المرور الجديدة",
+  confirmNewPassword: "تأكيد كلمة المرور الجديدة",
+  passwordResetSuccess:
+    "تم إعادة تعيين كلمة المرور بنجاح. يمكنك الآن تسجيل الدخول.",
 };
 
 export default ar;

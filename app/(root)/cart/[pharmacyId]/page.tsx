@@ -15,6 +15,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import noImg from "@/public/images/no-image.jpg";
 
 const PharamacyCart = () => {
   const params = useParams();
@@ -63,7 +64,24 @@ const PharamacyCart = () => {
     <section className="wrapper">
       <div className="wrapper mx-auto px-4 md:px-8 !py-12 grid grid-cols-1 lg:grid-cols-3 gap-8 dark:bg-slate-900 dark:text-white">
         <div className="lg:col-span-2 space-y-6">
-          {/* <h1 className="text-2xl font-bold mb-4">Cart for {cartPharmacy.pharmacy_name}</h1> */}
+          <div className="flex items-center gap-4">
+            <Image
+              src={cartPharmacy?.pharmacy_image as string}
+              alt={cartPharmacy?.pharmacy_name || "Pharmacy Image"}
+              className="rounded-full border object-cover w-12 h-12"
+              width={48}
+              height={48}
+              onError={(e) => {
+                e.currentTarget.src = noImg.src;
+              }}
+            />
+            <Link
+              href={`/store/${cartPharmacy?.pharmacy_id}`}
+              className="text-xl font-bold mb-4 block underline"
+            >
+              {cartPharmacy?.pharmacy_name}
+            </Link>
+          </div>
           <div className="space-y-4">
             {cartPharmacy?.items.map((item) => (
               <Card
@@ -72,16 +90,18 @@ const PharamacyCart = () => {
               >
                 <CardContent className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                   <div className="flex  items-start sm:items-center gap-4 w-full">
-                    <Image
+                    {/* <Image
                       src="/images/no-image.jpg"
                       alt="Pharmacy Image"
                       width={64}
                       height={64}
                       className="rounded-full border object-cover w-16 h-16"
-                    />
+                    /> */}
                     <div>
                       <h2 className="text-base font-semibold text-gray-800 dark:text-gray-100">
-                        {item.name}
+                        <Link href={`/product/${item.product_id}`}>
+                          {item.name}
+                        </Link>
                       </h2>
                       <p className="text-sm text-gray-600 dark:text-gray-400">
                         {t("pricePerUnit")}:{" "}

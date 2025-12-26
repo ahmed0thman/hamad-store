@@ -200,7 +200,7 @@ const AddressesPage = () => {
                 <div className="grid gap-4 py-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="name">الاسم</Label>
+                      <Label htmlFor="name">{t("name")}</Label>
                       <Input {...register("name")} type="text" />
                       {errors.name && (
                         <p className="text-red-500 text-sm">
@@ -209,7 +209,7 @@ const AddressesPage = () => {
                       )}
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="phone">رقم الهاتف</Label>
+                      <Label htmlFor="phone">{t("phoneNumber")}</Label>
                       <Input {...register("phone")} type="tel" />
                       {errors.phone && (
                         <p className="text-red-500 text-sm">
@@ -218,7 +218,7 @@ const AddressesPage = () => {
                       )}
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="building"> المبنى</Label>
+                      <Label htmlFor="building">{t("building")}</Label>
                       <Input {...register("building")} type="text" />
                       {errors.building && (
                         <p className="text-red-500 text-sm">
@@ -227,7 +227,7 @@ const AddressesPage = () => {
                       )}
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="city">المدينة</Label>
+                      <Label htmlFor="city">{t("city")}</Label>
                       <Input {...register("city")} type="text" />
                       {errors.city && (
                         <p className="text-red-500 text-sm">
@@ -236,7 +236,7 @@ const AddressesPage = () => {
                       )}
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="area">المنطقة</Label>
+                      <Label htmlFor="area">{t("area")}</Label>
                       <Input {...register("area")} type="text" />
                       {errors.area && (
                         <p className="text-red-500 text-sm">
@@ -253,7 +253,7 @@ const AddressesPage = () => {
                       id="isDefault"
                       // checked={getValues("is_default") === 1}
                     />
-                    <Label htmlFor="isDefault">اجعل العنوان افتراضي</Label>
+                    <Label htmlFor="isDefault">{t("makeDefaultAddress")}</Label>
                   </div>
                 </div>
                 <DialogFooter>
@@ -262,10 +262,10 @@ const AddressesPage = () => {
                     variant="outline"
                     onClick={handleDialogClose}
                   >
-                    إلغاء
+                    {t("cancel")}
                   </Button>
                   <Button type="submit" disabled={isSubmitting}>
-                    حفظ
+                    {t("save")}
                     {isSubmitting && <SpinnerMini />}
                   </Button>
                 </DialogFooter>
@@ -288,10 +288,10 @@ const AddressesPage = () => {
                 <Home className="inline-block me-2 w-4 h-4" />
                 {addr.city}, {addr.area}, {addr.building}
               </p>
-              <p className=" text-muted-foreground">
+              <div className="flex items-center text-muted-foreground">
                 <Phone className="inline-block me-2 w-4 h-4" />
-                {addr.phone}
-              </p>
+                <p className="text-phone">{addr.phone}</p>
+              </div>
               {addr.is_default ? (
                 <span className="inline-block mt-1 text-sm font-medium bg-teal-100/80 text-teal-900 px-2 py-0.5 rounded">
                   {t("defaultAddress")}

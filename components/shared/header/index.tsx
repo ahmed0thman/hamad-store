@@ -1,20 +1,17 @@
-import HaederPages from "./headerPages";
-import HeaderButtons from "./headerButtons";
-import HeaderLogo from "./headerLogo";
-import HeaderSearch from "./headerSearch";
-import UserButton from "./userButton";
-import HeaderMenu from "./headerMenu";
-import { Categories } from "./categories";
-import MobileNav from "./mobileNav";
-import { auth } from "@/lib/auth";
-import HeaderCart from "./headerCart";
 import { getCartData } from "@/lib/api/apiCart";
-import { category } from "@/types";
 import { getAllCategories } from "@/lib/api/apiProducts";
-import HeaderPages from "./headerPages";
+import { auth } from "@/lib/auth";
 import getLocaleStrings from "@/localization";
-import { Search } from "lucide-react";
-import { useState } from "react";
+import { category } from "@/types";
+import { Categories } from "./categories";
+import HeaderButtons from "./headerButtons";
+import HeaderCart from "./headerCart";
+import HeaderLogo from "./headerLogo";
+import HeaderMenu from "./headerMenu";
+import HeaderPages from "./headerPages";
+import HeaderSearch from "./headerSearch";
+import MobileNav from "./mobileNav";
+import UserButton from "./userButton";
 
 const Header = async () => {
   const session = await auth();
@@ -52,7 +49,6 @@ const Header = async () => {
             <UserButton user={user} />
             <div className=" col-start-1 col-span-1 flex justify-start items-center gap-2">
               <HeaderMenu session={session} />
-              
             </div>
             <MobileNav />
           </div>

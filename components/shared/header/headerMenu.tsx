@@ -42,6 +42,7 @@ import { usePathname } from "next/navigation";
 import { ReactNode, useEffect, useState, useTransition } from "react";
 import ButtonLang from "./buttonLang";
 import { useTranslation } from "@/hooks/useTranslation";
+import ButtonCurrency from "./buttonCurrency";
 
 const HeaderMenu = ({ session }: { session: any }) => {
   const { t } = useTranslation();
@@ -116,9 +117,12 @@ const HeaderMenu = ({ session }: { session: any }) => {
     setTheme(theme === "light" ? "dark" : "light");
   }
   return (
-    <nav className="lg:hidden">
+    <nav className="lg:!hidden flex-center gap-2">
       <Sheet>
-        <SheetTrigger className="align-middle  p-1 rounded-md text-stone-500 " aria-label={t("menu")}>
+        <SheetTrigger
+          className="align-middle  p-1 rounded-md text-stone-500 "
+          aria-label={t("menu")}
+        >
           <MenuIcon />
         </SheetTrigger>
         <SheetContent className="flex flex-col items-start p-4 overflow-auto">
@@ -237,6 +241,7 @@ const HeaderMenu = ({ session }: { session: any }) => {
           </div>
         </SheetContent>
       </Sheet>
+      <ButtonCurrency />
     </nav>
   );
 };
