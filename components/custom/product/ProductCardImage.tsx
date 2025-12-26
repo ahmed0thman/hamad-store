@@ -15,9 +15,9 @@ export default function ProductCardImage({ src, alt }: ProductCardImageProps) {
       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
       className="object-cover rounded-md"
       loading="lazy"
-      onError={(e) => {
-        e.currentTarget.src = "/images/no-image.jpg";
-      }}
+      // onError={(e) => {
+      //   e.currentTarget.src = "/images/no-image.jpg";
+      // }}
     />
   );
 }
