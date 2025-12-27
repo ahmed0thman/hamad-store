@@ -41,7 +41,7 @@ const Favorites = async () => {
         {locale.yourFavoritesList}
       </h2>
       <div className="grid grid-cols-1 gap-3 md:gap-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 lg:gap-3 xl:gap-2 justify-center">
-        {favoriteProducts.length > 0 ? (
+        {favoriteProducts && favoriteProducts.length > 0 ? (
           favoriteProducts.map((productItem) => (
             <div className="sm:mx-0" key={productItem.id}>
               <ProductCard productItem={productItem} />

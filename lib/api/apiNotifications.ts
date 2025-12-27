@@ -31,7 +31,15 @@ export async function getNotifications(token?: string) {
       message: response.data.message || "Failed to retrieve notifications",
     };
   } catch (error) {
-    console.error("Error fetching notifications:", error);
+    // console.error("Error fetching notifications:", error);
+    if (error instanceof AxiosError && error.response) {
+      console.log("Error response:", error.response.data);
+      return {
+        success: false,
+        message:
+          error.response.data.message || "Failed to retrieve notifications",
+      };
+    }
     return {
       success: false,
       message: "Failed to retrieve notifications",

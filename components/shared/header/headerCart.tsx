@@ -40,6 +40,9 @@ const HeaderCart = ({ session }: { session?: any }) => {
     }
   }
 
+  if (isLoading) return null;
+
+  console.log("Cart header data: ", cart);
   if (!isAuthenticated) {
     return (
       <DropdownMenu>
@@ -62,7 +65,7 @@ const HeaderCart = ({ session }: { session?: any }) => {
     );
   }
 
-  if (isEmpty) {
+  if (!cart || isEmpty) {
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -85,11 +88,15 @@ const HeaderCart = ({ session }: { session?: any }) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className=" relative p-0" aria-label={t("openCart")}>
+        <Button
+          variant="ghost"
+          className=" relative p-0"
+          aria-label={t("openCart")}
+        >
           <ShoppingCart className="!w-6 !h-6" />
           <Badge
             variant="default"
-            className="absolute bg-red-500 text-white -top-2 -right-0 h-5 min-w-5 flex items-center justify-center p-1 text-xs"
+            className="absolute bg-red-500 text-white -top-2 right-0 h-5 min-w-5 flex items-center justify-center p-1 text-xs"
           >
             {multiStores
               ? cart?.pharmacies.length
