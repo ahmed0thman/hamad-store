@@ -19,6 +19,7 @@ import SpinnerMini from "../SpinnerMini";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useGetCart } from "@/hooks/useGetCart";
 import { useTranslation } from "@/hooks/useTranslation";
+import { useGetProfile } from "@/hooks/useGetProfile";
 
 const ButtonSubmit = ({ children }: { children: React.ReactNode }) => {
   const { pending } = useFormStatus();
@@ -46,7 +47,7 @@ const AddToCart = ({
 
   const { data, isLoading, error } = useGetCart();
   const cart = data?.data as CartData | null | undefined;
-
+  const { profileData } = useGetProfile();
   const queryClient = useQueryClient();
   const { mutate: cartAddMutation, isPending: isAddPending } = useMutation({
     mutationFn: handleAddToCart,
@@ -144,7 +145,7 @@ const AddToCart = ({
     });
   }
 
-  if (data?.notAuthenticated) {
+  if (profileData?.success === false || !profileData?.data) {
     return (
       <Button
         onClick={() => {
