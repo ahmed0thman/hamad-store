@@ -26,20 +26,21 @@ api.interceptors.request.use(async (config) => {
   const currencyCookie = await getCurrency();
   if (currencyCookie) {
     currency = currencyCookie;
-  } else {
-    const currenciesResponse = await getCurrencies();
-    const currenciesData = currenciesResponse.data as currencyT[];
-    if (currenciesResponse.success && currenciesData.length > 0) {
-      const defaultCurrency = currenciesData.find(
-        (currency) => currency.is_default
-      );
-      if (defaultCurrency) {
-        currency = defaultCurrency.code;
-      } else if (currenciesData.length > 0) {
-        currency = currenciesData[0].code;
-      }
-    }
   }
+  // else {
+  //   const currenciesResponse = await getCurrencies();
+  //   const currenciesData = currenciesResponse.data as currencyT[];
+  //   if (currenciesResponse.success && currenciesData.length > 0) {
+  //     const defaultCurrency = currenciesData.find(
+  //       (currency) => currency.is_default
+  //     );
+  //     if (defaultCurrency) {
+  //       currency = defaultCurrency.code;
+  //     } else if (currenciesData.length > 0) {
+  //       currency = currenciesData[0].code;
+  //     }
+  //   }
+  // }
   config.headers["Accept-Language"] = lang;
   config.headers["currency"] = currency;
   // console.log("Setting Accept-Language:", lang);
