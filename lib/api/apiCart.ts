@@ -26,7 +26,12 @@ export const getCartData = async (userToken?: string) => {
       };
     }
 
-    if (!response.data.data && response.data.status === 500) {
+    if (
+      !response.data.data ||
+      response.data.status === 500 ||
+      response.data.result === "Error"
+    ) {
+      // console.log("cart is empty", typeof response.data.data);
       return { success: false, message: "Cart is Empty", empty: true };
     }
   } catch (error) {
