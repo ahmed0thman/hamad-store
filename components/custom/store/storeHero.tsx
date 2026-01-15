@@ -6,8 +6,10 @@ import { Pharmacy, siteBannerT, storeInformationT } from "@/types";
 import { Clock, Home, Phone } from "lucide-react";
 import ButtonShare from "../buttonShare";
 import StoreHeroClient from "./storeHeroClient";
+import getLocaleStrings from "@/localization";
 
 const StoreHero = async ({ pharmacy }: { pharmacy: Pharmacy }) => {
+  const strings = await getLocaleStrings();
   const bannersRes = await getStoreBanners(pharmacy?.id);
   const banners = bannersRes.data as siteBannerT[];
   const infoRes = await getStoreInformation(pharmacy?.id);
@@ -17,7 +19,7 @@ const StoreHero = async ({ pharmacy }: { pharmacy: Pharmacy }) => {
     return (
       <section className="mb-12">
         <div className="text-center text-red-500">
-          Pharmacy data not available
+          {strings.noDataAvailable}
         </div>
       </section>
     );
@@ -31,7 +33,7 @@ const StoreHero = async ({ pharmacy }: { pharmacy: Pharmacy }) => {
   //
 
   return (
-    <section className="mb-24 relative">
+    <section className="mb-28 relative">
       {/* Hero Banner Swiper */}
       <div className="relative w-full aspect-video max-h-[50vh] overflow-hidden">
         <StoreHeroClient banners={banners} />
@@ -41,7 +43,7 @@ const StoreHero = async ({ pharmacy }: { pharmacy: Pharmacy }) => {
         <CardContent className="flex flex-row gap-4 relative">
           <Avatar className="w-18 h-18">
             <AvatarImage src={pharmacy.image} />
-            <AvatarFallback>{initials || "Store"}</AvatarFallback>
+            <AvatarFallback>{initials || strings.store}</AvatarFallback>
           </Avatar>
           <div className="space-y-1 flex-grow">
             <h1 className="text-lg font-semibold text-primary">{info.name}</h1>
@@ -50,14 +52,14 @@ const StoreHero = async ({ pharmacy }: { pharmacy: Pharmacy }) => {
               <p className="flex items-center gap-1">
                 <Phone className="w-4 h-4" />
                 <span className="ml-2">
-                  {info.phone || "No phone number available"}
+                  {info.phone || strings.noDataAvailable}
                 </span>
               </p>
 
               <p className="flex items-center gap-1">
                 <Home className="w-4 h-4" />
                 <span className="ml-2">
-                  {info.address || "No address available"}
+                  {info.address || strings.noAddressesAvailable}
                 </span>
               </p>
 
@@ -67,13 +69,13 @@ const StoreHero = async ({ pharmacy }: { pharmacy: Pharmacy }) => {
               </p>
 
               <span className=" px-3 py-0.5 font-medium bg-green-100 text-green-800 border border-green-200 rounded-full">
-                Open Now
+                {strings.openNow}
               </span>
             </div>
 
             <div className="flex items-center justify-end gap-2 mt-3">
               <ButtonShare />
-              <Button variant="outline">Contact</Button>
+              {/* <Button variant="outline">Contact</Button> */}
             </div>
           </div>
         </CardContent>

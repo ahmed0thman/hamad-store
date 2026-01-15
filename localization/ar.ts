@@ -25,6 +25,14 @@ const ar: Locale = {
   goToPage: "الانتقال إلى الصفحة",
   removeFromFavorites: "إزالة من المفضلة",
   addToFavorites: "إضافة إلى المفضلة",
+  linkCopied: "تم نسخ الرابط إلى الحافظة",
+  shareText: "تحقق من هذا!",
+  sharedSuccessfully: "تم المشاركة بنجاح",
+  shareFailed: "فشل المشاركة",
+  copyFailed: "فشل النسخ إلى الحافظة",
+  shareOnFacebook: "المشاركة على فيسبوك",
+  shareOnTwitter: "المشاركة على تويتر",
+  copyLink: "مشاركة / نسخ الرابط",
 
   // Navigation
   home: "الرئيسية",
@@ -604,6 +612,10 @@ const ar: Locale = {
   termsOfServiceDescription: "شروط وأحكام استخدام منصة Valideria",
   failedToLoadPrivacyPolicy: "فشل تحميل سياسة الخصوصية",
   failedToLoadTermsOfService: "فشل تحميل شروط الاستخدام",
+  openNow: "مفتوح الآن",
+  closed: "مغلق",
+  store: "المتجر",
+  certificateImage: "صورة الشهادة",
 
   // FAQ Page (custom additions)
 

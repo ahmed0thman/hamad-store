@@ -125,6 +125,7 @@ export type Comment = {
   user_image: string | null;
   rate: number;
   comment: string;
+  user_id: string;
 };
 
 export type ProductItem = {

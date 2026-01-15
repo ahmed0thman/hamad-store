@@ -26,9 +26,7 @@ export default async function DoctorProfileCard({
           {locale.doctorPrefix} {doctor.first_name} {doctor.last_name}
         </h2>
         <p className="text-muted-foreground mb-2">{doctor.specialization}</p>
-        <p className="text-sm text-gray-500 dark:text-gray-300 mb-2">
-          {doctor.gender}
-        </p>
+
         {doctor.bio && <p className="text-base mb-2">{doctor.bio}</p>}
         {/* {doctor.phone && (
           <p className="text-sm text-gray-500 dark:text-gray-300">
@@ -58,7 +56,7 @@ export default async function DoctorProfileCard({
               return (
                 <div className="mt-4 flex flex-col items-center">
                   <span className="text-sm text-muted-foreground mb-1">
-                    Certificate Image:
+                    {locale.certificateImage}
                   </span>
                   <img
                     src={doctor.certificate_file}

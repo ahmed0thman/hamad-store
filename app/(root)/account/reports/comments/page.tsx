@@ -141,10 +141,10 @@ export default function CommentsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-lg font-bold text-primary">
-              {reportData.top_pharmacy.pharmacy}
+              {reportData.top_pharmacy?.pharmacy || "-"}
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              {reportData.top_pharmacy.points} {t("points")}
+              {reportData.top_pharmacy?.points || 0} {t("points")}
             </p>
           </CardContent>
         </Card>

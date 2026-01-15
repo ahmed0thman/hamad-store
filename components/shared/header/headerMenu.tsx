@@ -203,7 +203,7 @@ const HeaderMenu = ({ session }: { session: any }) => {
                       <MenuItem
                         key={`${ele.name}-category`}
                         title={ele.name}
-                        href={`products/${ele.id}`}
+                        href={`products?categoryId=${ele.id}`}
                       />
                     ))}
                   </Menu>

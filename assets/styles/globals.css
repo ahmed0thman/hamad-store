@@ -193,13 +193,14 @@ html[dir="rtl"] {
     animation: rotate 1s infinite linear;
   }
 
-  ::view-transition-new(.slide-up) {
-    animation: slideUp 1s;
-  }
   @keyframes rotate {
     to {
       transform: rotate(1turn);
     }
+  }
+
+  ::view-transition-new(.slide-up) {
+    animation: slideUp 1s;
   }
 
   @keyframes slideUp {

@@ -8,6 +8,7 @@ import {
   getPharmacyData,
   getPharmacyProductsByTitle,
 } from "@/lib/api/apiPharmacy";
+import getLocaleStrings from "@/localization";
 import { Pharmacy } from "@/types";
 import React from "react";
 
@@ -19,6 +20,7 @@ interface StorePageProps {
 }
 
 const StorePage = async ({ params }: StorePageProps) => {
+  const strings = await getLocaleStrings();
   const { id: pharmacyId } = await params;
 
   const [
@@ -52,19 +54,22 @@ const StorePage = async ({ params }: StorePageProps) => {
       )}
       {pharmacyCategories && pharmacyCategories.length > 0 && (
         <BrandSwiper
-          headLine="Browse all"
-          highlight="Categories"
-          subHeadign="Choose from a wide range of medicines, health products, and personal care products – everything you need in one place."
+          headLine={strings.browseAll}
+          highlight={strings.categories}
+          subHeadign={strings.categoriesSubheading}
           items={pharmacyCategories}
         />
       )}
       {pharmacyFeatured && pharmacyFeatured.length > 0 && (
-        <ProductSwiper headLine="Unique Products" products={pharmacyFeatured} />
+        <ProductSwiper
+          headLine={strings.uniqueProducts}
+          products={pharmacyFeatured}
+        />
       )}
       {pharmacyBrands && pharmacyBrands.length > 0 && (
         <BrandSwiper
           headLine=""
-          highlight="Brands"
+          highlight={strings.brands}
           subHeadign=""
           items={pharmacyBrands}
         />
@@ -72,14 +77,14 @@ const StorePage = async ({ params }: StorePageProps) => {
       {pharmacyTopSelling && pharmacyTopSelling.length > 0 && (
         <ProductSwiper
           products={pharmacyTopSelling}
-          headLine="Top Rated Products"
+          headLine={strings.topSellingProducts}
         />
       )}
       {/* <Banner /> */}
       {/* <BrandSwiper headLine="Top" highlight="Rated Brands" subHeadign="" /> */}
       {pharmacyTopRates && pharmacyTopRates.length > 0 && (
         <ProductSwiper
-          headLine="Top Selling Products"
+          headLine={strings.topRatedProducts}
           products={pharmacyTopRates}
         />
       )}

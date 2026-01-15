@@ -25,12 +25,14 @@ function CommentCard({
   rating,
   comment,
   avatarUrl,
+  user_id,
 }: {
   name: string;
   type: "doctor" | "customer";
   rating: number;
   comment: string;
   avatarUrl?: string;
+  user_id?: string;
 }) {
   const initials = name
     .split(" ")
@@ -51,7 +53,7 @@ function CommentCard({
         <div>
           <div className="font-semibold text-primary mb-0.5 text-start">
             {type === "doctor" ? (
-              <Link href={`/doctor/${name}`}> {name}</Link>
+              <Link href={`/doctor/${user_id}`}> {name}</Link>
             ) : (
               name
             )}
@@ -114,6 +116,7 @@ function CommentTabs({
               type="customer"
               rating={comment.rate}
               avatarUrl={comment.user_image || undefined}
+              user_id={comment.user_id}
             />
           ))
         ) : (
@@ -135,6 +138,7 @@ function CommentTabs({
               type="doctor"
               rating={comment.rate}
               comment={comment.comment}
+              user_id={comment.user_id}
             />
           ))
         ) : (

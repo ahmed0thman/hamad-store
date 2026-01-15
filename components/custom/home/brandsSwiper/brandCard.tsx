@@ -9,7 +9,7 @@ const BrandCard = ({ item }: { item: Brand | category }) => {
       ? item.image
       : "/images/no-image.jpg";
   return (
-    <Link href={`/products?brand=${item.name}`} className="flex-center w-full">
+    <Link href={`/products?brandId=${item.id}`} className="flex-center w-full">
       <div className="rounded-md w-full flex flex-col gap-3 justify-center">
         <div className="w-full aspect-square relative mx-auto">
           <Image

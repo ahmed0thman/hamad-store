@@ -23,6 +23,14 @@ const en = {
   goToPage: "Go to page",
   removeFromFavorites: "Remove from favorites",
   addToFavorites: "Add to favorites",
+  linkCopied: "Link copied to clipboard",
+  shareText: "Check out this!",
+  sharedSuccessfully: "Shared successfully",
+  shareFailed: "Share failed",
+  copyFailed: "Copy to clipboard failed",
+  shareOnFacebook: "Share on Facebook",
+  shareOnTwitter: "Share on Twitter",
+  copyLink: "Share / Copy Link",
 
   // Navigation
   home: "Home",
@@ -596,6 +604,10 @@ const en = {
   failedToLoadPrivacyPolicy: "Failed to load privacy policy",
   failedToLoadTermsOfService: "Failed to load terms of service",
   refundAmount: "Refund Amount",
+  openNow: "Open Now",
+  closed: "Closed",
+  store: "Store",
+  certificateImage: "Certificate Image",
 
   // FAQ Page
   noFaqsForNow: "No FAQs available for now.",
