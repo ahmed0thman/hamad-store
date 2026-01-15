@@ -122,10 +122,10 @@ const ProductCard = async ({ productItem }: { productItem: ProductItem }) => {
             {locale.notAvailable}
           </Badge>
         )}
-        <div className="hidden sm:flex flex-row  gap-1">
+        <div className="flex flex-row py-2 sm:py-0! gap-1">
           <Button
             asChild
-            className=" rounded-full text-stone-100 font-medium text-xs sm:text-base flex-grow-0 !py-1 sm:!py-2"
+            className="hidden sm:block rounded-full text-stone-100 font-medium text-xs sm:text-base grow-0 py-1! sm:py-2!"
           >
             <Link href={`/product/${productItem.id}`}>
               {/* {productItem.quantity > 0 ? locale.buyNowButton : locale.details} */}

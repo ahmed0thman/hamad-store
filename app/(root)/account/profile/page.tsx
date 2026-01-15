@@ -24,6 +24,7 @@ import { useGetProfile } from "@/hooks/useGetProfile";
 import { useQueryClient } from "@tanstack/react-query";
 import useGetDoctorsSpecializations from "@/hooks/useGetDoctorsSpecializations";
 import { useTranslation } from "@/hooks/useTranslation";
+import ProfileImage from "@/components/custom/account/ProfileImage";
 
 const Profile = () => {
   const { isLoadoingProfile, profileData } = useGetProfile();
@@ -57,7 +58,10 @@ const Profile = () => {
         gender: profile.gender || "",
         state: profile.state || "",
         Professional_info: {
-          specialization_id: profile.Professional_info?.specialization_id || "",
+          specialization: {
+            name: profile.Professional_info?.specialization?.name || "",
+            id: profile.Professional_info?.specialization.id.toString() || "",
+          },
           license_number: profile.Professional_info?.license_number || "",
           bio: profile.Professional_info?.bio || "",
           certificate_file: profile.Professional_info?.certificate_file || "",
@@ -93,10 +97,11 @@ const Profile = () => {
       language: profile?.language,
       profile_image: profile?.profile_image,
       is_doctor: profile?.is_doctor,
-      currency_code: profile?.currency_code,
       Professional_info: {
-        specialization_id: data.Professional_info?.specialization_id || "",
-
+        specialization: {
+          id: data.Professional_info?.specialization.id || "",
+          name: data.Professional_info?.specialization.name || "",
+        },
         license_number: data.Professional_info?.license_number || "",
         bio: data.Professional_info?.bio || "",
         promo_code: data.Professional_info?.promo_code || "",
@@ -109,6 +114,7 @@ const Profile = () => {
 
     // Call the API to update the profile
     const response = await updateUserProfile(updatedProfileData);
+    // console.log({ response });
     if (response && response.success) {
       toast.success(t("profileUpdatedSuccessfully"), {
         duration: 3000,
@@ -158,6 +164,9 @@ const Profile = () => {
 
   return (
     <div className="">
+      <div className="sm:hidden">
+        <ProfileImage />
+      </div>
       <h1 className="text-2xl font-bold text-gray-800 dark:text-white mb-6">
         {t("accountDetails")}
       </h1>{" "}
@@ -296,31 +305,35 @@ const Profile = () => {
               </Label>
               <Select
                 onValueChange={(value) => {
-                  const key = specializations?.find(
+                  console.log("Professional_info.specialization", value);
+                  const selectedSpec = specializations?.find(
                     (spec) => spec.name === value
-                  )?.id;
-                  console.log("Professional_info.specialization_id", key);
+                  );
                   setValue(
-                    "Professional_info.specialization_id",
-                    key?.toString()
+                    "Professional_info.specialization.id",
+                    selectedSpec ? selectedSpec.id.toString() : ""
+                  );
+                  setValue(
+                    "Professional_info.specialization.name",
+                    value?.toString()
                   );
                 }}
-                value={getValues("Professional_info.specialization_id") || ""}
+                value={getValues("Professional_info.specialization.name") || ""}
               >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder={t("selectSpecialization")} />
                 </SelectTrigger>
                 <SelectContent>
                   {specializations?.map((spec) => (
-                    <SelectItem key={`${spec.id}`} value={spec.name}>
+                    <SelectItem key={`${spec.id}`} value={spec.name.toString()}>
                       {spec.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-              {errors.Professional_info?.specialization_id && (
+              {errors.Professional_info?.specialization?.name && (
                 <span className="text-red-500 text-xs">
-                  {errors.Professional_info.specialization_id.message}
+                  {errors.Professional_info.specialization.name.message}
                 </span>
               )}
             </div>

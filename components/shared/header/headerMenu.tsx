@@ -16,7 +16,7 @@ import {
 import { revalidate } from "@/lib/api/actions";
 import { getAllCategories } from "@/lib/api/apiProducts";
 import { signOutUser } from "@/lib/api/apiUser";
-import { category } from "@/types";
+import { category, UserProfile } from "@/types";
 import {
   Globe,
   Heart,
@@ -43,10 +43,11 @@ import { ReactNode, useEffect, useState, useTransition } from "react";
 import ButtonLang from "./buttonLang";
 import { useTranslation } from "@/hooks/useTranslation";
 import ButtonCurrency from "./buttonCurrency";
+import { useGetProfile } from "@/hooks/useGetProfile";
 
 const HeaderMenu = ({ session }: { session: any }) => {
   const { t } = useTranslation();
-
+  const { profileData, isLoadoingProfile } = useGetProfile();
   const headerPages = [
     { title: t("home"), path: "/", icon: <Home /> },
     { title: t("about"), path: "/about", icon: <Info /> },
@@ -99,9 +100,9 @@ const HeaderMenu = ({ session }: { session: any }) => {
   useEffect(() => {
     if (isAuth) {
       setInitials(
-        `${session?.user.firstName?.charAt(0)} ${session?.user.lastName?.charAt(
+        `${profile?.first_name?.charAt(
           0
-        )}`
+        )} ${profileData?.data?.last_name?.charAt(0)}`
       );
     }
   }, [isAuth]);
@@ -116,6 +117,9 @@ const HeaderMenu = ({ session }: { session: any }) => {
   function toggleTheme() {
     setTheme(theme === "light" ? "dark" : "light");
   }
+
+  if (isLoadoingProfile) return null;
+  const profile = profileData?.data as UserProfile | undefined;
   return (
     <nav className="lg:!hidden flex-center gap-2">
       <Sheet>
@@ -127,11 +131,11 @@ const HeaderMenu = ({ session }: { session: any }) => {
         </SheetTrigger>
         <SheetContent className="flex flex-col items-start p-4 overflow-auto">
           <SheetTitle></SheetTitle>
-          {isAuth && (
+          {profile && (
             <div className="flex-center gap-3">
-              {session?.user.image?.endsWith(".svg") ? (
+              {profile?.profile_image ? (
                 <Image
-                  src={session?.user.image}
+                  src={profile?.profile_image}
                   width={50}
                   height={50}
                   alt="profile"
@@ -144,13 +148,13 @@ const HeaderMenu = ({ session }: { session: any }) => {
                 </div>
               )}
               <p className="text-gray-600 font-medium text-lg">
-                {session?.user.firstName} {session?.user.lastName}
+                {profile?.first_name} {profile?.last_name}
               </p>
             </div>
           )}
           {/* Menus */}
           <div className="flex-grow-1 w-full flex flex-col divide-y divide-gray-200 dark:divide-slate-700">
-            {!isAuth ? (
+            {!profile ? (
               <Menu>
                 <MenuItem href="/signin" title={t("signin")} icon={<LogIn />} />
               </Menu>
@@ -168,7 +172,7 @@ const HeaderMenu = ({ session }: { session: any }) => {
             </Menu>
 
             {/* Account */}
-            {isAuth ? (
+            {profile ? (
               // <Accordion type="single" collapsible>
               //   <AccordionItem value="account">
               //     <AccordionTrigger className="py-3 px-6 text-lg hover:no-underline">
@@ -228,7 +232,7 @@ const HeaderMenu = ({ session }: { session: any }) => {
             </Menu>
 
             {/* Logout */}
-            {isAuth ? (
+            {profile ? (
               <Menu>
                 <MenuItem
                   title={t("signOut")}

@@ -242,7 +242,10 @@ export async function getProfile(userToken?: string) {
 export async function updateUserProfile(
   profileData: Omit<UserProfile, "Professional_info"> & {
     Professional_info: {
-      specialization_id: string;
+      specialization: {
+        id: string;
+        name: string;
+      };
       license_number: string;
       bio: string;
       promo_code: string;
@@ -257,14 +260,14 @@ export async function updateUserProfile(
   }
   userToken = authResult.token;
   const data = { ...profileData, ...profileData.Professional_info };
-  console.log("profile Data: ", data);
+  // console.log("profile Data: ", data);
   try {
     let response;
     if (profileData.is_doctor) {
       response = await api.patch(
         "doctor/update/data",
         {
-          data,
+          ...data,
         },
         {
           headers: {
@@ -291,7 +294,12 @@ export async function updateUserProfile(
         data: response.data.data as UserProfile,
       };
     }
+    return {
+      success: false,
+      message: response.data.message || "Failed to update profile",
+    };
   } catch (error) {
+    console.log({ error });
     if (error instanceof AxiosError) {
       console.error("Error updating user profile:", error.response?.statusText);
       return {
@@ -788,14 +796,6 @@ export async function updateProfileImage(image: File, userToken?: string) {
     return { success: false, message: "An unknown error occurred" };
   }
 }
-
-
-
-
-
-
-
-
 
 export async function getAuthData() {
   const session = await auth();

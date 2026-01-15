@@ -136,8 +136,10 @@ export const profileSchema = z.object({
   Professional_info: z
     .object({
       bio: z.string().optional(),
-      specialization: z.string().optional(),
-      specialization_id: z.string(t().specializationRequired),
+      specialization: z.object({
+        name: z.string().optional(),
+        id: z.string(t().specializationRequired),
+      }),
       license_number: z.string().min(1, t().licenseNumberRequired),
       certificate_file: z.string(t().certificateFileInvalid).refine(
         (val) => {

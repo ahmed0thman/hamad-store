@@ -101,11 +101,10 @@ const Orders = () => {
     );
   }
 
-  const currency = profileData?.data?.currency_code || CURRENCY_CODE;
-
   const filteredOrders = ordersData?.data?.filter((order) =>
     order.id.toString().toLowerCase().includes(searchQuery.toLowerCase())
   );
+  const currency = profileData?.data?.currency_code || CURRENCY_CODE;
   return (
     <section className="">
       <div className="wrapper px-4 py-8">
@@ -154,7 +153,7 @@ const Orders = () => {
                   <p className="text-sm text-muted-foreground">
                     {formatCurrency(
                       Number(order.total_after_shipping),
-                      currency
+                      order.currency || currency
                     )}
                   </p>
                 </div>

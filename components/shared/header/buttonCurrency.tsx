@@ -12,8 +12,11 @@ import {
 import SpinnerMini from "@/components/custom/SpinnerMini";
 import { currencyT } from "@/types";
 import { updateUserCurrency } from "@/lib/api/apiUser";
+import { useRouter } from "next/navigation";
+import { revalidateAll } from "@/lib/api/actions";
 
 const ButtonCurrency = () => {
+  const router = useRouter();
   const [currencies, setCurrencies] = useState<currencyT[]>([]);
   const [selected, setSelected] = useState<string>("");
   const [isPending, startTransition] = useTransition();
@@ -62,6 +65,10 @@ const ButtonCurrency = () => {
         setCurrency(currencyCode),
         updateUserCurrency(currencyCode),
       ]);
+      // Revalidate all cached paths so they refetch with new currency
+      await revalidateAll();
+      // Refresh current route and reload
+      router.refresh();
       window.location.reload();
     });
   };

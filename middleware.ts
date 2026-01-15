@@ -6,6 +6,7 @@ export async function middleware(req: NextRequest) {
   const session = await auth();
 
   // Create response
+  // console.log({ session });
   const response = !session?.user
     ? (() => {
         const url = req.nextUrl.clone();

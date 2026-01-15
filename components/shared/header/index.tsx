@@ -31,8 +31,8 @@ const Header = async () => {
             <div className="flex justify-end items-center gap-2 col-start-2 col-span-3 row-start-1 row-span-1">
               {user ? (
                 <div className="ms-auto sm:ms-0 sm:hidden text-gray-600 text-sm dark:text-gray-300 ">
-                  <span className="font-semibold">{locale.welcome},</span>{" "}
-                  {user.firstName} {user.lastName}.
+                  {locale.welcome},{" "}
+                  <span className="font-semibold">{user.firstName}</span>
                 </div>
               ) : null}
               <div className="">

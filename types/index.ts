@@ -325,6 +325,9 @@ export type OrderItem = {
   total_after_shipping: string;
   is_paid: boolean;
   remaining_days_to_return: number;
+  currency: string;
+  exchange_rate: number;
+  is_request_return: boolean;
 };
 export type OrderDetailsItem = {
   id: number;

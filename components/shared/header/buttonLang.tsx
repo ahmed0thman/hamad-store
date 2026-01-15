@@ -4,7 +4,7 @@ import { Globe } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useTranslation } from "@/hooks/useTranslation";
-import { revalidate } from "@/lib/api/actions";
+import { revalidate, revalidateAll } from "@/lib/api/actions";
 import { usePathname } from "next/navigation";
 
 const ButtonLang = ({ children }: { children?: React.ReactNode }) => {
@@ -30,7 +30,7 @@ const ButtonLang = ({ children }: { children?: React.ReactNode }) => {
 
     // Trigger a page reload to update server components
     // revalidate current path
-    await revalidate(pathName);
+    await revalidateAll();
     window.location.reload();
   }
 
