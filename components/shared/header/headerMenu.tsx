@@ -81,6 +81,7 @@ const HeaderMenu = ({ session }: { session: any }) => {
   const [lang, setLang] = useState<string>("ar");
   const [initials, setInitials] = useState<string>("");
   const pathName = usePathname();
+  const profile = profileData?.data as UserProfile | undefined;
 
   async function handleGetCategories() {
     const categories = await getAllCategories();
@@ -98,14 +99,12 @@ const HeaderMenu = ({ session }: { session: any }) => {
   }
 
   useEffect(() => {
-    if (isAuth) {
+    if (profile) {
       setInitials(
-        `${profile?.first_name?.charAt(
-          0
-        )} ${profileData?.data?.last_name?.charAt(0)}`
+        `${profile?.first_name?.charAt(0)} ${profile?.last_name?.charAt(0)}`
       );
     }
-  }, [isAuth]);
+  }, [profile]);
 
   useEffect(function () {
     startTransition(handleGetCategories);
@@ -119,7 +118,6 @@ const HeaderMenu = ({ session }: { session: any }) => {
   }
 
   if (isLoadoingProfile) return null;
-  const profile = profileData?.data as UserProfile | undefined;
   return (
     <nav className="lg:!hidden flex-center gap-2">
       <Sheet>
